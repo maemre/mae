@@ -20,7 +20,7 @@
   Tevfik Bultan \quad
   Chandra Krintz
 }
-\titlegraphic{\hfill\includegraphics[width=1.5cm]{ucsbseal_cmyk.pdf}}
+\titlegraphic{\hfill\includegraphics[width=2.25cm]{ucsbseal_cmyk.pdf}}
 
 \begin{document}
 \maketitle
@@ -70,30 +70,32 @@ There are other alternatives:
 \end{frame}
 
 \section{Lattices and order}
+
+\begingroup
+\small
 \begin{frame}{Lattices and Order Theory}
-  \small
-  \begin{columns}
-  \begin{column}{0.5\textwidth}
+  \vspace*{-1em}
+  \begin{columns}[T]
+  \begin{column}{0.6\textwidth}
   \begin{itemize}
-  \item A lattice $(L, \sqcup, \sqcap, \sqsubseteq)$ is a partially ordered set (poset) with:
+  \item A lattice $(L, \sqcup, \sqcap, \sqsubseteq)$ is a partially ordered set (poset) with:\vspace{-0.8em}
     \begin{itemize}
     \item a least upper bound (join) operation $\sqcup: L \times L \rightarrow L$
-    \item and a greatest lower bound (meet) operation $\sqcap: L \times L \rightarrow L$
+    \item a greatest lower bound (meet) operation $\sqcap: L \times L \rightarrow L$
     \item $\sqcup, \sqcap$ determine the partial order $\sqsubseteq$
-    \end{itemize}
+    \end{itemize}\vspace{-1em}
   \item<9-> A bounded lattice has a least element $\bot$, (bottom)
-    and greatest element $\top$ (top)
+    and greatest element $\top$ (top)\vspace{-1em}
   \item<10-> Any powerset $\mathcal{P}(S)$ of a set $S$ is a bounded lattice where:
      $\top = S$,
      $\bot = \emptyset$,
      $\sqcup = \cup$,
      $\sqcap = \cap$,
      $\sqsubseteq = \subseteq$
-  \end{itemize}
+  \end{itemize}\
   \end{column}
-  \begin{column}{0.5\textwidth}
-    \vspace{-3cm}
-  \begin{figure}[t]
+  \begin{column}{0.4\textwidth}
+    \begin{figure}[h]
     \centering
     \begin{tikzpicture}[x=2cm, y=1.5cm]
       \node(top)at (1,3){$\textcolor<9>{magenta}{\{+,-,0\} = \top}$} ;
@@ -117,7 +119,7 @@ There are other alternatives:
       \draw(m)--(bot);
       \draw(z)--(bot);
     \end{tikzpicture}
-    \caption{Hasse diagram of a sign lattice, built from the powerset of the set $\{+,-,0\}$}
+    \caption{\footnotesize Hasse diagram of a sign lattice, built from the powerset of the set $\{+,-,0\}$}
   \end{figure}
   % \only<4>{\begin{figure}[t]
   %   \centering
@@ -134,44 +136,42 @@ There are other alternatives:
   \end{column}
   \end{columns}
 \end{frame}
+\endgroup % footnotesize
 
+\begingroup
+\footnotesize
 \begin{frame}{Relating lattices}
-  \begin{columns}
-    \begin{column}{0.6\textwidth}
-      \small
-      %\vspace*{-.75em}
+  \vspace*{-1.2em}
+  \begin{columns}[t]
+    \begin{column}{0.7\textwidth}
     \begin{itemize}
-    \item There is a relationship between the domain $EvenOdd$ and
-      $\mathcal{P}(\mathbb{Z})$
-    \item $\gamma : EvenOdd \to \mathcal{P}(\mathbb{Z})$,
-      $\alpha : \mathcal{P}(\mathbb{Z}) \to EvenOdd$
-      \begin{itemize}
-      \item<2-> $\gamma(\top) = \mathbb{Z}, \gamma(\bot) = \emptyset$
-      \item<2->
-        $\gamma(o) = \{z \in \mathbb{Z} \mid z \text{ odd} \}$,
-        $\gamma(e) = \{z \in \mathbb{Z} \mid z \text{ even} \}$
-      \item<3-> $\alpha(S) = \bigsqcup\limits_{z \in S}
+    \item There is a relationship between $\mathit{Parity}$ and
+      $\mathcal{P}(\mathbb{Z})$:\vspace{-0.8em}
+      \begin{align*}
+        \uncover<2->{\gamma : \mathit{Parity} & \monarrow \mathcal{P}(\mathbb{Z}) \\
+        \alpha : \mathcal{P}(\mathbb{Z}) & \monarrow \mathit{Parity}}
+      \end{align*}\vspace{-3em}
+      \begin{align*}
+        \uncover<3->{\gamma(\top) & = \mathbb{Z}, \gamma(\bot) = \emptyset \\
+        \gamma(o) & = \{z \in \mathbb{Z} \mid z \text{ odd} \} \\
+        \gamma(e) & = \{z \in \mathbb{Z} \mid z \text{ even} \}} \\
+        \uncover<4->{\alpha(S) & = \bigsqcup\limits_{z \in S}
         \begin{cases}
           o & z \text{ odd}\\
           e & z \text{ even}
-        \end{cases}
-        $
-      \end{itemize}
+        \end{cases}}
+      \end{align*}\vspace{-2em}
     \item<5-> $\alpha$ and $\gamma$ are kind of like inverses, though
-      there is some information loss
+      there is some information loss\vspace{-0.6em}
     \item<6-> $\alpha$ happens to be the \emph{best possible} function to pair
-      with $\gamma$ in a certain sense
-      \begin{itemize}
-      \item<7-> This relationship is known as a \emph{Galois Connection}
-      \end{itemize}
+      with $\gamma$ in a certain sense\vspace{-0.6em}
+    \item<7-> This relationship is known as a \alert{\emph{Galois Connection}}
     \end{itemize}
   \end{column}
-  \begin{column}{0.4\textwidth}
+  \begin{column}{0.3\textwidth}
     \begin{figure}
       \centering
-      
-      \vspace{-3cm}
-      
+      \footnotesize
       \begin{tikzpicture}[x=1.25cm, y=1.25cm]
         \node(top)at (0,1){$\top$} ;
         \node(e)at (-1,0){$e$} ;
@@ -181,14 +181,17 @@ There are other alternatives:
         \draw(top)--(e)--(bot);
       \end{tikzpicture}\\[0.5em]
 
-      \onslide<4->{$\tikzmarkin<4>[above offset=0.4]{s}\alpha(5) + \alpha(-7) = e + o = o\tikzmarkend{s}$}
-      \caption{Hasse diagram of an even/odd lattice ($EvenOdd$), and
+      \onslide<4->{$\alert<4>{\alpha(5) + \alpha(-7) = e + o = o}$}
+      \caption{\footnotesize Hasse diagram of an even/odd lattice ($\mathit{Parity}$), and
         an example of abstracting an operator}
     \end{figure}
   \end{column}
   \end{columns}
 \end{frame}
+\endgroup
 
+\begingroup
+\small
 \begin{frame}{Galois Connections}
   \[ \textcolor<2->{gray}{\forall c \in \mathit{Concrete}, a \in \mathit{Abstract}.\, c \subseteq \gamma(a) \iff \alpha(c) \sqsubseteq a} \]
   \pause
@@ -200,7 +203,7 @@ There are other alternatives:
    \begin{tikzpicture}
      \draw[fill=lightblue] (0,0.25) ellipse (1.75cm and 1.75cm);
      \node at (0,2.33) {$\mathcal{P}(\mathbb{Z})$};
-     \node at (5.5,1.5) {$EvenOdd$};
+     \node at (5.5,1.5) {$\mathit{Parity}$};
 
      \node(top)at (5.5,1){$\top$} ;
      \node(e)at (4.5,0){$e$} ;
@@ -232,6 +235,7 @@ There are other alternatives:
    %\draw<11>[draw opacity=0] (ra) to node [midway, below, yshift=-.5em] {$\alpha$ is sound} (rb);
  \end{tikzpicture}
 \end{frame}
+\endgroup
 
 \begin{frame}{Computing fixpoints}
   \begin{thm}[Kleene-Tarski fixed point theorem\footcite{kleene_stephen_cole_introduction_1952,tarski1955lattice,cousot1979constructive}]
@@ -259,7 +263,7 @@ There are other alternatives:
   \begin{itemize}[<+->]
   \item Introduced by Cousot and Cousot in 1977 for a flow-chart language \footcite{cousot1977abstract}
   \item Deep connections to math, correct by construction \footcite{cousot1979systematic}
-  \item Expanded to be used in different kinds of semantics \footcite{schmidt1998trace,schmidt2009abstract}
+  \item Expanded to be used with different kinds of semantics \footcite{schmidt1998trace,schmidt2009abstract}
   \item General idea: Create an \emph{abstract} interpreter that
     overapproximates the \emph{concrete} interpreter's behavior
     soundly.
