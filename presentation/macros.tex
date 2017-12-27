@@ -1,0 +1,82 @@
+% Unicode math symbols for XeLaTeX
+\usepackage{mathrsfs}
+
+% standard math packages
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{amsmath}
+\usepackage{amstext}
+% math tools for amsmath
+\usepackage{mathtools}
+
+\usepackage{proof}
+
+% tikz & friends
+
+\usepackage{galois}
+\usepackage{tikz}
+\usetikzlibrary{fit,calc,shapes,arrows.meta}
+\usepackage[beamer]{hf-tikz}
+\usepackage{tikz-cd}
+
+\newcommand{\tikzmark}[1]{%
+  \tikz[overlay,remember picture,baseline] \node [anchor=base] (#1) {};}
+
+\newenvironment{tightcenter}{%
+  \setlength\topsep{0pt}
+  \setlength\parskip{0pt}
+  \begin{center}
+}{%
+  \end{center}
+}
+
+% new colors
+\definecolor{lightblue}{RGB}{217,220,253}
+\definecolor{lightred}{RGB}{251,216,218}
+
+
+\newcommand{\fset}[1]{\mathsf{#1}}
+\newcommand{\nats}{\mathbb{N}}
+\newcommand{\zahlen}{\mathbb{Z}}
+\newcommand{\bools}{\mathbb{B}}
+\newcommand{\Set}[1]{\left\{#1\right\}}
+\newcommand{\kw}[1]{\textbf{#1}} % keywords
+\newcommand{\true}{\kw{true}}
+\newcommand{\false}{\kw{false}}
+\newcommand{\sidenote}[1]{\hfill\quad \textsf{#1}}
+
+\newcommand{\pitype}[1]{\Pi (#1).\,}
+% \newcommand{\|}{\,\vert\,}
+\newcommand{\todo}[1]{{\tiny \sffamily \textcolor{red}{TODO: #1}}}
+
+% ceiling and floor symbols
+\DeclarePairedDelimiter\ceil{\lceil}{\rceil}
+\DeclarePairedDelimiter\floor{\lfloor}{\rfloor}
+
+% big O notation
+\DeclareMathOperator{\bigO}{O}
+
+% print both years for bibliography
+\renewbibmacro*{cite:labelyear+extrayear}{%
+\iffieldundef{labelyear}
+{}
+{\printtext[bibhyperref]{%
+\iffieldundef{origyear}{}{\printfield{origyear}\addslash}%   <--- added
+\printfield{labelyear}%
+\printfield{extrayear}}}}
+
+\renewbibmacro*{date+extrayear}{%
+\iffieldundef{year}
+{}
+{\printtext[parens]{%
+\iffieldundef{origyear}{}{\printfield{origyear}\addslash}%  <--- added
+\printdateextra}}}
+
+% overlay an image
+\def\Put(#1,#2)#3{\leavevmode\makebox(0,0){\put(#1,#2){#3}}}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "main"
+%%% TeX-engine: xetex
+%%% End:
