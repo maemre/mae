@@ -34,7 +34,7 @@
 \definecolor{lightblue}{RGB}{217,220,253}
 \definecolor{lightred}{RGB}{251,216,218}
 
-
+\DeclareMathOperator{\pw}{\mathcal{P}} % powerset
 \newcommand{\fset}[1]{\mathsf{#1}}
 \newcommand{\nats}{\mathbb{N}}
 \newcommand{\zahlen}{\mathbb{Z}}
@@ -56,6 +56,9 @@
 % big O notation
 \DeclareMathOperator{\bigO}{O}
 
+% fixed points
+\DeclareMathOperator{\lfp}{lfp}
+
 % print both years for bibliography
 \renewbibmacro*{cite:labelyear+extrayear}{%
 \iffieldundef{labelyear}
@@ -74,6 +77,15 @@
 
 % overlay an image
 \def\Put(#1,#2)#3{\leavevmode\makebox(0,0){\put(#1,#2){#3}}}
+
+% text over symbols nicely, requires amsmath for overset
+\newcommand\textoverop[2]{\mathrel{\overset{\makebox[0pt]{\mbox{\normalfont\tiny\sffamily #1}}}{#2}}}
+
+% special arrows
+\newcommand\monarrow{\textoverop{mon}{\rightarrow}}
+
+% theorems
+\newtheorem{thm}{Theorem}
 
 %%% Local Variables:
 %%% mode: latex

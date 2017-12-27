@@ -233,13 +233,34 @@ There are other alternatives:
  \end{tikzpicture}
 \end{frame}
 
+\begin{frame}{Computing fixpoints}
+  \begin{thm}[Kleene-Tarski fixed point theorem\footcite{kleene_stephen_cole_introduction_1952,tarski1955lattice,cousot1979constructive}]
+    If $L$ is a complete lattice and $F: L \monarrow L$ then $\forall x \in L$, $\lfp_x F$ exists and
+    \[
+      \lfp_x F = \bigsqcup \Set{F^n(x) \vert n \in \nats}.
+    \]
+  \end{thm}
+
+  Moreover, if $L$ is Noetherian (has no infinite ascending chains), $\exists n. \lfp_x F = x \sqcup F(x) \sqcup F(F(x)) \sqcup \ldots \sqcup F^n(x)$.
+\end{frame}
+
+\begin{frame}{Reachability analysis}
+  We will view program semantics using transition systems. Consider a state transition system $(S, I, R)$.\pause
+  
+  $S$ is the set of states, \pause $I \subset S$ be the set of initial states, \pause $R \subset S \times S$ be the transition relation. \pause Let
+  \[ F : \pw(S) \monarrow \pw(S),\, F(X) = \Set{y \vert (x, y) \in R \wedge x \in X}. \]\pause
+  $\lfp_I F = I \cup F(I) \cup F(F(I)) \cup \ldots $ is the set of reachable states.\pause
+
+  \alert{$\lfp_I F$ is potentially infinite and requires infinitely many steps to compute!}
+\end{frame}
+
 \section{Abstract interpretation}
 \begin{frame}{Abstract interpretation}
-  \begin{itemize}
-  \item<1-> Introduced by Cousot and Cousot in 1977 for a flow-chart language \footcite{cousot1977abstract}
-  \item<2-> Deep connections to math, correct by construction \footcite{cousot1979systematic}
-  \item<3-> Expanded to be used in different kinds of semantics \footcite{schmidt1998trace,schmidt2009abstract}
-  \item<4-> General idea: Create an \emph{abstract} interpreter that
+  \begin{itemize}[<+->]
+  \item Introduced by Cousot and Cousot in 1977 for a flow-chart language \footcite{cousot1977abstract}
+  \item Deep connections to math, correct by construction \footcite{cousot1979systematic}
+  \item Expanded to be used in different kinds of semantics \footcite{schmidt1998trace,schmidt2009abstract}
+  \item General idea: Create an \emph{abstract} interpreter that
     overapproximates the \emph{concrete} interpreter's behavior
     soundly.
   \end{itemize}
@@ -274,7 +295,7 @@ There are other alternatives:
 \begin{frame}{A plethora of domains}
   \footnotesize
   \begin{tabular*}{1.0\linewidth}{lcc}
-    \textbf{Domain & Constraints & Complexity} \\
+    \textbf{Domain} & \textbf{Constraints} & \textbf{Complexity} \\
     % Presburger formulas\footcite{bultan_model-checking_1999} & Presburger arithmetic & $ \bigO(2^{2^{2^{pn}}}) $ \\
     Polyhedra\footcite{cousot1978automatic} & \( \sum_{j} c_{ij}x_j \leq 0 \) & $ \bigO(2^n) $ \\
     Octagons\footcite{mine2004weakly} & \( \pm x \pm y \leq c \) & $ \bigO(n^3) $ \\
@@ -286,7 +307,8 @@ There are other alternatives:
   \uncover<1->{Also: congruences, floating-point variants\footcite{mine2004relational}, gauges\footcite{venet2012gauge} \ldots{}} \\
   \uncover<2->{\alert{How do we choose/combine them?}}
 
-  \vspace{1em}
+  \vspace*{1em}
+
 \end{frame}
 
 \begin{frame}{Reduced products}
