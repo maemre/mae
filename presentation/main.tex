@@ -1,4 +1,4 @@
-\documentclass[aspectratio=169]{beamer}
+\documentclass[aspectratio=169,14pt]{beamer}
 \usetheme[titleformat=regular%
 ,numbering=fraction% use slide numbers
 ]{metropolis}
@@ -16,7 +16,7 @@
 \institute[UCSB]{
   \normalsize
   {\large \bfseries Committee:}\\
-  Ben Hardekopf (\textbf{Chair}) \quad
+  Ben Hardekopf (\,$\vcenter{\hbox{\includegraphics[height=1em]{chair/file.eps}}}$) \quad
   Tevfik Bultan \quad
   Chandra Krintz
 }
@@ -26,11 +26,13 @@
 \maketitle
 
 \begin{frame}{Outline}
+  \small
+  \vspace{0.5em}
   \tableofcontents
 \end{frame}
 
 \section{Introduction}
-\begin{frame}{What is low-level software? Why should we analyze them?}
+\begin{frame}{What is low-level software? Why should we analyze it?}
 Low-level software:
 \begin{itemize}
 \item Interacts with intricate APIs (drivers, kernel modules, databases)
@@ -69,6 +71,7 @@ There are other alternatives:
 
 \section{Lattices and order}
 \begin{frame}{Lattices and Order Theory}
+  \small
   \begin{columns}
   \begin{column}{0.5\textwidth}
   \begin{itemize}
@@ -89,6 +92,7 @@ There are other alternatives:
   \end{itemize}
   \end{column}
   \begin{column}{0.5\textwidth}
+    \vspace{-3cm}
   \begin{figure}[t]
     \centering
     \begin{tikzpicture}[x=2cm, y=1.5cm]
@@ -134,7 +138,8 @@ There are other alternatives:
 \begin{frame}{Relating lattices}
   \begin{columns}
     \begin{column}{0.6\textwidth}
-      \vspace*{-.75em}
+      \small
+      %\vspace*{-.75em}
     \begin{itemize}
     \item There is a relationship between the domain $EvenOdd$ and
       $\mathcal{P}(\mathbb{Z})$
@@ -164,6 +169,9 @@ There are other alternatives:
   \begin{column}{0.4\textwidth}
     \begin{figure}
       \centering
+      
+      \vspace{-3cm}
+      
       \begin{tikzpicture}[x=1.25cm, y=1.25cm]
         \node(top)at (0,1){$\top$} ;
         \node(e)at (-1,0){$e$} ;
@@ -171,7 +179,7 @@ There are other alternatives:
         \node(bot)at (0,-1){$\bot$} ;
         \draw(top)--(o)--(bot);
         \draw(top)--(e)--(bot);
-      \end{tikzpicture}\\[1em]
+      \end{tikzpicture}\\[0.5em]
 
       \onslide<4->{$\tikzmarkin<4>[above offset=0.4]{s}\alpha(5) + \alpha(-7) = e + o = o\tikzmarkend{s}$}
       \caption{Hasse diagram of an even/odd lattice ($EvenOdd$), and
@@ -182,8 +190,7 @@ There are other alternatives:
 \end{frame}
 
 \begin{frame}{Galois Connections}
-  For all $c \in Concrete, a \in Abstract$,
-  $$\textcolor<2->{gray}{c \subseteq \gamma(a) \iff \alpha(c) \sqsubseteq a}$$
+  \[ \textcolor<2->{gray}{\forall c \in \mathit{Concrete}, a \in \mathit{Abstract}.\, c \subseteq \gamma(a) \iff \alpha(c) \sqsubseteq a} \]
   \pause
   or, equivalently,
   $$ \tikzmark{ma}\textcolor<1,7->{gray}{\alpha, \gamma \text{ monotone}}\tikzmark{mb} \qquad \tikzmark{a}\textcolor<1,4-6,10->{gray}{c \subseteq \gamma(\alpha(c))}\tikzmark{b} \qquad \tikzmark{ra}\textcolor<1,4-9>{gray}{\alpha(\gamma(a)) \sqsubseteq a\tikzmark{rb}} $$
@@ -265,10 +272,11 @@ There are other alternatives:
 
 \subsection{Combination of domains}
 \begin{frame}{A plethora of domains}
+  \footnotesize
   \begin{tabular*}{1.0\linewidth}{lcc}
-    Domain & Constraints & Complexity \\
+    \textbf{Domain & Constraints & Complexity} \\
     % Presburger formulas\footcite{bultan_model-checking_1999} & Presburger arithmetic & $ \bigO(2^{2^{2^{pn}}}) $ \\
-    Polyhedra\footcite{cousot1978automatic} & \( \Set{\sum_{j} c_{ij}x_j \leq 0} \) & $ \bigO(2^n) $ \\
+    Polyhedra\footcite{cousot1978automatic} & \( \sum_{j} c_{ij}x_j \leq 0 \) & $ \bigO(2^n) $ \\
     Octagons\footcite{mine2004weakly} & \( \pm x \pm y \leq c \) & $ \bigO(n^3) $ \\
     Pentagons\footcite{logozzo2010pentagons} & \( x \in [a,b] \wedge x < y \) & $ \bigO(n^2) $ \\
     % Gauges\footcite{venet2012gauge} & \( x \in \left[\sum_{j} a_{j}\lambda_j, \sum_{j} b_{ij}\lambda_j \right] \) & $ \bigO(n2^l) $ \\
@@ -276,7 +284,9 @@ There are other alternatives:
   \end{tabular*}
 
   \uncover<1->{Also: congruences, floating-point variants\footcite{mine2004relational}, gauges\footcite{venet2012gauge} \ldots{}} \\
-  \alert<2->{How do we choose/combine them?}
+  \uncover<2->{\alert{How do we choose/combine them?}}
+
+  \vspace{1em}
 \end{frame}
 
 \begin{frame}{Reduced products}
@@ -303,6 +313,10 @@ There are other alternatives:
 
 \section{Memes}
 \begin{frame}{\todo{Memes}}\end{frame}
+
+\begin{frame}[standout]
+  Thank you!
+\end{frame}
 
 \appendix
 
