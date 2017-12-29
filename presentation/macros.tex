@@ -11,13 +11,16 @@
 
 \usepackage{proof}
 
+\usepackage{listings}
+\usepackage{xcolor}
+
 % tikz & friends
 
 \usepackage{galois}
 \usepackage{tikz}
-\usetikzlibrary{fit,calc,shapes,arrows.meta}
+\usetikzlibrary{fit,calc,shapes,arrows.meta,patterns,backgrounds}
+\usetikzlibrary{cd}
 \usepackage[beamer]{hf-tikz}
-\usepackage{tikz-cd}
 
 \newcommand{\tikzmark}[1]{%
   \tikz[overlay,remember picture,baseline] \node [anchor=base] (#1) {};}
@@ -40,14 +43,43 @@
 \newcommand{\zahlen}{\mathbb{Z}}
 \newcommand{\bools}{\mathbb{B}}
 \newcommand{\Set}[1]{\left\{#1\right\}}
-\newcommand{\kw}[1]{\textbf{#1}} % keywords
 \newcommand{\true}{\kw{true}}
 \newcommand{\false}{\kw{false}}
 \newcommand{\sidenote}[1]{\hfill\quad \textsf{#1}}
 
-\newcommand{\pitype}[1]{\Pi (#1).\,}
+% named set
+\newcommand{\ns}[1]{\mathit{#1}}
+% function
+\newcommand{\fn}[1]{\mathrm{#1}}
+% "vector of"
+\newcommand{\vo}[1]{\overrightarrow{#1}}
+% "set of"
+\newcommand{\setOf}[1]{\overline{#1}}
+% syntactic tag
+\newcommand{\sTag}[2]{\textsf{\textbf{#1}}\,#2}
+% keyword
+\newcommand{\kw}[1]{\texttt{#1}}
+% usual suspects
+\newcommand{\State}{\ns{State}}
+\newcommand{\Value}{\ns{Value}}
+\newcommand{\Stmt}{\ns{Stmt}}
+\newcommand{\Env}{\ns{Env}}
+\newcommand{\Store}{\ns{Store}}
+\newcommand{\Kont}{\ns{Kont}}
+% syntactic domains
+\newcommand{\Exp}{\ns{Exp}}
+\newcommand{\Var}{\ns{Var}}
+% put a value to a pointer
+\newcommand{\update}{\leftarrow}
+
+% ebnf
+\newcommand{\eDEF}{\,::=\;}
+\newcommand{\eOR}{\;\vert\;}
+
+\newcommand{\widen}{\nabla}
+
 % \newcommand{\|}{\,\vert\,}
-\newcommand{\todo}[1]{{\tiny \sffamily \textcolor{red}{TODO: #1}}}
+\newcommand{\todo}[1]{{\textcolor{red}{TODO: #1}}}
 
 % ceiling and floor symbols
 \DeclarePairedDelimiter\ceil{\lceil}{\rceil}
@@ -86,6 +118,11 @@
 
 % theorems
 \newtheorem{thm}{Theorem}
+\newtheorem{eg}{Example}
+
+\newcommand{\abscolor}[1]{\textcolor{magenta}{#1}}
+\newcommand{\concolor}[1]{\textcolor{blue}{#1}}
+\newcommand{\abst}[1]{#1^{\#}}
 
 %%% Local Variables:
 %%% mode: latex

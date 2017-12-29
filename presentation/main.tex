@@ -1,9 +1,9 @@
-\documentclass[aspectratio=169,14pt]{beamer}
+\documentclass[aspectratio=169,14pt,handout]{beamer}
 \usetheme[titleformat=regular%
 ,numbering=fraction% use slide numbers
 ]{metropolis}
 \usepackage{appendixnumberbeamer} % separate appendix
-\usepackage[citestyle=authortitle-icomp]{biblatex}
+\usepackage[citestyle=authortitle-ibid]{biblatex}
 \setbeamerfont{footnote}{size=\tiny}
 \addbibresource{mae.bib}
 
@@ -45,20 +45,25 @@ Low-level software:
 
 \end{frame}
 
-{ % all template changes are local to this group.
-    \setbeamertemplate{navigation symbols}{}
-    \begin{frame}[plain]
-        \begin{tikzpicture}[remember picture,overlay]
-            \node[at=(current page.center)] {
-                \includegraphics[width=\paperwidth]{material/bsod_resized.png}
-            };
-          \end{tikzpicture} \pause
+\only<beamer>{ % all template changes are local to this group.
+  \setbeamertemplate{navigation symbols}{}
+  \begin{frame}[plain]
+    \begin{tikzpicture}[remember picture,overlay]
+      \node[at=(current page.center)] {
+        \includegraphics[width=\paperwidth]{material/bsod_resized.png}
+      };
+    \end{tikzpicture} \pause
 
-          \Put(10,10){\includegraphics[width=0.4\textwidth]{material/heartbleed.pdf}}\pause
-          \Put(180,200){\includegraphics[width=0.4\textwidth]{material/formal-verification-as-a-sinking-airplane.png}}\pause
-          \Put(210,-50){\includegraphics[width=0.5\textwidth]{material/us-govt-patriot-missile.png}}
-     \end{frame}
+    \Put(10,10){\includegraphics[width=0.4\textwidth]{material/heartbleed.pdf}}\pause
+    \Put(180,200){\includegraphics[width=0.4\textwidth]{material/formal-verification-as-a-sinking-airplane.png}}\pause
+    \Put(210,-50){\includegraphics[width=0.5\textwidth]{material/us-govt-patriot-missile.png}}
+  \end{frame}
 }
+
+\only<handout>{
+  \addtocounter{framenumber}{1}
+}
+
 
 \begin{frame}{Why abstract interpretation?}
 There are other alternatives:
@@ -67,6 +72,63 @@ There are other alternatives:
 \item model checking (there is a neat connection with model checking)
 \item type systems (limits choice of language, context-insensitive)
 \end{itemize}
+\end{frame}
+
+\section{A first attempt}
+\begin{frame}{SIMPL\footnote{simple introductory made-up programming language} Syntax}
+  \vspace{-2em}
+  \small
+  \begin{gather*}
+    x,f \in \Var,\, b \in \bools,\, n \in \zahlen,\, \oplus \in \ns{BinOp},\,\Value = \bools \amalg \zahlen
+  \end{gather*}\vspace{-2em}
+  \begin{align*}
+    fd \in \ns{FunDef} \eDEF & \kw{def}\, f(\vo{x}) = s;\,\kw{return}\, e \\
+    e \in \Exp \eDEF & x \eOR n \eOR b \eOR e_1 \oplus e_2 \eOR *x \\
+    s \in \Stmt \eDEF & s;\,s \eOR \kw{abort} \\
+    \eOR & \kw{if}\, e\; s_1 \; \kw{else} \; s_2 \\
+    \eOR & \kw{while}\; e\; s \\
+    \eOR & \kw{let}\; x := e \;\kw{in}\;s \\
+    \eOR & \kw{letref}\; x := \kw{new}\;e \;\kw{in}\;s \\
+    \eOR & e_1 \update e_2 \eOR x := e \\
+    \eOR & x := f(\vo{e})
+  \end{align*}
+\end{frame}
+\begin{frame}{SIMPL semantic domains}
+  \begingroup\footnotesize We will use abstract machine semantics and represent the semantics of a program as a transition relation.\endgroup
+\begin{align*}
+  \varsigma \in \State & = \Stmt^? \times \Env \times \Store \times \vo{\Kont} \\
+  \rho \in \Env & = \Value^\ns{Var} = \left\{ \rho \vert \rho : \ns{Var} \rightarrow \Value \right\} \\
+  \sigma \in \Store & = \Value^\ns{Addr} \\
+  \kappa \in \Kont & = \sTag{stmtK}{\Stmt} \\
+                       & \amalg \sTag{whileK}{\ns{Exp} \times \Stmt} \\
+                       & \amalg \sTag{retK}{\ns{Var} \times \ns{Exp} \times \Env}
+\end{align*}
+\end{frame}
+\begin{frame}{Some transition rules}
+  \small
+  \begin{itemize}
+  \item \(\eta_\varsigma : \Exp \to \Value \) is the per-state expression evaluation function
+\item Current state: \(\varsigma = (so, \rho, \sigma, \vec{\kappa})$ and $\kappa :: \vec{\kappa_r} = \vec{\kappa} \)
+\item Next state: \( \varsigma' = (so', \rho', \sigma', \vec{\kappa}') \) \pause
+  \end{itemize}
+  \footnotesize
+  \[
+  \begin{array}{llllll}
+    so & \text{side condition} & so' & \rho' & \sigma' & \vec{\kappa}' \\ \hline
+    e_1 \update e_2 & & - & \rho & \sigma[\eta_\varsigma(e_1) \mapsto \eta_\varsigma(e_2)] & \vec{\kappa} \\
+    \kw{while}\; e\; s & \eta_\varsigma(e) = \true & - & \rho & \sigma & \sTag{stmtK}{s} :: \sTag{whileK}{(e, s)} :: \vec{\kappa} \\
+    \kw{while}\; e\; s & \eta_\varsigma(e) = \false & - & \rho & \sigma & \vec{\kappa} \\
+    - & \kappa = \sTag{stmtK}{s} & s & \rho & \sigma & \vec{\kappa_r}
+  \end{array}
+  \]
+\end{frame}
+
+\begin{frame}{Collecting semantics}
+  Abstract machine semantics gives us a state transition system $(\State, I, R)$ where \pause $\State$ is the set of states, \pause $I \subset \State$ is the set of initial states, \pause $R \subset \State \times \State$ is the transition relation. \pause Let
+  \[ F : \pw(\State) \monarrow \pw(\State),\, F(X) = \Set{y \vert (x, y) \in R \wedge x \in X}. \]\pause
+  $\lfp_I F = I \cup F(I) \cup F(F(I)) \cup \ldots $ is the set of reachable states.\pause
+
+  \alert{$\lfp_I F$ is potentially infinite and requires infinitely many steps to compute!}
 \end{frame}
 
 \section{Lattices and order}
@@ -248,16 +310,6 @@ There are other alternatives:
   Moreover, if $L$ is Noetherian (has no infinite ascending chains), $\exists n. \lfp_x F = x \sqcup F(x) \sqcup F(F(x)) \sqcup \ldots \sqcup F^n(x)$.
 \end{frame}
 
-\begin{frame}{Reachability analysis}
-  We will view program semantics using transition systems. Consider a state transition system $(S, I, R)$.\pause
-  
-  $S$ is the set of states, \pause $I \subset S$ be the set of initial states, \pause $R \subset S \times S$ be the transition relation. \pause Let
-  \[ F : \pw(S) \monarrow \pw(S),\, F(X) = \Set{y \vert (x, y) \in R \wedge x \in X}. \]\pause
-  $\lfp_I F = I \cup F(I) \cup F(F(I)) \cup \ldots $ is the set of reachable states.\pause
-
-  \alert{$\lfp_I F$ is potentially infinite and requires infinitely many steps to compute!}
-\end{frame}
-
 \section{Abstract interpretation}
 \begin{frame}{Abstract interpretation}
   \begin{itemize}[<+->]
@@ -270,46 +322,222 @@ There are other alternatives:
   \end{itemize}
 \end{frame}
 
-\section{Predicate abstraction \& Abstraction Refinement}
+\begin{frame}[fragile]{Safe simulations}
+  \small
+  \vspace{-1em}
+  \begin{itemize}[<+->]
+  \item Run the concrete machine and the abstract machine in lockstep
+  \item Taking a step in both \abscolor{abstract} and \concolor{concrete} machines should result in a new \emph{safe} pair of states
+    \uncover<6->{\alert<6>{($\alpha \circ F \sqsubseteq \abst{F} \circ \alpha$)}}
+  \begin{tightcenter}
+    \begin{tikzcd}[execute at end picture={
+        \only<beamer>{
+      \onslide<2>{\node(o1)[fill=blue,opacity=0.1,fit=(ea.north west) (eb.north east) (eb.south east) (ea.south west)]{};}
+      \onslide<3>{\node(o2)[fill=blue,opacity=0.1,fit=(aa.south west) (ea.north east)]{};}
+      \onslide<4>{\fill[blue,opacity=0.1] (aa.north west) -- (ab.north east) -- (ab.south east) -- (aa.south west) -- cycle;}
+      \onslide<5>{\node(o3)[fill=blue,opacity=0.1,fit=(ab.south west) (eb.north east)]{};}
+      }
+    }]
+       & |[alias=ea]| \concolor{\varsigma } \arrow[r] \arrow[dd, "\alpha", dotted] & |[alias=eb]| \concolor{\varsigma'  \arrow[d, "\alpha", dotted]} \\
+    &  & \abscolor{\alpha(\varsigma') } \arrow[d, "\sqsubseteq", dashed] \\
+      & |[alias=aa]| \abscolor{\alpha(\varsigma) } \arrow[r] & |[alias=ab]| \abscolor{\alpha(\varsigma)' }
+    \end{tikzcd}
+    \only<beamer>{
+    \begin{tikzpicture}[remember picture, overlay,
+      every node/.append style = { align = center, minimum height = 10pt,fill=blue,opacity=0.1,text opacity=1}]
+      \onslide<2>{\node[left=6cm, text width=4cm](){\textcolor{gray}{\textsf{\footnotesize Program executing state $\varsigma$ transitions to state $\varsigma'$}}};}
+      
+      \onslide<3>{\node[left=6cm, text width=4cm](){\textcolor{gray}{\textsf{\footnotesize $\alpha(\varsigma)$ abstracts $\varsigma$}}};}
+      
+      \onslide<4>{\node[left=6cm, text width=4cm](){\textcolor{gray}{\textsf{\footnotesize Abstract state $\alpha(\varsigma)$ transitions to $\alpha(\varsigma)'$}}};}
+      
+      \onslide<5>{\node[left=6cm, text width=4cm](){\textcolor{gray}{\textsf{\footnotesize $\alpha(\varsigma)'$ covers $\alpha(\varsigma')$ thus is a safe counterpart for $\varsigma'$}}};}
+    \end{tikzpicture}
+    }
+   \end{tightcenter}
+
+   \vspace{-1em}
+   \item<7> By (co)induction, starting from an initially-safe pair of states we will soundly cover every possible path through the program
+ \end{itemize}
+\end{frame}
+
+\begin{frame}{Abstracting Abstract Machines}
+  \todo{van horn}
+\end{frame}
+
+\begin{frame}{Widening}
+  \small
+  A widening operator $\widen : A \times A \to A$ ensures convergence
+  in a domain $A$ with infinite height. It has the following
+  properties:\vspace{-0.3em}
+  \begin{itemize}\footnotesize
+  \item $\forall a_1, a_2 \in A, a_1 \sqcup a_2 \sqsubseteq a_1 \widen a_2$
+  \item For any sequence $a_1, a_2, \ldots$, let $w_o = a_o, \ldots, w_n = w_{n-1} \widen a_n$. Then, $a_i \sqsubseteq w_i$ and the chain $w_1, w_2, \ldots$ eventually stabilizes
+  \end{itemize}\pause\vspace{-0.3em}
+  \begin{exampleblock}{\small Example: a widening operator on an integer range domain}
+    \vspace{-0.8em}
+  \begin{itemize}[<+->]\footnotesize
+  \item $[1,1] \widen [2,2] \widen [3,3] \widen \ldots \to [1, \infty]$
+  \item $[1,5] \widen [0,5] \widen [-1,5] \widen \ldots \to [-\infty, 5]$
+  \end{itemize}
+\end{exampleblock}\vspace{-1.6em}\pause
+Note: Widening operators are more general than Galois Connections.\footcite{cousot92comparing}\vspace{1em}
+\end{frame}
+
+\begin{frame}[fragile]{Control Flow Analysis}
+  \footnotesize
+  \begin{columns}
+    \begin{column}{0.5\textwidth}
+    Consider following program:\vspace{-1em}
+  \begin{semiverbatim}\footnotesize
+def error() = \{ \textcolor{red}{abort}; return 0 \}
+def success() = return 0
+def choice(b, f, g) = \{
+  if (b) _ := \alert<3>{f}();
+  else   _ := \alert<3>{g}();
+  return 0
+\}
+choice(true, success, error);
+choice(false, error, success);
+\end{semiverbatim}\vspace{-2em}
+\begin{itemize}
+\item<3-> Whether \texttt{error} is called depends on parameters on different calls.
+\item<4-> We need to keep track of calling contexts to know what \texttt{f} and \texttt{g} are.
+\end{itemize}
+\end{column}
+\begin{column}{0.5\textwidth}
+  \uncover<2>{
+    \todo{insert CFG here}
+  }
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Control Flow Analysis\footcite{shivers1991control}}
+  \todo{Olin Shivers, make it short\\}
+\end{frame}
+
+\begin{frame}{Widening for Control-Flow\footcite{hardekopf2014widening}}
+  \footnotesize
+  \begin{columns}
+  \begin{column}{.55\textwidth}
+  \begin{itemize}[<+->]
+  \item Often control-flow sensitivity is baked into an analysis
+  \item This paper presents a unifying approach to context, flow, and
+    path sensitivity with the help of a widening operator $\nabla$
+    \begin{itemize}\footnotesize
+    \item Partition the set of visited states by some equivalence
+      relation $\sim$ \emph{\alert<3>{into finitely many sets}}, merge each
+      partition into one state that overapproximates them, return the
+      new set of states to work with
+    \end{itemize}
+  \end{itemize}
+\end{column}
+\begin{column}{.45\textwidth}
+\begin{exampleblock}<4->{\footnotesize Flow insensitive, context insensitive}
+    \centering
+    $Partitions = \{\mathbf{1}\}$\\
+    $\pi(\hat\varsigma) = \mathbf{1}$
+  \end{exampleblock}
+  \begin{exampleblock}<5->{\footnotesize Flow sensitive, $k$-CFA}
+    $Partitions = Label \times Label^k$\\
+    \centering
+    $\pi(\hat\varsigma) = \ldots$
+  \end{exampleblock}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Abstract Garbage Collection\footcite{might2006improving}}
+  \todo{Explain the analogy and how it benefits}
+\end{frame}
+
+\begin{frame}{Monadic abstract interpreters\footcite{sergey2013monadic}}
+  \begin{itemize}
+  \item Representing different aspects of an abstract interpreter with monads
+  \item Composing different monads gives different abstract interpreters
+  \item \todo{Give example}
+  \item \todo{Explain Galois Transformers}\footcite{darais2015galois}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Relationship with model checking}
+  \todo{\footcite{schmidt1998program}}
+  \todo{\footcite{schmidt1998data}}
+\end{frame}
+
+\section{Predicate abstraction \& Abstraction refinement}
 \subsection{Predicate abstraction}
+\begin{frame}{Predicate abstraction}
+  \todo{\footcite{clarke1994model,graf1997construction}}
+\end{frame}
 \subsection{Abstraction refinement}
+\begin{frame}{Counterexample-Generated Abstraction Refinement}
+  \todo{\footcite{clarke2003counterexample}}
+  \todo{\footcite{ball2001automatic}}
+  \todo{\footcite{ball2001automatically}}
+  \todo{\footcite{podelski2007armc}}
+\end{frame}
+\begin{frame}{Lazy abstraction}
+  \todo{\footcite{henzinger2002lazy}}
+\end{frame}
+\begin{frame}{Craig interpolants}
+  \begin{itemize}[<+->]
+  \item If $\neg (\phi \wedge \psi)$ is false then $\exists I$ (Craig interpolant of $\phi, \psi$) s.t.
+    \begin{itemize}[<+->]
+    \item $\phi \implies I$ and $\neg (I \wedge \psi)$
+    \item $V(I) \subseteq V(\phi) \cap V(\psi)$ where $V(\varphi)$ denotes the set of variables occuring in $\varphi$
+    \end{itemize}
+  \item Craig interpolants exist for all FOL formulas and can be computed by theorem provers
+  \item A sequence of Craig interpolants can be used instead of computing weakest preconditions for abstraction refinement\footcite{mcmillan2006lazy}\pause
+    \begin{itemize}
+    \item $3.8$-$17.7\times$ faster than lazy abstraction on BLAST benchmarks
+    \end{itemize}
+  \end{itemize}
+\end{frame}
+\begin{frame}{Abstraction refinement for widening}
+  \todo{\footcite{gulavani2006counterexample}}
+  \todo{\footcite{gulavani2008automatically}}
+\end{frame}
 
 \section{Static analysis of control software}
 \begin{frame}{What is control software?}
   Example: autopilots, nuclear plant rod controller etc.
   
   \begin{itemize}
-  \item<2-> Has multiple synchronous components
+  \item<2-> Has multiple synchronous components\pause
     \begin{itemize}
-    \item<3-> Control part of the state is not as straightforward as sequential programs
+    \item<3-> Control part of the state is not as straightforward as sequential programs. \uncover<4->{Represented using control variables, finite state machines etc.}
     \end{itemize}
-  \item<4-> Variables with complex numeric relationships
+  \item<5-> Variables with complex numeric relationships
   \end{itemize}
 \end{frame}
+
 \subsection{Dynamic state partitioning}
 \begin{frame}{\todo{Bultan et al. \& cite Jeannet}}
-  
+  \todo{\footcite{bultan_model-checking_1999,jeannet_dynamic_1999}}
+  \todo{\footcite{bultan_composite_2000,jeannet_representing_2002}}
 \end{frame}
 
-\begin{frame}{\todo{Chen \& Cousot}}
-  
+\begin{frame}{\todo{Chen \& Cousot\footcite{chen2015binary}}}
 \end{frame}
 
 \subsection{Combination of domains}
 \begin{frame}{A plethora of domains}
   \footnotesize
-  \begin{tabular*}{1.0\linewidth}{lcc}
+  \begin{tightcenter}
+  \begin{tabular}{lcc}
     \textbf{Domain} & \textbf{Constraints} & \textbf{Complexity} \\
     % Presburger formulas\footcite{bultan_model-checking_1999} & Presburger arithmetic & $ \bigO(2^{2^{2^{pn}}}) $ \\
     Polyhedra\footcite{cousot1978automatic} & \( \sum_{j} c_{ij}x_j \leq 0 \) & $ \bigO(2^n) $ \\
     Octagons\footcite{mine2004weakly} & \( \pm x \pm y \leq c \) & $ \bigO(n^3) $ \\
     Pentagons\footcite{logozzo2010pentagons} & \( x \in [a,b] \wedge x < y \) & $ \bigO(n^2) $ \\
-    % Gauges\footcite{venet2012gauge} & \( x \in \left[\sum_{j} a_{j}\lambda_j, \sum_{j} b_{ij}\lambda_j \right] \) & $ \bigO(n2^l) $ \\
-    Arithmetic-geometric progressions\footcite{feret2005arithmetic} & \( x \mapsto ax + b \) & $ \bigO(n) $
-  \end{tabular*}
-
-  \uncover<1->{Also: congruences, floating-point variants\footcite{mine2004relational}, gauges\footcite{venet2012gauge} \ldots{}} \\
-  \uncover<2->{\alert{How do we choose/combine them?}}
+    Gauges\footcite{venet2012gauge} & \( x \in \left[\sum_{j} a_{j}\lambda_j, \sum_{j} b_{ij}\lambda_j \right] \) & $ \bigO(n2^l) $ \\
+    %Arithmetic-geometric progressions\footcite{feret2005arithmetic} & \( x \mapsto ax + b \) & $ \bigO(n) $
+  \end{tabular}
+  \end{tightcenter}
+  \uncover<2->{Also: congruences, floating-point versions\footcite{mine2004relational}, arithmetic-geometric progressions\footcite{feret2005arithmetic} \ldots{}}\\
+  \uncover<3->{\alert{How do we choose/combine them?}}
 
   \vspace*{1em}
 
@@ -331,10 +559,16 @@ There are other alternatives:
   \todo{$\times : \mathcal{D \times D} \rightarrow \mathcal{D}$}
 
   \todo{Add the functor from ASTRÉE}
+
+  \todo{\footcite{cousot2005astree,cousot2007varieties,cousot2006combination}}
 \end{frame}
 
 \begin{frame}{Reduced products \& combination of DP}
   \todo{\footcite{cousot2011reduced}}
+\end{frame}
+
+\begin{frame}{Extending non-parallel analysis to multithreaded programs}
+  \todo{\footcite{mine2011static}}
 \end{frame}
 
 \section{Memes}
@@ -346,8 +580,8 @@ There are other alternatives:
 
 \appendix
 
-\begin{frame}{Dependent object types}
-  
+\begin{frame}{All transition rules for SIMPL}
+  \todo{}
 \end{frame}
 \end{document}
 
