@@ -1,4 +1,4 @@
-\documentclass[aspectratio=169,14pt,handout]{beamer}
+\documentclass[aspectratio=169,14pt]{beamer}
 \usetheme[titleformat=regular%
 ,numbering=fraction% use slide numbers
 ]{metropolis}
@@ -52,11 +52,12 @@ Low-level software:
       \node[at=(current page.center)] {
         \includegraphics[width=\paperwidth]{material/bsod_resized.png}
       };
-    \end{tikzpicture} \pause
-
+    \end{tikzpicture}
+    %\sound[autostart,inlinesound]{foo}{beep.wav}
+    \pause
     \Put(10,10){\includegraphics[width=0.4\textwidth]{material/heartbleed.pdf}}\pause
     \Put(180,200){\includegraphics[width=0.4\textwidth]{material/formal-verification-as-a-sinking-airplane.png}}\pause
-    \Put(210,-50){\includegraphics[width=0.5\textwidth]{material/us-govt-patriot-missile.png}}
+    \Put(210,-100){\includegraphics[width=0.5\textwidth]{material/us-govt-patriot-missile.png}}
   \end{frame}
 }
 
@@ -67,7 +68,7 @@ Low-level software:
 
 \begin{frame}{Why abstract interpretation?}
 There are other alternatives:
-\begin{itemize}
+\begin{itemize}[<+->]
 \item ad-hoc, iterative DFA (not amenable to systematic correctness)
 \item model checking (there is a neat connection with model checking)
 \item type systems (limits choice of language, context-insensitive)
@@ -82,15 +83,15 @@ There are other alternatives:
     x,f \in \Var,\, b \in \bools,\, n \in \zahlen,\, \oplus \in \ns{BinOp},\,\Value = \bools \amalg \zahlen
   \end{gather*}\vspace{-2em}
   \begin{align*}
-    fd \in \ns{FunDef} \eDEF & \kw{def}\, f(\vo{x}) = s;\,\kw{return}\, e \\
-    e \in \Exp \eDEF & x \eOR n \eOR b \eOR e_1 \oplus e_2 \eOR *x \\
-    s \in \Stmt \eDEF & s;\,s \eOR \kw{abort} \\
-    \eOR & \kw{if}\, e\; s_1 \; \kw{else} \; s_2 \\
-    \eOR & \kw{while}\; e\; s \\
+    fd \in \ns{FunDef} \eDEF & \alert<5>{\kw{def}\; f(\vo{x}) = s;\,\kw{return}\; e} \\
+    e \in \Exp \eDEF & x \eOR n \eOR b \eOR e_1 \oplus e_2 \eOR *x \eOR \alert<1>{\kw{choose}\;e_1\,e_2} \\
+    s \in \Stmt \eDEF & s;\,s \eOR \alert<2>{\kw{abort}} \\
+    \eOR & \alert<4>{\kw{if}\, e\; s_1 \; \kw{else} \; s_2} \\
+    \eOR & \alert<4>{\kw{while}\; e\; s} \\
     \eOR & \kw{let}\; x := e \;\kw{in}\;s \\
-    \eOR & \kw{letref}\; x := \kw{new}\;e \;\kw{in}\;s \\
-    \eOR & e_1 \update e_2 \eOR x := e \\
-    \eOR & x := f(\vo{e})
+    \eOR & \alert<3>{\kw{letref}\; x := \kw{new}\;e \;\kw{in}\;s} \\
+    \eOR & \alert<3>{e_1 \update e_2} \eOR x := e \\
+    \eOR & \alert<5>{x := f(\vo{e})}
   \end{align*}
 \end{frame}
 \begin{frame}{SIMPL semantic domains}
@@ -107,6 +108,7 @@ There are other alternatives:
 \begin{frame}{Some transition rules}
   \small
   \begin{itemize}
+  \item $\varsigma \step \varsigma'$ is the transition relation\footnote{Because of nondeterminism. One can also view it as a transition \emph{function} from a state to a set of states.}
   \item \(\eta_\varsigma : \Exp \to \Value \) is the per-state expression evaluation function
 \item Current state: \(\varsigma = (so, \rho, \sigma, \vec{\kappa})$ and $\kappa :: \vec{\kappa_r} = \vec{\kappa} \)
 \item Next state: \( \varsigma' = (so', \rho', \sigma', \vec{\kappa}') \) \pause
@@ -124,8 +126,8 @@ There are other alternatives:
 \end{frame}
 
 \begin{frame}{Collecting semantics}
-  Abstract machine semantics gives us a state transition system $(\State, I, R)$ where \pause $\State$ is the set of states, \pause $I \subset \State$ is the set of initial states, \pause $R \subset \State \times \State$ is the transition relation. \pause Let
-  \[ F : \pw(\State) \monarrow \pw(\State),\, F(X) = \Set{y \vert (x, y) \in R \wedge x \in X}. \]\pause
+  Abstract machine semantics gives us a state transition system $(\State, I, \step)$ where \pause $\State$ is the set of states, \pause $I \subset \State$ is the set of initial states, \pause $\step \subset \State \times \State$ is the transition relation. \pause Let
+  \[ F : \pw(\State) \monarrow \pw(\State),\, F(X) = \Set{y \vert (x, y) \in \step \wedge x \in X}. \]\pause
   $\lfp_I F = I \cup F(I) \cup F(F(I)) \cup \ldots $ is the set of reachable states.\pause
 
   \alert{$\lfp_I F$ is potentially infinite and requires infinitely many steps to compute!}
