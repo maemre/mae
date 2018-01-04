@@ -557,16 +557,14 @@ choice(false, error, success);
   \todo{Explain with an example}
 \end{frame}
 
-\begin{frame}{Binary product abstract domain functor}
-  \todo{$\times : \mathcal{D \times D} \rightarrow \mathcal{D}$}
-
-  \todo{Add the functor from ASTRÉE}
-
-  \todo{\footcite{cousot2005astree,cousot2007varieties,cousot2006combination}}
-\end{frame}
-
-\begin{frame}{Reduced products \& combination of DP}
-  \todo{\footcite{cousot2011reduced}}
+\begin{frame}{Iterative reductions}
+  \small
+  \begin{itemize}
+  \item \todo{$\times : \mathcal{D \times D} \rightarrow \mathcal{D}$}
+  \item \todo{Binary product abstract domain functor from ASTRÉE\footcite{cousot2005astree,cousot2007varieties,cousot2006combination}}
+  \item The communication of information is a reduction operator. Iteratively applying it till reaching a fixpoint is a reduction of the cartesian product.
+  \item Also, Nelson-Oppen combination used in SMT solvers can be used for computing iterative reductions efficiently and separately, even if the decision procedures share their signatures.\footcite{cousot2011reduced}
+  \end{itemize}
 \end{frame}
 
 \begin{frame}{Extending non-parallel analysis to multithreaded programs}
@@ -586,6 +584,21 @@ choice(false, error, success);
   \todo{}
 \end{frame}
 \end{document}
+
+
+\begin{frame}{Reduced products \& combination of decision procedures\footcite{cousot2011reduced}}
+  \footnotesize
+  \begin{itemize}
+  \item The formulas of the language of a theory form a lattice where the ordering is implication
+  \item Nelson-Oppen combination of theories is a form of product over the lattices of formulas of different theories
+  \item The purification phase is same as observational Cartesian products
+  \item The reduction phase is just an iterative reduction fixpoint computation
+    \begin{itemize}
+    \item which is between the reduced product and the Cartesian product
+    \end{itemize}
+  \item So, it can be used in static analyses
+  \end{itemize}
+\end{frame}
 
 %%% Local Variables:
 %%% mode: latex
