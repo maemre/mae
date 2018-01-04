@@ -521,6 +521,20 @@ choice(false, error, success);
   \todo{\footcite{bultan_composite_2000,jeannet_representing_2002}}
 \end{frame}
 
+\begin{frame}{Extending non-parallel analysis to multithreaded programs\footcite{mine2011static}}
+  \footnotesize
+  \begin{itemize}[<+->]
+  \item For statically fixed threads, locks and scheduling policy
+  \item Start with structural semantics, then consider \emph{interleaving} semantics for paths consisting of interleaving statements from different threads
+  \item Abstract it with \emph{interferences} $I = X \times V \times T$ summarizing the effects of other threads over shared variables flow-insensitively
+    \begin{itemize}[<+->]\footnotesize
+    \item Evaluation of each expression considers all possible interferences and picks the values separately for each instance of a variable
+    \end{itemize}
+  \item To model different memory consistency models, apply certain program transformations, e.g. reordering assignments, eliminating multiple instances of variables etc.
+  \item Partition the state space by status of threads (waiting, yielding, ready) and status of locks (held by $t$, free) and eliminate the invalid interferences
+  \end{itemize}
+\end{frame}
+
 \begin{frame}{\todo{Chen \& Cousot\footcite{chen2015binary}}}
 \end{frame}
 
@@ -565,10 +579,6 @@ choice(false, error, success);
   \item The communication of information is a reduction operator. Iteratively applying it till reaching a fixpoint is a reduction of the cartesian product.
   \item Also, Nelson-Oppen combination used in SMT solvers can be used for computing iterative reductions efficiently and separately, even if the decision procedures share their signatures.\footcite{cousot2011reduced}
   \end{itemize}
-\end{frame}
-
-\begin{frame}{Extending non-parallel analysis to multithreaded programs}
-  \todo{\footcite{mine2011static}}
 \end{frame}
 
 \section{Memes}
