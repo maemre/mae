@@ -473,12 +473,67 @@ static void main(string[] args) {
     \begin{column}{.45\textwidth}
       \pause
       \begin{itemize}[<+->]
-      \item 0CFA would compute the output to be \alert<2>{\texttt{1;$\top$}}
+      \item Non-relational 0CFA would compute the output to be \alert<2>{\texttt{1;$\top$}}. \texttt{1} pointed by \texttt{y} became live again, it is a \emph{zombie}.
       \item \texttt{y} from first call to \texttt{f} is not reachable on the second call
-      \item Abstract GC would collect \texttt{y} after the first call and restore precision
+      \item Abstract GC would collect \texttt{y} after the first call and restore precision \pause
+        \begin{itemize}[<+->] \footnotesize
+        \item Allows strong updates
+        \item We get a \emph{more precise and faster} analysis
+        \end{itemize}
       \end{itemize}
     \end{column}
   \end{columns}
+\end{frame}
+
+\begin{frame}[fragile]{Abstract Garbage Collection\footcite{might2006improving}}
+  \small
+  \begin{columns}
+    \begin{column}{.55\textwidth}
+        \begin{itemize}
+        \item Consider:
+          \begin{lstlisting}[language=Java,numbers=left,columns=flexible,basewidth=0.45em]
+static int f(int x) {
+  Integer y = new Integer(x);
+  return x == (int)y;
+}
+
+static void main(string[] args) {
+  std::cout << f(1) << ';'
+            << f(2) << endl;
+  return 0;
+}
+          \end{lstlisting}
+        \end{itemize}
+    \end{column}
+    \begin{column}{.45\textwidth}
+      \todo{Put the abstract heap \& collection}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Abstract garbage collection\footcite{might2006improving}}
+  \begin{itemize}
+  \item When to do it?
+    \begin{itemize}
+    \item Too infrequent: not much precision gain
+    \item Too frequent: extra overhead\pause
+    \item Suggested strategy: Perform abstract GC if zombie creation is imminent otherwise.
+    \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Abstract counting\footcite{might2006improving}}
+  \begin{itemize}[<+->]
+  \item Count the number of objects at each heap address.
+  \item When we know that the sets a
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Abstract counting\footcite{might2006improving}}
+  \begin{itemize}[<+->]
+  \item Count the number of objects at each heap address.
+  \item When we know that the sets a
+  \end{itemize}
 \end{frame}
 
 \begin{frame}{Monadic abstract interpreters\footcite{sergey2013monadic}}
