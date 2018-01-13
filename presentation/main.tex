@@ -363,7 +363,7 @@ There are other alternatives:
  \end{itemize}
 \end{frame}
 
-\begin{frame}{Abstracting Abstract Machines}
+\begin{frame}{Abstracting Abstract Machines (AAM)}
   \todo{van horn}
 \end{frame}
 
@@ -538,7 +538,8 @@ static void main(string[] args) {
 
 \begin{frame}{Monadic abstract interpreters\footcite{sergey2013monadic}}
   \begin{itemize}
-  \item Representing different aspects of an abstract interpreter with monads
+  \item They factor out store and timestamps of AAM into a monad
+  \item The abstract semantics, domains and path sensitivity are independent of each other
   \item Composing different monads gives different abstract interpreters
   \item \todo{Give example}
   \item \todo{Explain Galois Transformers}\footcite{darais2015galois}
@@ -553,15 +554,31 @@ static void main(string[] args) {
 \section{Predicate abstraction \& Abstraction refinement}
 \subsection{Predicate abstraction}
 \begin{frame}{Predicate abstraction}
-  \todo{\footcite{clarke1994model,graf1997construction}}
+  \begin{itemize}[<+->]
+  \item Main idea: our abstract domain is a finite set of predicates $\phi_i,\, 1 \le i\le n$ over states
+  \item $\abst{\State} = \pw\left(\bigcup_{i}\Set{\phi_i, \neg \phi_i}\right).$
+  \item $\abst{\varsigma_1} \sqsubseteq \abst{\varsigma_2} \equiv \abst{\varsigma_2} \subseteq \abst{\varsigma_1}.$
+  \item $\gamma(\abst{\varsigma}) = \Set{\varsigma \in \State \vert \bigwedge_{\phi \in \varsigma} \phi}.$
+  \item $\alpha(\varsigma) = \bigwedge_{\phi_i(\varsigma)} \phi_i \wedge \Set{\neg\phi_i \vert \neg\phi_i(\varsigma)}.$
+  \item Use model checkers/theorem provers to compute $\abst{\fn{Post}}$ and reachability
+  \item Proposed by Clarke et al. and Graf et al. for hardware verification\footcite{clarke1994model,graf1997construction}
+  \end{itemize}
 \end{frame}
 \subsection{Abstraction refinement}
-\begin{frame}{Counterexample-Generated Abstraction Refinement}
-  \todo{\footcite{clarke2003counterexample}}
-  \todo{\footcite{ball2001automatic}}
-  \todo{\footcite{ball2001automatically}}
-  \todo{\footcite{podelski2007armc}}
+\begin{frame}{Counterexample-Generated Abstraction Refinement (CEGAR)}
+  \begin{itemize}[<+->]
+  \item Choosing the correct predicates is tricky and tedious
+  \item When proving safety using the current abstraction fails, compute a counterexample using backwards semantics (and a model checker) to find a path it fails
+  \item Add the counterexample to the set of predicates and try again
+  \item Proposed by Clarke et al.\footcite{clarke2003counterexample}. Extended by Ball et al. to support C programs for SLAM project\footcite{ball2001automatic,ball2001automatically}
+  \item Can be implemented ``naturally'' using CLP by modifying Prolog's fact database on the fly.\footcite{podelski2007armc}
+  \end{itemize}
 \end{frame}
+
+\begin{frame}{CEGAR Example}
+  \todo{Example}
+\end{frame}
+
 \begin{frame}{Lazy abstraction}
   \todo{\footcite{henzinger2002lazy}}
 \end{frame}
