@@ -1,0 +1,88 @@
+\begin{frame}[fragile]{Control Flow Analysis}
+  \footnotesize
+  \begin{columns}
+    \begin{column}{0.5\textwidth}
+    Consider following program:\vspace{-1em}
+  \begin{semiverbatim}\footnotesize
+def error() = \{ \textcolor{red}{abort}; return 0 \}
+def success() = return 0
+def choice(b, f, g) = \{
+  if (b) _ := \alert<3>{f}();
+  else   _ := \alert<3>{g}();
+  return 0
+\}
+choice(true, success, error);
+choice(false, error, success);
+\end{semiverbatim}\vspace{-2em}
+\begin{itemize}
+\item<3-> Whether \texttt{error} is called depends on parameters on different calls.
+\item<4-> We need to keep track of calling contexts to know what \texttt{f} and \texttt{g} are.
+\end{itemize}
+\end{column}
+\begin{column}{0.5\textwidth}
+  \uncover<2>{
+    \todo{insert CFG here}
+  }
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Control Flow Analysis\footcite{shivers1991control}}
+  \todo{Olin Shivers, make it short\\}
+\end{frame}
+
+\begin{frame}{Terminology}
+  \begin{columns}[t]
+  \begin{column}{.45\textwidth}
+  \begin{block}{Flow sensitive analysis}
+    Takes into consideration the order of program statements
+  \end{block}
+\begin{example}[Context Insensitive]
+\begin{lstlisting}[language=Java,numbers=left,columns=flexible,basewidth=0.45em,mathescape]
+x := 3;
+y := x + 1; // $y \in \Set{4,43}$
+x := 42;
+  \end{lstlisting}
+  \end{example}
+  \end{column}
+  \begin{column}{.45\textwidth}
+    \pause
+  \begin{block}{Context sensitive analysis}
+    Differentiates calls to the same function
+  \end{block}
+  \begin{example}[Context Insensitive]
+    \begin{lstlisting}[language=Java,numbers=left,columns=flexible,basewidth=0.45em,mathescape]
+x := add1(2); // $x \in \Set{3,4}$
+y := add1(3); // $y \in \Set{3,4}$
+\end{lstlisting}
+  \end{example}
+\end{column}
+\end{columns}
+\end{frame}
+        
+\begin{frame}{$k$-CFA\footcite{shivers1991control}}
+  \begin{columns}
+  \begin{column}{0.5\textwidth}
+  \begin{itemize}
+  \item<2-> Duplicating functions in the control flow graph depending on
+    how they are called would increase precision
+  \item<3-> $k$-CFA: each abstract state contains a context with the last
+    $k$ call sites
+  \end{itemize}
+  \end{column}
+
+  \begin{column}{0.5\textwidth}
+  \onslide<4->{\begin{exampleblock}{Example with $k=2$}
+      $\langle \ell_3: \textbf{baz}\ 7, \ldots, [\textbf{foo}_{\ell_1}, \textbf{bar}_{\ell_2}]
+      \rangle \to \langle \ell_4: \textbf{baz}_{entry}, \ldots, [\textbf{bar}_{\ell_2},
+      \textbf{baz}_{\ell_3}] \rangle$
+  \end{exampleblock}}
+  \end{column}
+  \end{columns}
+\end{frame}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "main"
+%%% TeX-engine: xetex
+%%% End:

@@ -386,38 +386,7 @@ There are other alternatives:
 Note: Widening operators are more general than Galois Connections.\footcite{cousot92comparing}\vspace{1em}
 \end{frame}
 
-\begin{frame}[fragile]{Control Flow Analysis}
-  \footnotesize
-  \begin{columns}
-    \begin{column}{0.5\textwidth}
-    Consider following program:\vspace{-1em}
-  \begin{semiverbatim}\footnotesize
-def error() = \{ \textcolor{red}{abort}; return 0 \}
-def success() = return 0
-def choice(b, f, g) = \{
-  if (b) _ := \alert<3>{f}();
-  else   _ := \alert<3>{g}();
-  return 0
-\}
-choice(true, success, error);
-choice(false, error, success);
-\end{semiverbatim}\vspace{-2em}
-\begin{itemize}
-\item<3-> Whether \texttt{error} is called depends on parameters on different calls.
-\item<4-> We need to keep track of calling contexts to know what \texttt{f} and \texttt{g} are.
-\end{itemize}
-\end{column}
-\begin{column}{0.5\textwidth}
-  \uncover<2>{
-    \todo{insert CFG here}
-  }
-\end{column}
-\end{columns}
-\end{frame}
-
-\begin{frame}{Control Flow Analysis\footcite{shivers1991control}}
-  \todo{Olin Shivers, make it short\\}
-\end{frame}
+\input{cfa.tex}
 
 \begin{frame}{Widening for Control-Flow\footcite{hardekopf2014widening}}
   \footnotesize
