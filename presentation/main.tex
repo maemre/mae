@@ -1,3 +1,4 @@
+%\documentclass[14pt]{beamer}
 \documentclass[aspectratio=169,14pt]{beamer}
 \usetheme[titleformat=regular%
 ,numbering=fraction% use slide numbers
@@ -420,12 +421,12 @@ Note: Widening operators are more general than Galois Connections.\footcite{cous
 \end{frame}
 
 \begin{frame}[fragile]{Abstract Garbage Collection\footcite{might2006improving}}
-  \small
-  \begin{columns}
-    \begin{column}{.55\textwidth}
+  \small\vspace{-1em}
+  \begin{columns}[t]
+    \begin{column}{.40\textwidth}
         \begin{itemize}
         \item Consider:
-          \begin{lstlisting}[language=Java,numbers=left,columns=flexible,basewidth=0.45em]
+          \begin{lstlisting}[language=Java,numbers=left]
 static int f(int x) {
   Integer y = new Integer(x);
   return x == (int)y;
@@ -439,7 +440,7 @@ static void main(string[] args) {
           \end{lstlisting}
         \end{itemize}
     \end{column}
-    \begin{column}{.45\textwidth}
+    \begin{column}{.60\textwidth}
       \pause
       \begin{itemize}[<+->]
       \item Non-relational 0CFA would compute the output to be \alert<2>{\texttt{1;$\top$}}. \texttt{1} pointed by \texttt{y} became live again, it is a \emph{zombie}.
@@ -447,61 +448,52 @@ static void main(string[] args) {
       \item Abstract GC would collect \texttt{y} after the first call and restore precision \pause
         \begin{itemize}[<+->] \footnotesize
         \item Allows strong updates
-        \item We get a \emph{more precise and faster} analysis
+        \item We get a \alert{\emph{more precise and faster}} analysis
         \end{itemize}
       \end{itemize}
     \end{column}
   \end{columns}
 \end{frame}
 
-\begin{frame}[fragile]{Abstract Garbage Collection\footcite{might2006improving}}
-  \small
-  \begin{columns}
-    \begin{column}{.55\textwidth}
-        \begin{itemize}
-        \item Consider:
-          \begin{lstlisting}[language=Java,numbers=left,columns=flexible,basewidth=0.45em]
-static int f(int x) {
-  Integer y = new Integer(x);
-  return x == (int)y;
-}
+% \begin{frame}[fragile]{Abstract Garbage Collection\footcite{might2006improving}}
+%   \small
+%   \begin{columns}
+%     \begin{column}{.55\textwidth}
+%         \begin{itemize}
+%         \item Consider:
+%           \begin{lstlisting}[language=Java,numbers=left,columns=flexible,basewidth=0.45em]
+% static int f(int x) {
+%   Integer y = new Integer(x);
+%   return x == (int)y;
+% }
 
-static void main(string[] args) {
-  std::cout << f(1) << ';'
-            << f(2) << endl;
-  return 0;
-}
-          \end{lstlisting}
-        \end{itemize}
-    \end{column}
-    \begin{column}{.45\textwidth}
-      \todo{Put the abstract heap \& collection}
-    \end{column}
-  \end{columns}
-\end{frame}
+% static void main(string[] args) {
+%   std::cout << f(1) << ';'
+%             << f(2) << endl;
+%   return 0;
+% }
+%           \end{lstlisting}
+%         \end{itemize}
+%     \end{column}
+%     \begin{column}{.45\textwidth}
+%       \todo{Put the abstract heap \& collection}
+%     \end{column}
+%   \end{columns}
+% \end{frame}
 
-\begin{frame}{Abstract garbage collection\footcite{might2006improving}}
-  \begin{itemize}
+\begin{frame}{Abstract garbage collection}
+  \begin{itemize}[<+->]
   \item When to do it?
     \begin{itemize}
     \item Too infrequent: not much precision gain
     \item Too frequent: extra overhead\pause
-    \item Suggested strategy: Perform abstract GC if zombie creation is imminent otherwise.
+    \item Strategy suggested by the paper: Perform abstract GC if zombie creation is imminent otherwise.
     \end{itemize}
-  \end{itemize}
-\end{frame}
-
-\begin{frame}{Abstract counting\footcite{might2006improving}}
-  \begin{itemize}[<+->]
-  \item Count the number of objects at each heap address.
-  \item When we know that the sets a
-  \end{itemize}
-\end{frame}
-
-\begin{frame}{Abstract counting\footcite{might2006improving}}
-  \begin{itemize}[<+->]
-  \item Count the number of objects at each heap address.
-  \item When we know that the sets a
+  \item Abstract counting
+    \begin{itemize}
+    \item Count the number of objects at each heap address.
+    \item When we know that an abstract address contains a single object, we can convert \emph{may alias} relations to \emph{must alias} relations.
+    \end{itemize}
   \end{itemize}
 \end{frame}
 
@@ -545,7 +537,26 @@ static void main(string[] args) {
 \end{frame}
 
 \begin{frame}{CEGAR Example}
-  \todo{Example}
+  \footnotesize
+  \begin{enumerate}[<+->]
+  \item Abstract a C program with a Boolean program with one variable per predicate
+  \item Give the abstracted program to a model checker to check if it can reach the \texttt{ERROR} label
+  \item If verification fails, produce a counterexample by computing a backwards path and add the corresponding new predicate to the set of predicates and go to step 1.
+  \item Otherwise, we verified the program
+  \end{enumerate}
+\end{frame}
+
+\begin{frame}{C $\to$ Boolean: Instrumentation code}
+  \small
+  $\phi_1 = \texttt{\{state==Locked\}}$, $\phi_2 = \texttt{\{state==Unlocked\}}$\\
+  \begin{columns}[t]
+    \begin{column}{0.45\textwidth}
+      \lstinputlisting[language=C,mathescape]{lst/pred_instr.c}
+    \end{column}
+    \begin{column}{0.45\textwidth}
+      \lstinputlisting[language=C,mathescape]{lst/pred_instr.bool}
+    \end{column}
+  \end{columns}
 \end{frame}
 
 \begin{frame}{Lazy abstraction}

@@ -1,0 +1,16 @@
+decl {state==Locked},
+     {state==Unlocked} := F,T;
+
+void error() { $\alert{\texttt{ERROR:}}$ skip }
+
+void lock() {
+  if ({state==Locked}) error();
+  else {State==Locked} = T,
+       {State==Unlocked} = F;
+}
+
+void unlock() {
+  if ({state==Unlocked}) error();
+  else {State==Locked} = F,
+       {State==Unlocked} = T;
+}

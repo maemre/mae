@@ -32,32 +32,32 @@ choice(false, error, success);
 \end{frame}
 
 \begin{frame}{Terminology}
-  \begin{columns}[t]
-  \begin{column}{.45\textwidth}
-  \begin{block}{Flow sensitive analysis}
-    Takes into consideration the order of program statements
-  \end{block}
-\begin{example}[Context Insensitive]
-\begin{lstlisting}[language=Java,numbers=left,columns=flexible,basewidth=0.45em,mathescape]
-x := 3;
-y := x + 1; // $y \in \Set{4,43}$
-x := 42;
-  \end{lstlisting}
-  \end{example}
-  \end{column}
-  \begin{column}{.45\textwidth}
-    \pause
-  \begin{block}{Context sensitive analysis}
-    Differentiates calls to the same function
-  \end{block}
-  \begin{example}[Context Insensitive]
-    \begin{lstlisting}[language=Java,numbers=left,columns=flexible,basewidth=0.45em,mathescape]
-x := add1(2); // $x \in \Set{3,4}$
-y := add1(3); // $y \in \Set{3,4}$
-\end{lstlisting}
-  \end{example}
-\end{column}
-\end{columns}
+%   \begin{columns}
+%   \begin{column}{.45\textwidth}
+%   \begin{block}{Flow sensitive analysis}
+%     Takes into consideration the order of program statements
+%   \end{block}
+% \begin{example}[Context Insensitive]
+% \begin{lstlisting}[language=Java,numbers=left,columns=flexible,basewidth=0.45em,mathescape]
+% x := 3;
+% y := x + 1; // $y \in \Set{4,43}$
+% x := 42;
+%   \end{lstlisting}
+%   \end{example}
+%   \end{column}
+%   \begin{column}{.45\textwidth}
+%     \pause
+%   \begin{block}{Context sensitive analysis}
+%     Differentiates calls to the same function
+%   \end{block}
+%   \begin{example}[Context Insensitive]
+%     \begin{lstlisting}[language=Java,numbers=left,columns=flexible,basewidth=0.45em,mathescape]
+% x := add1(2); // $x \in \Set{3,4}$
+% y := add1(3); // $y \in \Set{3,4}$
+% \end{lstlisting}
+%   \end{example}
+% \end{column}
+% \end{columns}
 \end{frame}
         
 \begin{frame}{$k$-CFA\footcite{shivers1991control}}
