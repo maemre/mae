@@ -652,8 +652,17 @@ static void main(string[] args) {
   \end{itemize}
 \end{frame}
 \begin{frame}{Abstraction refinement for widening}
-  \todo{\footcite{gulavani2006counterexample}}
-  \todo{\footcite{gulavani2008automatically}}
+  \small
+  \begin{itemize}
+  \item Gulavani et al. used abstract refinement to find the first instance of widening that causes imprecision\footcite{gulavani2006counterexample}
+  \item They use it to determine widening delays, they also keep a history of widening results because widening is not monotonic
+  \item On a later paper\footcite{gulavani2008automatically}, they extend this technique to joins and combine results of Craig interpolants and widening
+    \begin{itemize}
+    \item They use bounded widening ($\widen_T$): $\widen_T$ is a widening operation such that\\ if $\exists C \in T.\, A, B \sqsubseteq C$ then $A \widen_T B \sqsubseteq C$
+    \item Then define \emph{interpolated widening} as $A \widen_{\Set{I}} B$ where $I$ is the interpolant of $A, B$.
+    \end{itemize}
+  \item Both of these works are implemented using polyhedral domains
+  \end{itemize}
 \end{frame}
 
 \section{Static analysis of control software}
