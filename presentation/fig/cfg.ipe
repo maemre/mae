@@ -1,5 +1,7 @@
 <?xml version="1.0"?>
-<!DOCTYPE ipestyle SYSTEM "ipe.dtd">
+<!DOCTYPE ipe SYSTEM "ipe.dtd">
+<ipe version="70206" creator="Ipe 7.2.7">
+<info created="D:20180113214925" modified="D:20180113215926"/>
 <ipestyle name="presentation">
 <symbol name="arrow/arc(spx)">
 <path stroke="sym-stroke" fill="sym-stroke" pen="sym-pen">
@@ -255,8 +257,30 @@ h
               \itemsep   \topsep}
 \makeatother
 </preamble>
-<layout paper="800 600" origin="0 0" frame="800 600" skip="32" crop="yes"/>
+<layout paper="800 600" origin="0 0" frame="800 600" skip="32" crop="no"/>
 <titlestyle pos="368 554" size="large" color="title"  halign="center" valign="baseline"/>
 <tiling name="falling" angle="-60" step="12" width="3"/>
 <tiling name="rising" angle="30" step="12" width="3"/>
 </ipestyle>
+<page>
+<layer name="alpha"/>
+<view layers="alpha" active="alpha"/>
+<text layer="alpha" matrix="1 0 0 1 -96 64" transformations="translations" pos="128 480" stroke="black" type="minipage" width="128" height="214.874" depth="203.424" valign="top" size="small">\begin{verbatim}
+enum lock_state { Unlocked = 0, Locked = 1};
+lock_state state = Unlocked;
+
+void error() { ERROR: goto ERROR }
+
+void lock() {
+  if (state == Locked) error();
+  else state = Locked;
+}
+
+void lock() {
+  if (state == Unocked) error();
+  else state = Unlocked;
+}
+
+\end{verbatim}</text>
+</page>
+</ipe>

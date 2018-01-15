@@ -1,5 +1,5 @@
 %\documentclass[14pt]{beamer}
-\documentclass[aspectratio=169,14pt]{beamer}
+\documentclass[aspectratio=169]{beamer}
 \usetheme[titleformat=regular%
 ,numbering=fraction% use slide numbers
 ]{metropolis}
@@ -420,7 +420,7 @@ Note: Widening operators are more general than Galois Connections.\footcite{cous
 \end{columns}
 \end{frame}
 
-\begin{frame}[fragile]{Abstract Garbage Collection\footcite{might2006improving}}
+\begin{frame}[fragile]{Abstract garbage collection\footcite{might2006improving}}
   \small\vspace{-1em}
   \begin{columns}[t]
     \begin{column}{.40\textwidth}
@@ -500,7 +500,7 @@ static void main(string[] args) {
 \begin{frame}{Monadic abstract interpreters\footcite{sergey2013monadic}}
   \begin{itemize}
   \item They factor out store and timestamps of AAM into a monad
-  \item The abstract semantics, domains and path sensitivity are independent of each other
+  \item The monad is independent of the transfer function and encodes path/flow/context/heap-sensitivity
   \item Composing different monads gives different abstract interpreters
   \item \todo{Give example}
   \item \todo{Explain Galois Transformers}\footcite{darais2015galois}
@@ -508,8 +508,24 @@ static void main(string[] args) {
 \end{frame}
 
 \begin{frame}{Relationship with model checking}
-  \todo{\footcite{schmidt1998program}}
-  \todo{\footcite{schmidt1998data}}
+  \begin{itemize}
+  \item Abstract interpretation links model
+    checking and a certain kind of dataflow analysis
+    \footcite{schmidt1998program,schmidt1998data}
+  \item There's a mechanical way to transform any bit-vector-based,
+    iterative dataflow analysis to a modal $\mu$-calculus formula
+    \begin{itemize}
+    \item
+      $VBE(pp) = Used(pp) \cup (notModified(pp) \cap (\bigcap_{pp' \in
+        succ\, pp} VBE(pp')))$
+      \vspace{.5em}
+    \item
+      $isVBE(e) = \nu Z \,.\, isUsed(e) \vee (\neg isModified(e)
+      \wedge \square Z)$
+    \end{itemize}
+  \item (Trace-based) abstract interpretation creates the finite model of the
+    program at the desired precision level
+  \end{itemize}
 \end{frame}
 
 \section{Predicate abstraction \& Abstraction refinement}
@@ -559,9 +575,28 @@ static void main(string[] args) {
   \end{columns}
 \end{frame}
 
-\begin{frame}{Lazy abstraction}
-  \todo{\footcite{henzinger2002lazy}}
+\begin{frame}{C $\to$ Boolean: The actual program}
+  \small
+  $\phi_1 = \texttt{\{state==Locked\}}$, $\phi_2 = \texttt{\{state==Unlocked\}}$\\
+  \todo{abstract the lock example}
+%   \begin{columns}[t]
+%     \begin{column}{0.45\textwidth}
+%       \lstinputlisting[language=C,mathescape]{lst/pred_program.c}
+%     \end{column}
+%     \begin{column}{0.45\textwidth}
+%       \lstinputlisting[language=C,mathescape]{lst/pred_program.bool}
+%     \end{column}
+%   \end{columns}
 \end{frame}
+
+\begin{frame}{Refining the abstraction}
+  \todo{Generate a counterexample, then update the predicate list}
+\end{frame}
+
+\begin{frame}{Lazy abstraction\footcite{henzinger2002lazy}}
+  \todo{Explain the speedup and the ideas}
+\end{frame}
+
 \begin{frame}{Craig interpolants}
   \begin{itemize}[<+->]
   \item If $\neg (\phi \wedge \psi)$ is false then $\exists I$ (Craig interpolant of $\phi, \psi$) s.t.
@@ -660,18 +695,11 @@ static void main(string[] args) {
   \end{itemize}
 \end{frame}
 
-\section{Memes}
-\begin{frame}{\todo{Memes}}\end{frame}
-
 \begin{frame}[standout]
   Thank you!
 \end{frame}
 
 \appendix
-
-\begin{frame}{All transition rules for SIMPL}
-  \todo{}
-\end{frame}
 
 \begin{frame}{Reduced products \& combination of decision procedures\footcite{cousot2011reduced}}
   \footnotesize

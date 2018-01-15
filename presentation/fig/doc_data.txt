@@ -1,0 +1,42 @@
+InfoBegin
+InfoKey: ModDate
+InfoValue: D:20180115000347
+InfoBegin
+InfoKey: CreationDate
+InfoValue: D:20180113214925
+InfoBegin
+InfoKey: Creator
+InfoValue: Ipe 7.2.7
+InfoBegin
+InfoKey: Producer
+InfoValue: Ipe 7.2.7
+NumberOfPages: 4
+PageMediaBegin
+PageMediaNumber: 1
+PageMediaRotation: 0
+PageMediaRect: 0 0 800 600
+PageMediaDimensions: 800 600
+PageMediaCropRect: 283.579 227.183 483.974 414.967
+PageMediaBegin
+PageMediaNumber: 2
+PageMediaRotation: 0
+PageMediaRect: 0 0 800 600
+PageMediaDimensions: 800 600
+PageMediaCropRect: 283.579 227.183 483.974 414.967
+PageMediaBegin
+PageMediaNumber: 3
+PageMediaRotation: 0
+PageMediaRect: 0 0 800 600
+PageMediaDimensions: 800 600
+PageMediaCropRect: 283.579 227.183 483.974 414.967
+PageMediaBegin
+PageMediaNumber: 4
+PageMediaRotation: 0
+PageMediaRect: 0 0 800 600
+PageMediaDimensions: 800 600
+PageMediaCropRect: 283.579 227.183 483.974 414.967
+PageLabelBegin
+PageLabelNewIndex: 1
+PageLabelStart: 1
+PageLabelPrefix: 1-
+PageLabelNumStyle: DecimalArabicNumerals
