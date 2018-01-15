@@ -627,7 +627,14 @@ static void main(string[] args) {
 \end{frame}
 
 \begin{frame}{Lazy abstraction\footcite{henzinger2002lazy}}
-  \todo{Explain the speedup and the ideas}
+  \begin{itemize}[<+->]
+  \item We don't need to analyze the whole program after refinement
+  \item Lazy abstraction applies refinement to only the program states after the state initiating the refinement
+    \begin{itemize}
+    \item It computes a new smaller refined transition system after refinement
+    \item Different states can have different predicate abstractions
+    \end{itemize}
+  \end{itemize}
 \end{frame}
 
 \begin{frame}{Craig interpolants}
