@@ -4,7 +4,7 @@
 ,numbering=fraction% use slide numbers
 ]{metropolis}
 \usepackage{appendixnumberbeamer} % separate appendix
-\usepackage[citestyle=authortitle-ibid]{biblatex}
+\usepackage[citestyle=authortitle-ibid,sorting=none]{biblatex}
 \setbeamerfont{footnote}{size=\tiny}
 \addbibresource{mae.bib}
 
@@ -81,7 +81,7 @@ There are other alternatives:
   \vspace{-2em}
   \small
   \begin{gather*}
-    x,f \in \Var,\, b \in \bools,\, n \in \zahlen,\, \oplus \in \ns{BinOp},\,\Value = \bools \amalg \zahlen
+    x,f \in \Var,\, b \in \bools,\, n \in \zahlen,\, \oplus \in \ns{BinOp},\,\Value = \bools \disunion \zahlen
   \end{gather*}\vspace{-2em}
   \begin{align*}
     fd \in \ns{FunDef} \eDEF & \alert<5>{\kw{def}\; f(\vo{x}) = s;\,\kw{return}\; e} \\
@@ -98,14 +98,15 @@ There are other alternatives:
 \begin{frame}{SIMPL semantic domains}
   \begingroup\footnotesize We will use abstract machine semantics and represent the semantics of a program as a transition relation.\endgroup
 \begin{align*}
-  \varsigma \in \State & = \Stmt^? \times \Env \times \Store \times \vo{\Kont} \\
-  \rho \in \Env & = \Value^\ns{Var} = \left\{ \rho \vert \rho : \ns{Var} \rightarrow \Value \right\} \\
-  \sigma \in \Store & = \Value^\ns{Addr} \\
-  \kappa \in \Kont & = \sTag{stmtK}{\Stmt} \\
-                       & \amalg \sTag{whileK}{\ns{Exp} \times \Stmt} \\
-                       & \amalg \sTag{retK}{\ns{Var} \times \ns{Exp} \times \Env}
+    \varsigma \in \State & = \Stmt^? \times \Env \times \Store \times \alert<4>{\Kont} \\
+    \rho \in \Env & = \alert<2>{\Value}^{\alert<3>{\Var}} \only<1>{\alert{= \Set{\rho : \Var \to \Value}}} \\
+    \sigma \in \Store & = \alert<2>{\Value}^{\alert<3>{\Addr}} \\
+    \kappa \in \alert<4>{\Kont} & = \sTag{stmtK}{\Stmt \times \alert<4>{\Kont}} \\
+                         & \disunion \sTag{whileK}{\Exp \times \Stmt \times \alert<4>{\Kont}} \\
+                         & \disunion \sTag{retK}{\Var \times \Exp \times \Env \times \alert<4>{\Kont}}
 \end{align*}
 \end{frame}
+
 \begin{frame}{Some transition rules}
   \small
   \begin{itemize}
@@ -145,8 +146,8 @@ There are other alternatives:
   \begin{itemize}
   \item A lattice $(L, \sqcup, \sqcap, \sqsubseteq)$ is a partially ordered set (poset) with:\vspace{-0.8em}
     \begin{itemize}
-    \item a least upper bound (join) operation $\sqcup: L \times L \rightarrow L$
-    \item a greatest lower bound (meet) operation $\sqcap: L \times L \rightarrow L$
+    \item a least upper bound (join) operation $\sqcup: L \times L \to L$
+    \item a greatest lower bound (meet) operation $\sqcap: L \times L \to L$
     \item $\sqcup, \sqcap$ determine the partial order $\sqsubseteq$
     \end{itemize}\vspace{-1em}
   \item<9-> A bounded lattice has a least element $\bot$, (bottom)
@@ -364,8 +365,39 @@ There are other alternatives:
  \end{itemize}
 \end{frame}
 
-\begin{frame}{Abstracting Abstract Machines (AAM)}
-  \todo{van horn}
+\begin{frame}{Abstracting Abstract Machines (AAM)\footcite{van2010abstracting,van2012systematic}}
+  \only<1>{Here is our state, let's start by abstracting it pointwise}
+  \only<2>{We are almost done, but $\abst\Kont$ is still \emph{infinite}!}
+  \only<3>{We store the continuations at the store and forcibly finitize them}
+  \only<4>{We may add \emph{timestamps} to record the history of states (more on this later)}
+  \only<1>{
+  \begin{align*}
+    \varsigma \in \State & = \Stmt^? \times \Env \times \Store \times \vo{\Kont} \\
+    \rho \in \Env & = \Value^\Var \\
+    \sigma \in \Store & = \Value^\Addr \\
+    \kappa \in \Kont & = \sTag{stmtK}{\Stmt \times \Kont} \\
+                         & \disunion \sTag{whileK}{\Exp \times \Stmt \times \Kont} \\
+                         & \disunion \sTag{retK}{\Var \times \Exp \times \Env \times \Kont}
+  \end{align*}
+  }
+  \only<2>{
+  \begin{align*}
+    \abst{\varsigma} \in \abst{\State} & = {\abst{\Stmt}}^? \times \abst{\Env} \times \abst\Store \times \alert<2>{\abst\Kont} \\
+    \abst\rho \in \abst\Env & = {\abst\Value}^{\abst{\Var}} \\
+    \abst\sigma \in \abst\Store & = {\abst\Value}^{\abst{\Addr}} \\
+    \abst\kappa \in \abst\Kont & = \sTag{stmtK}{\abst\Stmt \times \abst\Kont} \\
+                         & \disunion \sTag{whileK}{\abst{\Exp} \times \abst\Stmt \times \abst\Kont} \\
+                         & \disunion \sTag{retK}{\abst\Var \times \abst\Exp \times \abst\Env \times \abst\Kont}
+  \end{align*}}
+\only<3->{
+  \begin{align*}
+    \abst{\varsigma} \in \abst{\State} & = {\abst{\Stmt}}^? \times \abst{\Env} \times \abst\Store \times \alert<3>{\abst\Addr} \only<4>{\alert{\times \abst{\ns{Time}}}} \\
+    \abst\rho \in \abst\Env & = {\abst\Value}^{\abst{\Var}} \\
+    \abst\sigma \in \abst\Store & = {\left(\abst\Value+\alert<3>{\alert<3>{\abst\Kont}}\right)}^{\abst{\Addr}} \\
+    \abst\kappa \in \alert<3>{\abst\Kont} & = \sTag{stmtK}{\abst\Stmt \times \alert<3>{\abst\Addr}} \\
+                                       & \disunion \sTag{whileK}{\abst{\Exp} \times \abst\Stmt \times \alert<3>{\abst\Addr}} \\
+                                       & \disunion \sTag{retK}{\abst\Var \times \abst\Exp \times \abst\Env \times \alert<3>{\abst\Addr}}
+  \end{align*}}
 \end{frame}
 
 \begin{frame}{Widening}
@@ -501,9 +533,10 @@ static void main(string[] args) {
   \begin{itemize}
   \item They factor out store and timestamps of AAM into a monad
   \item The monad is independent of the transfer function and encodes path/flow/context/heap-sensitivity
-  \item Composing different monads gives different abstract interpreters
-  \item \todo{Give example}
-  \item \todo{Explain Galois Transformers}\footcite{darais2015galois}
+  \item Galois connections can be expressed with monad transformers\footcite{darais2015galois}
+    \begin{itemize}
+    \item  Composing different monads gives different abstract interpreters
+    \end{itemize}
   \end{itemize}
 \end{frame}
 
@@ -688,7 +721,7 @@ static void main(string[] args) {
 \begin{frame}{Iterative reductions}
   \small
   \begin{itemize}
-  \item \todo{$\times : \mathcal{D \times D} \rightarrow \mathcal{D}$}
+  \item \todo{$\times : \mathcal{D \times D} \to \mathcal{D}$}
   \item \todo{Binary product abstract domain functor from ASTRÉE\footcite{cousot2005astree,cousot2007varieties,cousot2006combination}}
   \item The communication of information is a reduction operator. Iteratively applying it till reaching a fixpoint is a reduction of the cartesian product.
   \item Also, Nelson-Oppen combination used in SMT solvers can be used for computing iterative reductions efficiently and separately, even if the decision procedures share their signatures.\footcite{cousot2011reduced}
