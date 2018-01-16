@@ -99,7 +99,7 @@ There are other alternatives:
   \begingroup\footnotesize We will use abstract machine semantics and represent the semantics of a program as a transition relation.\endgroup
 \begin{align*}
     \varsigma \in \State & = \Stmt^? \times \Env \times \Store \times \alert<4>{\Kont} \\
-    \rho \in \Env & = \alert<2>{\Value}^{\alert<3>{\Var}} \only<1>{\alert{= \Set{\rho : \Var \to \Value}}} \\
+    \rho \in \Env & = \alert<2>{\Value}^{\Var} \only<1>{\alert{= \Set{\rho : \Var \to \Value}}} \\
     \sigma \in \Store & = \alert<2>{\Value}^{\alert<3>{\Addr}} \\
     \kappa \in \alert<4>{\Kont} & = \sTag{stmtK}{\Stmt \times \alert<4>{\Kont}} \\
                          & \disunion \sTag{whileK}{\Exp \times \Stmt \times \alert<4>{\Kont}} \\
@@ -112,17 +112,17 @@ There are other alternatives:
   \begin{itemize}
   \item $\varsigma \step \varsigma'$ is the transition relation\footnote{Because of nondeterminism. One can also view it as a transition \emph{function} from a state to a set of states.}
   \item \(\eta_\varsigma : \Exp \to \Value \) is the per-state expression evaluation function
-\item Current state: \(\varsigma = (so, \rho, \sigma, \vec{\kappa})$ and $\kappa :: \vec{\kappa_r} = \vec{\kappa} \)
-\item Next state: \( \varsigma' = (so', \rho', \sigma', \vec{\kappa}') \) \pause
+\item Current state: \(\varsigma = (so, \rho, \sigma, \kappa) \)
+\item Next state: \( \varsigma' = (so', \rho', \sigma', \kappa') \) \pause
   \end{itemize}
   \footnotesize
   \[
   \begin{array}{llllll}
-    so & \text{side condition} & so' & \rho' & \sigma' & \vec{\kappa}' \\ \hline
-    e_1 \update e_2 & & - & \rho & \sigma[\eta_\varsigma(e_1) \mapsto \eta_\varsigma(e_2)] & \vec{\kappa} \\
-    \kw{while}\; e\; s & \eta_\varsigma(e) = \true & - & \rho & \sigma & \sTag{stmtK}{s} :: \sTag{whileK}{(e, s)} :: \vec{\kappa} \\
-    \kw{while}\; e\; s & \eta_\varsigma(e) = \false & - & \rho & \sigma & \vec{\kappa} \\
-    - & \kappa = \sTag{stmtK}{s} & s & \rho & \sigma & \vec{\kappa_r}
+    so & \text{side condition} & so' & \rho' & \sigma' & {\kappa}' \\ \hline
+    e_1 \update e_2 & & - & \rho & \sigma[\eta_\varsigma(e_1) \mapsto \eta_\varsigma(e_2)] & {\kappa} \\
+    \kw{while}\; e\; s & \eta_\varsigma(e) = \true & - & \rho & \sigma & \sTag{stmtK}{(s, \sTag{whileK}{(e, s,\kappa)})} \\
+    \kw{while}\; e\; s & \eta_\varsigma(e) = \false & - & \rho & \sigma & {\kappa} \\
+    - & \kappa = \sTag{stmtK}{(s,\kappa_r)} & s & \rho & \sigma & {\kappa_r}
   \end{array}
   \]
 \end{frame}
@@ -366,11 +366,11 @@ There are other alternatives:
 \end{frame}
 
 \begin{frame}{Abstracting Abstract Machines (AAM)\footcite{van2010abstracting,van2012systematic}}
-  \only<1>{Here is our state, let's start by abstracting it pointwise}
+  \only<beamer>{\only<1>{Here is our state, let's start by abstracting it pointwise}
   \only<2>{We are almost done, but $\abst\Kont$ is still \emph{infinite}!}
   \only<3>{We store the continuations at the store and forcibly finitize them}
-  \only<4>{We may add \emph{timestamps} to record the history of states (more on this later)}
-  \only<1>{
+  \only<4>{We may add \emph{timestamps} to record the history of states (more on this later)}}
+  \only<beamer>{\only<1>{
   \begin{align*}
     \varsigma \in \State & = \Stmt^? \times \Env \times \Store \times \vo{\Kont} \\
     \rho \in \Env & = \Value^\Var \\
@@ -382,22 +382,46 @@ There are other alternatives:
   }
   \only<2>{
   \begin{align*}
-    \abst{\varsigma} \in \abst{\State} & = {\abst{\Stmt}}^? \times \abst{\Env} \times \abst\Store \times \alert<2>{\abst\Kont} \\
-    \abst\rho \in \abst\Env & = {\abst\Value}^{\abst{\Var}} \\
+    \abst{\varsigma} \in \abst{\State} & = {\Stmt}^? \times \abst{\Env} \times \abst\Store \times \alert<2>{\abst\Kont} \\
+    \abst\rho \in \abst\Env & = {\abst\Value}^{\Var} \\
     \abst\sigma \in \abst\Store & = {\abst\Value}^{\abst{\Addr}} \\
-    \abst\kappa \in \abst\Kont & = \sTag{stmtK}{\abst\Stmt \times \abst\Kont} \\
-                         & \disunion \sTag{whileK}{\abst{\Exp} \times \abst\Stmt \times \abst\Kont} \\
-                         & \disunion \sTag{retK}{\abst\Var \times \abst\Exp \times \abst\Env \times \abst\Kont}
-  \end{align*}}
+    \abst\kappa \in \abst\Kont & = \sTag{stmtK}{\Stmt \times \abst\Kont} \\
+                         & \disunion \sTag{whileK}{\Exp \times \Stmt \times \abst\Kont} \\
+                         & \disunion \sTag{retK}{\Var \times \Exp \times \abst\Env \times \abst\Kont}
+  \end{align*}}}
 \only<3->{
   \begin{align*}
-    \abst{\varsigma} \in \abst{\State} & = {\abst{\Stmt}}^? \times \abst{\Env} \times \abst\Store \times \alert<3>{\abst\Addr} \only<4>{\alert{\times \abst{\ns{Time}}}} \\
-    \abst\rho \in \abst\Env & = {\abst\Value}^{\abst{\Var}} \\
+    \abst{\varsigma} \in \abst{\State} & = {\Stmt}^? \times \abst{\Env} \times \abst\Store \times \alert<3>{\abst\Addr} \only<4>{\alert{\times \abst{\ns{Time}}}} \\
+    \abst\rho \in \abst\Env & = {\abst\Value}^{\Var} \\
     \abst\sigma \in \abst\Store & = {\left(\abst\Value+\alert<3>{\alert<3>{\abst\Kont}}\right)}^{\abst{\Addr}} \\
-    \abst\kappa \in \alert<3>{\abst\Kont} & = \sTag{stmtK}{\abst\Stmt \times \alert<3>{\abst\Addr}} \\
-                                       & \disunion \sTag{whileK}{\abst{\Exp} \times \abst\Stmt \times \alert<3>{\abst\Addr}} \\
-                                       & \disunion \sTag{retK}{\abst\Var \times \abst\Exp \times \abst\Env \times \alert<3>{\abst\Addr}}
+    \abst\kappa \in \alert<3>{\abst\Kont} & = \sTag{stmtK}{\Stmt \times \alert<3>{\abst\Addr}} \\
+                                       & \disunion \sTag{whileK}{\Exp \times \Stmt \times \alert<3>{\abst\Addr}} \\
+                                       & \disunion \sTag{retK}{\Var \times \Exp \times \abst\Env \times \alert<3>{\abst\Addr}}
   \end{align*}}
+\end{frame}
+
+\begin{frame}{Abstracting Abstract Machines (AAM)}
+  \begin{itemize}
+  \item The \alt<2->{abstract}{concrete} transition relation \alt<2->{$\abst\varsigma \abst\step {\abst\varsigma}'$}{$\varsigma \step \varsigma'$}
+  \item Current state: \(\alt<2->{\abst\varsigma}{\varsigma} = ({so}, {\alt<2->{\abst\rho}{\rho}}, {\alt<2->{\abst\sigma}{\sigma}}, {\alt<2->{\abst\kappa}{\kappa}}) \)
+\item Next state: \( {\alt<2->{\abst\varsigma}{\varsigma}}' = ({so}', {\alt<2->{\abst\rho}{\rho}}', {\alt<2->{\abst\sigma}{\sigma}}', {\alt<2->{\abst\kappa}{\kappa}}') \)
+  \end{itemize}
+  \footnotesize
+  \[
+  \begin{array}{llllll}
+    so & \text{side condition} & {so}' & {\alt<2->{\abst\rho}{\rho}}' & {\alt<2->{\abst\sigma}{\sigma}}' & {\alt<2->{\abst\kappa}{\kappa}}' \\ \hline
+    e_1 \update e_2 & \alt<2->{\abst{a} = \abst\eta_{\abst\varsigma}(e_1)}{a = \eta_\varsigma(e_1)} & - & \alt<2->{\abst\rho}{\rho} & \alt<2->{\alert<2>{\alt<2->{\abst\sigma}{\sigma}[a \mapsto \alt<2->{\abst\sigma}{\sigma}(a) \sqcup \abst\eta_{\abst\varsigma}(e_2)]}}{\sigma[a \mapsto \eta_\varsigma(e_2)]} & {\alt<2->{\abst\kappa}{\kappa}} \\
+    \kw{while}\; e\; s & \alt<2->{\alert<3>{\true \in \gamma(\abst\eta_{\abst\varsigma}(e))}}{\eta_\varsigma(e) = \true} & - & \alt<2->{\abst\rho}{\rho} & \alt<2->{\abst\sigma}{\sigma} & \sTag{stmtK}{(s, \sTag{whileK}{(e, s,\alt<2->{\abst\kappa}{\kappa})})} \\
+    \kw{while}\; e\; s & \alt<2->{\alert<3>{\false \in \gamma(\abst\eta_{\abst\varsigma}(e))}}{\eta_\varsigma(e) = \true} & - & \alt<2->{\abst\rho}{\rho} & \alt<2->{\abst\sigma}{\sigma} & {\alt<2->{\abst\kappa}{\kappa}} \\
+    - & \alt<2->{\abst\kappa}{\kappa} = \sTag{stmtK}{(s,\alt<2->{\abst\kappa}{\kappa}_r)} & s & \alt<2->{\abst\rho}{\rho} & \alt<2->{\abst\sigma}{\sigma} & {\alt<2->{\abst\kappa}{\kappa}_r}
+  \end{array}
+\]
+
+\begin{itemize}
+\item<2-> We are doing weak updates
+\item<3-> The semantics of loops became nondeterministic
+\end{itemize}
+\todo{Kont $\to$ addr change}
 \end{frame}
 
 \begin{frame}{Widening}
