@@ -728,8 +728,9 @@ static void main(string[] args) {
 \end{frame}
 
 \begin{frame}[fragile]{Reduced products}
+  \small
   \begin{figure}
-    \centering
+    \raggedright
     \begin{subfigure}[b]{0.28\textwidth}\centering\tiny
       \[\begin{tikzcd}
         & \top &  \\
@@ -747,7 +748,7 @@ static void main(string[] args) {
       \caption{\small Cycle domain $\ns{Cyc}$}
     \end{subfigure}
     \begin{subfigure}[b]{0.45\textwidth}\tiny
-      \centering
+      \raggedright
       \[\begin{tikzcd}
         &  & \top &  \\
         \only<1>{\alert{Null,Cyc} \arrow[rru, no head]} & \mathit{Null,Acyc} \arrow[ru, no head] & \mathit{NotNull,Cyc} \arrow[u, no head] & \mathit{NotNull,Acyc} \arrow[lu, no head] \\
@@ -757,8 +758,9 @@ static void main(string[] args) {
   \end{subfigure}
 \end{figure}
 \begin{itemize}
-\item Reduced products have the same concretization. They eliminate impossible (spurious) configurations
-\item There is no general (algorithmic) way to derive them
+\item<2-> Reduced products have the same concretization. They eliminate impossible (spurious) configurations
+\item<3-> There is no general (algorithmic) way to derive them
+\item<4-> But iterative reductions can provide an approximation
 \end{itemize}
 
 \end{frame}
@@ -766,11 +768,15 @@ static void main(string[] args) {
 \begin{frame}{Iterative reductions}
   \small
   \begin{itemize}
-  \item \todo{$\times : \mathcal{D \times D} \to \mathcal{D}$}
-  \item \todo{Binary product abstract domain functor from ASTRÉE\footcite{cousot2005astree,cousot2007varieties,cousot2006combination}}
+  \item \todo{Define reduction operator}
   \item The communication of information is a reduction operator. Iteratively applying it till reaching a fixpoint is a reduction of the cartesian product.
   \item Also, Nelson-Oppen combination used in SMT solvers can be used for computing iterative reductions efficiently and separately, even if the decision procedures share their signatures.\footcite{cousot2011reduced}
   \end{itemize}
+\end{frame}
+
+\begin{frame}{Reduction operator example}
+  \item \todo{$\times : \mathcal{D \times D} \to \mathcal{D}$}
+  \item \todo{Binary product abstract domain functor from ASTRÉE\footcite{cousot2005astree,cousot2007varieties,cousot2006combination}}
 \end{frame}
 
 \begin{frame}{Sharing information}
