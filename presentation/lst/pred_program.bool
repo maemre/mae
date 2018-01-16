@@ -1,0 +1,20 @@
+void example() {
+  do {
+    skip;
+    lock_return();
+    skip;
+    if ($\alert<3>{\texttt{*}}$) {
+      skip;
+      unlock_return();
+      skip;
+      if(*) {
+        skip;
+      } else {
+        skip;
+      }
+      skip;
+    } 
+  } while (*);
+  skip;
+  unlock_return();
+}

@@ -3,14 +3,12 @@ decl {state==Locked},
 
 void error() { $\alert{\texttt{ERROR:}}$ skip }
 
-void lock() {
-  if ({state==Locked}) error();
-  else {State==Locked} = T,
-       {State==Unlocked} = F;
+void lock_return() {
+  if ($\phi_1$) error();
+  else $\phi_1$,$\phi_2$ = T, F;
 }
 
-void unlock() {
-  if ({state==Unlocked}) error();
-  else {State==Locked} = F,
-       {State==Unlocked} = T;
+void unlock_return() {
+  if ($\phi_2$) error();
+  else $\phi_1$,$\phi_2$ = F, T;
 }

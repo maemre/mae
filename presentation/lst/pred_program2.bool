@@ -1,0 +1,9 @@
+void example() {
+  do {
+    lock_return();
+    if (*) {
+      unlock_return();
+    } 
+  } while (*);
+  unlock_return();
+}

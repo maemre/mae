@@ -3,13 +3,13 @@ lock_state state = Unlocked;
 
 void error() { $\alert{\texttt{ERROR:}}$ }
 
-void lock() {
+void lock_return() {
   if (state == Locked) error();
   else state = Locked;
 }
 
 
-void unlock() {
+void unlock_return() {
   if (state == Unlocked) error();
   else state = Unlocked;
 }

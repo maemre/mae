@@ -585,7 +585,7 @@ static void main(string[] args) {
   \end{itemize}
 \end{frame}
 
-\begin{frame}{CEGAR Example}
+\begin{frame}{CEGAR Example (from SLAM project)}
   \footnotesize
   \begin{enumerate}[<+->]
   \item Abstract a C program with a Boolean program with one variable per predicate
@@ -595,9 +595,9 @@ static void main(string[] args) {
   \end{enumerate}
 \end{frame}
 
-\begin{frame}{C $\to$ Boolean: Instrumentation code}
-  \small
-  $\phi_1 = \texttt{\{state==Locked\}}$, $\phi_2 = \texttt{\{state==Unlocked\}}$\\
+\begin{frame}{Predicate abstraction: Instrumentation code}
+  \begingroup\footnotesize
+  $\phi_1 = \texttt{\{state==Locked\}}$, $\phi_2 = \texttt{\{state==Unlocked\}}$\endgroup
   \begin{columns}[t]
     \begin{column}{0.45\textwidth}
       \lstinputlisting[language=C,mathescape]{lst/pred_instr.c}
@@ -608,22 +608,26 @@ static void main(string[] args) {
   \end{columns}
 \end{frame}
 
-\begin{frame}{C $\to$ Boolean: The actual program}
-  \small
-  $\phi_1 = \texttt{\{state==Locked\}}$, $\phi_2 = \texttt{\{state==Unlocked\}}$\\
-  \todo{abstract the lock example}
-%   \begin{columns}[t]
-%     \begin{column}{0.45\textwidth}
-%       \lstinputlisting[language=C,mathescape]{lst/pred_program.c}
-%     \end{column}
-%     \begin{column}{0.45\textwidth}
-%       \lstinputlisting[language=C,mathescape]{lst/pred_program.bool}
-%     \end{column}
-%   \end{columns}
-\end{frame}
-
-\begin{frame}{Refining the abstraction}
-  \todo{Generate a counterexample, then update the predicate list}
+\begin{frame}{\alt<5->{Abstraction refinement}{Predicate abstraction: The actual program}}
+  \begingroup\footnotesize\vspace{-0.5em}
+  $\phi_1 = \texttt{\{state==Locked\}}$, $\phi_2 = \texttt{\{state==Unlocked\}}$\vspace{-1.5em}
+  \begin{columns}[t]
+    \begin{column}{0.40\textwidth}
+      \lstinputlisting[language=C,mathescape]{lst/pred_program.c}
+    \end{column}\pause
+    \begin{column}{0.55\textwidth}
+      \only<beamer>{
+        \only<3>{\lstinputlisting[language=C,mathescape]{lst/pred_program.bool}}
+        }
+        \only<4->{\lstinputlisting[language=C,mathescape]{lst/pred_program2.bool}}
+        \begin{itemize}\footnotesize
+        \item<5-> We send this program to the model checker
+        \item<6-> Get the counterexample
+        \item<7-> Refine with $\phi_3 = \texttt{\{nPackets==nPacketsOld\}}$
+        \end{itemize}
+    \end{column}
+  \end{columns}
+  \endgroup
 \end{frame}
 
 \begin{frame}{Lazy abstraction\footcite{henzinger2002lazy}}
