@@ -657,11 +657,12 @@ static void main(string[] args) {
   \item Gulavani et al. used abstract refinement to find the first instance of widening that causes imprecision\footcite{gulavani2006counterexample}
   \item They use it to determine widening delays, they also keep a history of widening results because widening is not monotonic
   \item On a later paper\footcite{gulavani2008automatically}, they extend this technique to joins and combine results of Craig interpolants and widening
-    \begin{itemize}
+    \begin{itemize}\footnotesize
     \item They use bounded widening ($\widen_T$): $\widen_T$ is a widening operation such that\\ if $\exists C \in T.\, A, B \sqsubseteq C$ then $A \widen_T B \sqsubseteq C$
     \item Then define \emph{interpolated widening} as $A \widen_{\Set{I}} B$ where $I$ is the interpolant of $A, B$.
+    \item This is useful because widening and interpolants find different kinds of invariants
     \end{itemize}
-  \item Both of these works are implemented using polyhedral domains
+  \item Both of these works are implemented using polyhedral domains (formulas over linear arithmetic)
   \end{itemize}
 \end{frame}
 
@@ -722,8 +723,40 @@ static void main(string[] args) {
 
 \end{frame}
 
-\begin{frame}{Reduced products}
-  \todo{Null \& cycle example}
+\begin{frame}[fragile]{Reduced products}
+  \begin{figure}
+    \centering
+    \begin{subfigure}[b]{0.28\textwidth}\centering\tiny
+      \[\begin{tikzcd}
+        & \top &  \\
+        \mathit{Null} \arrow[ru, no head] &  & \mathit{NotNull} \arrow[lu, no head] \\
+        & \bot \arrow[ru, no head] \arrow[lu, no head] & 
+      \end{tikzcd}\]
+      \caption{\small Nullity domain $\ns{Null}$}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.25\textwidth}\centering\tiny
+      \[\begin{tikzcd}
+        & \top &  \\
+        \mathit{Cyclic} \arrow[ru, no head] &  & \mathit{NotCyclic} \arrow[lu, no head] \\
+        & \bot \arrow[ru, no head] \arrow[lu, no head] & 
+      \end{tikzcd}\]
+      \caption{\small Cycle domain $\ns{Cyc}$}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.45\textwidth}\tiny
+      \centering
+      \[\begin{tikzcd}
+        &  & \top &  \\
+        \only<1>{\alert{Null,Cyc} \arrow[rru, no head]} & \mathit{Null,Acyc} \arrow[ru, no head] & \mathit{NotNull,Cyc} \arrow[u, no head] & \mathit{NotNull,Acyc} \arrow[lu, no head] \\
+        &  & \bot \arrow[ru, no head] \arrow[lu, no head] \arrow[u, no head] \only<1>{\arrow[llu, no head]} & 
+      \end{tikzcd}\]
+    \caption{\small \alt<2>{The reduced product of $Null$ and $Cyc$}{The Cartesian product $Null \times Cyc$}}
+  \end{subfigure}
+\end{figure}
+\begin{itemize}
+\item Reduced products have the same concretization. They eliminate impossible (spurious) configurations
+\item There is no general (algorithmic) way to derive them
+\end{itemize}
+
 \end{frame}
 
 \begin{frame}{Sharing information}
