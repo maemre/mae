@@ -755,7 +755,7 @@ static void main(string[] args) {
 
 \end{frame}
 
-\begin{frame}[fragile]{Reduced products}
+\begin{frame}[fragile]{Reduced products\footcite{cousot1979systematic}}
   \small
   \begin{figure}
     \raggedright
@@ -786,9 +786,9 @@ static void main(string[] args) {
   \end{subfigure}
 \end{figure}
 \begin{itemize}
-\item<2-> Reduced products have the same concretization. They eliminate impossible (spurious) configurations
-\item<3-> There is no general (algorithmic) way to derive them
-\item<4-> But iterative reductions can provide an approximation
+\item<3-> Reduced products have the same concretization. They eliminate impossible (spurious) configurations
+\item<4-> There is no general (algorithmic) way to derive them
+\item<5-> But iterative reductions can provide an approximation
 \end{itemize}
 
 \end{frame}
@@ -796,15 +796,21 @@ static void main(string[] args) {
 \begin{frame}{Iterative reductions}
   \small
   \begin{itemize}
-  \item \todo{Define reduction operator}
-  \item The communication of information is a reduction operator. Iteratively applying it till reaching a fixpoint is a reduction of the cartesian product.
+  \item A reduction operator\footcite{cousot2011reduced} $\rho: L \to L$ over a lattice $L$ is
+    \begin{itemize}
+    \item a reductive $\rho(a) \sqsubseteq a$ operation
+    \item  that preserves concretization $\gamma \circ \rho = \gamma$
+\end{itemize}
+  \item The communication of information between different domains is a reduction operator. Iteratively applying it until reaching a fixpoint is a reduction of the cartesian product.
   \item Also, Nelson-Oppen combination used in SMT solvers can be used for computing iterative reductions efficiently and separately, even if the decision procedures share their signatures.\footcite{cousot2011reduced}
   \end{itemize}
 \end{frame}
 
 \begin{frame}{Reduction operator example}
+  \begin{itemize}
   \item \todo{$\times : \mathcal{D \times D} \to \mathcal{D}$}
   \item \todo{Binary product abstract domain functor from ASTRÉE\footcite{cousot2005astree,cousot2007varieties,cousot2006combination}}
+  \end{itemize}
 \end{frame}
 
 \begin{frame}{Sharing information}
