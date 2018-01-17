@@ -735,7 +735,13 @@ static void main(string[] args) {
   \todo{Explain with an example}
 \end{frame}
 
-\begin{frame}{\todo{Chen \& Cousot\footcite{chen2015binary}}}
+\begin{frame}{Binary Decision Tree Abstract Domain Functor\footcite{chen2015binary}}
+  \begin{itemize}
+  \item Do a control flow analysis, extract DAGs of branch conditions (not loop conditions)
+  \item Construct binary decision trees whose leaves are the input abstract domain
+  \item Define widening and narrowing pointwise
+  \item Partially restore path sensitivity (disjunctions) for some portions of the state
+  \end{itemize}
 \end{frame}
 
 \subsection{Combination of domains}
