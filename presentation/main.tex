@@ -412,7 +412,7 @@ There are other alternatives:
   \begin{array}{llllll}
     so & \text{side condition} & {so}' & {\alt<2->{\abst\rho}{\rho}}' & {\alt<2->{\abst\sigma}{\sigma}}' & {\alt<2->{\abst{a}}{\kappa}}' \\ \hline
     e_1 \update e_2 & \alt<2->{\abst{a} = \abst\eta_{\abst\varsigma}(e_1)}{a = \eta_\varsigma(e_1)} & - & \alt<2->{\abst\rho}{\rho} & \alt<2->{\alert<2>{\alt<2->{\abst\sigma}{\sigma}[a \mapsto \alt<2->{\abst\sigma}{\sigma}(a) \sqcup \abst\eta_{\abst\varsigma}(e_2)]}}{\sigma[a \mapsto \eta_\varsigma(e_2)]} & {\alt<2->{\abst{a}}{\kappa}} \\
-    \kw{while}\; e\; s & \alt<2->{\alert<3>{\true \in \gamma(\abst\eta_{\abst\varsigma}(e)) \wedge \abst{a}_2 = \fn{tick}_2}}{\eta_\varsigma(e) = \true} & - & \alt<2->{\abst\rho}{\rho} & \alt<2->{\abst\sigma[\abst{a}' \mapsto \sTag{stmtK}{(s, \abst{a}_2)}, \abst{a}_2 \mapsto \sTag{whileK}{(e, s,\abst{a})}]}{\sigma} & \alt<2->{\fn{tick}_1}{\sTag{stmtK}{(s, \sTag{whileK}{(e, s,\kappa)})}} \\
+    \kw{while}\; e\; s & \alt<2->{\alert<3>{\true \in \gamma(\abst\eta_{\abst\varsigma}(e)) \wedge \abst{a}_2 = \fn{tick}_2}}{\eta_\varsigma(e) = \true} & - & \alt<2->{\abst\rho}{\rho} & \alt<2->{\abst\sigma[{\abst{a}}' \mapsto \sTag{stmtK}{(s, \abst{a}_2)}, \abst{a}_2 \mapsto \sTag{whileK}{(e, s,\abst{a})}]}{\sigma} & \alt<2->{\fn{tick}_1}{\sTag{stmtK}{(s, \sTag{whileK}{(e, s,\kappa)})}} \\
     \kw{while}\; e\; s & \alt<2->{\alert<3>{\false \in \gamma(\abst\eta_{\abst\varsigma}(e))}}{\eta_\varsigma(e) = \true} & - & \alt<2->{\abst\rho}{\rho} & \alt<2->{\abst\sigma}{\sigma} & {\alt<2->{\abst{a}}{\kappa}} \\
     - & \alt<2->{\sigma(\abst{a})}{\kappa} = \sTag{stmtK}{(s,\alt<2->{\abst{a}}{\kappa}_r)} & s & \alt<2->{\abst\rho}{\rho} & \alt<2->{\abst\sigma}{\sigma} & {\alt<2->{\abst{a}}{\kappa}_r}
   \end{array}
@@ -650,7 +650,7 @@ static void main(string[] args) {
         \only<4->{\lstinputlisting[language=C,mathescape]{lst/pred_program2.bool}}
         \begin{itemize}\footnotesize
         \item<5-> Send this program to the model checker to verify it
-        \item<6-> The model checker finds a bad path, reify it using \fn{Pre}
+        \item<6-> The model checker finds a bad path, concretize it using $\fn{Pre}$
         \item<7-> Refine with $\phi_3 = \texttt{\{nPackets==nPacketsOld\}}$, generated from the counterexample
         \end{itemize}
     \end{column}
@@ -731,17 +731,32 @@ static void main(string[] args) {
   \end{itemize}
 \end{frame}
 
-\begin{frame}{Variable packing}
-  \todo{Explain with an example}
-\end{frame}
-
 \begin{frame}{Binary Decision Tree Abstract Domain Functor\footcite{chen2015binary}}
-  \begin{itemize}
+  
+  \begin{itemize}[<+->]
   \item Do a control flow analysis, extract DAGs of branch conditions (not loop conditions)
   \item Construct binary decision trees whose leaves are the input abstract domain
   \item Define widening and narrowing pointwise
   \item Partially restore path sensitivity (disjunctions) for some portions of the state
-  \end{itemize}
+  \end{itemize}\uncover<5->{
+  \begin{columns}
+    \begin{column}{0.2\textwidth}\centering
+  \lstinputlisting[language=C,numbers=left]{lst/chen_cousot.c}
+\end{column}
+\begin{column}{0.7\textwidth}\centering
+  \footnotesize
+  \alt<6->{\begin{tikzcd}[ampersand replacement=\&]
+    \& x \le 50 \arrow[rd, "\false"] \arrow[ld, "\true"'] \& \\
+    0 \le x \le 50 \wedge x = y \&  \& x+y-102=0 \wedge 51 \le x \le 103
+  \end{tikzcd}}
+{
+  \begin{align*}
+    y \ge 1 \wedge x-y\ge 0 \wedge x + 52y \ge 0\\
+    \alert{\not \therefore x + y \le 102}
+  \end{align*}
+}
+\end{column}
+\end{columns}}
 \end{frame}
 
 \subsection{Combination of domains}
