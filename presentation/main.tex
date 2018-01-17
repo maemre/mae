@@ -565,7 +565,8 @@ static void main(string[] args) {
 \end{frame}
 
 \begin{frame}{Relationship with model checking}
-  \begin{itemize}
+  \small
+  \begin{itemize}[<+->]
   \item Abstract interpretation links model
     checking and a certain kind of dataflow analysis
     \footcite{schmidt1998program,schmidt1998data}
@@ -582,6 +583,9 @@ static void main(string[] args) {
     \end{itemize}
   \item (Trace-based) abstract interpretation creates the finite model of the
     program at the desired precision level
+    \begin{itemize}
+    \item We will see something in the same vein in predicate abstraction
+    \end{itemize}
   \end{itemize}
 \end{frame}
 
@@ -589,13 +593,13 @@ static void main(string[] args) {
 \subsection{Predicate abstraction}
 \begin{frame}{Predicate abstraction}
   \begin{itemize}[<+->]
+  \item Proposed by Clarke et al. and Graf et al. for hardware verification\footcite{clarke1994model,graf1997construction}
   \item Main idea: our abstract domain is a finite set of predicates $\phi_i,\, 1 \le i\le n$ over states
   \item $\abst{\State} = \pw\left(\bigcup_{i}\Set{\phi_i, \neg \phi_i}\right).$
   \item $\abst{\varsigma_1} \sqsubseteq \abst{\varsigma_2} \equiv \abst{\varsigma_2} \subseteq \abst{\varsigma_1}.$
   \item $\gamma(\abst{\varsigma}) = \Set{\varsigma \in \State \vert \bigwedge_{\phi \in \varsigma} \phi}.$
   \item $\alpha(\varsigma) = \bigwedge_{\phi_i(\varsigma)} \phi_i \wedge \Set{\neg\phi_i \vert \neg\phi_i(\varsigma)}.$
   \item Use model checkers/theorem provers to compute $\abst{\fn{Post}}$ and reachability
-  \item Proposed by Clarke et al. and Graf et al. for hardware verification\footcite{clarke1994model,graf1997construction}
   \end{itemize}
 \end{frame}
 \subsection{Abstraction refinement}
@@ -645,9 +649,9 @@ static void main(string[] args) {
         }
         \only<4->{\lstinputlisting[language=C,mathescape]{lst/pred_program2.bool}}
         \begin{itemize}\footnotesize
-        \item<5-> We send this program to the model checker
-        \item<6-> Get the counterexample
-        \item<7-> Refine with $\phi_3 = \texttt{\{nPackets==nPacketsOld\}}$
+        \item<5-> Send this program to the model checker to verify it
+        \item<6-> The model checker finds a bad path, reify it using \fn{Pre}
+        \item<7-> Refine with $\phi_3 = \texttt{\{nPackets==nPacketsOld\}}$, generated from the counterexample
         \end{itemize}
     \end{column}
   \end{columns}
