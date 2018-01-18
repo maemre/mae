@@ -1,12 +1,17 @@
-%\documentclass[14pt]{beamer}
+%\documentclass[aspectratio=169,notes]{beamer}
 \documentclass[aspectratio=169]{beamer}
 \usetheme[titleformat=regular%
 ,numbering=fraction% use slide numbers
 ]{metropolis}
 \usepackage{appendixnumberbeamer} % separate appendix
-\usepackage[citestyle=authortitle-ibid,sorting=none]{biblatex}
+\usepackage[citestyle=authortitle-comp,sorting=none]{biblatex}
 \setbeamerfont{footnote}{size=\tiny}
 \addbibresource{mae.bib}
+
+% add notes:
+% \usepackage{pgfpages}
+% \setbeamertemplate{note page}[plain]
+% \setbeameroption{show notes on second screen=right}
 
 \input{macros}
 
@@ -38,7 +43,7 @@ Low-level software:
 \begin{itemize}
 \item Interacts with intricate APIs (drivers, kernel modules, databases)
 \item Require preserving subtle invariants (above, control software)
-\item Have heavy reliability requirements
+\item Have strong reliability requirements
 \begin{itemize}
 \item with unpleasant consequences % : BSoD, data loss, Arianne~5, Heartbleed, Patriot missile
 \end{itemize}
@@ -74,6 +79,8 @@ There are other alternatives:
 \item model checking (there is a neat connection with model checking)
 \item type systems (limits choice of language, context-insensitive)
 \end{itemize}
+
+\note{a.i.+MC can give a DFA that is correct by construction}
 \end{frame}
 
 \section{A first attempt}
@@ -85,7 +92,7 @@ There are other alternatives:
   \end{gather*}\vspace{-2em}
   \begin{align*}
     fd \in \ns{FunDef} \eDEF & \alert<5>{\kw{def}\; f(\vo{x}) = s;\,\kw{return}\; e} \\
-    e \in \Exp \eDEF & x \eOR n \eOR b \eOR e_1 \oplus e_2 \eOR *x \eOR \alert<1>{\kw{choose}\;e_1\,e_2} \\
+    e \in \Exp \eDEF & x \eOR n \eOR b \eOR e_1 \oplus e_2 \eOR *x \\ % \eOR \alert<1>{\kw{choose}\;e_1\,e_2} \\
     s \in \Stmt \eDEF & s;\,s \eOR \alert<2>{\kw{abort}} \\
     \eOR & \alert<4>{\kw{if}\, e\; s_1 \; \kw{else} \; s_2} \\
     \eOR & \alert<4>{\kw{while}\; e\; s} \\
@@ -164,23 +171,23 @@ There are other alternatives:
     \begin{figure}[h]
     \centering
     \begin{tikzpicture}[x=2cm, y=1.5cm]
-      \node(top)at (1,3){$\textcolor<9>{magenta}{\{+,-,0\} = \top}$} ;
+      \node(top)at (1,3){$\textcolor<9>{mLightBrown}{\{+,-,0\} = \top}$} ;
       \node(pm)at (1,2){$\{+,-\}$} ;
       \node(mz)at (2,2){$\{-,0\}$} ;
-      \node(pz)at (0,2){$\textcolor<4>{magenta}{\{+,0\}}$} ;
+      \node(pz)at (0,2){$\textcolor<4>{mLightBrown}{\{+,0\}}$} ;
       \node(p)at (0,1){$\{+\}$} ;
       \node(m)at (2,1){$\{-\}$} ;
-      \node(z)at (1,1){$\textcolor<8>{magenta}{\{0\}}$} ;
-      \node(bot)at (1,0){$\textcolor<9>{magenta}{\emptyset = \bot}$} ;
+      \node(z)at (1,1){$\textcolor<8>{mLightBrown}{\{0\}}$} ;
+      \node(bot)at (1,0){$\textcolor<9>{mLightBrown}{\emptyset = \bot}$} ;
       \draw(top)--(pm);
       \draw(top)--(mz);
       \draw(top)--(pz);
       \draw(pm)--(p);
       \draw(pm)--(m);
       \draw(mz)--(m);
-      \draw[onslide={<7-8> draw=magenta, line width=1.2pt}](mz)--(z);
-      \draw[onslide={<2-4> draw=magenta, line width=1.2pt}](pz)--(p);
-      \draw[onslide={<3-4,6-8> draw=magenta, line width=1.2pt}](pz)--(z);
+      \draw[onslide={<7-8> draw=mLightBrown, line width=1.2pt}](mz)--(z);
+      \draw[onslide={<2-4> draw=mLightBrown, line width=1.2pt}](pz)--(p);
+      \draw[onslide={<3-4,6-8> draw=mLightBrown, line width=1.2pt}](pz)--(z);
       \draw(p)--(bot);
       \draw(m)--(bot);
       \draw(z)--(bot);
@@ -293,11 +300,11 @@ There are other alternatives:
  \end{tightcenter}
 
  \begin{tikzpicture}[overlay, remember picture]
-   \draw<7-9>[draw=magenta, line width=1.1pt] ($(a)+(-.1em,-.4em)$) rectangle ($(b)+(0.1em,1em)$);
+   \draw<7-9>[draw=mLightBrown, line width=1.1pt] ($(a)+(-.1em,-.4em)$) rectangle ($(b)+(0.1em,1em)$);
    \draw<7-9>[draw opacity=0] (a) to node [midway, below, yshift=-.5em] {$\alpha$ is sound} (b);
-   \draw<4-6>[draw=magenta, line width=1.1pt] ($(ma)+(-.1em,-.4em)$) rectangle ($(mb)+(0.1em,1em)$);
+   \draw<4-6>[draw=mLightBrown, line width=1.1pt] ($(ma)+(-.1em,-.4em)$) rectangle ($(mb)+(0.1em,1em)$);
    %\draw<4>[draw opacity=0] (ma) to node [midway, below, yshift=-.5em] {$\alpha$ is sound} (mb);
-   \draw<10-12>[draw=magenta, line width=1.1pt] ($(ra)+(-.1em,-.4em)$) rectangle ($(rb)+(0.1em,1em)$);
+   \draw<10-12>[draw=mLightBrown, line width=1.1pt] ($(ra)+(-.1em,-.4em)$) rectangle ($(rb)+(0.1em,1em)$);
    %\draw<11>[draw opacity=0] (ra) to node [midway, below, yshift=-.5em] {$\alpha$ is sound} (rb);
  \end{tikzpicture}
 \end{frame}
@@ -336,10 +343,10 @@ There are other alternatives:
   \begin{tightcenter}
     \begin{tikzcd}[execute at end picture={
         \only<beamer>{
-      \onslide<2>{\node(o1)[fill=blue,opacity=0.1,fit=(ea.north west) (eb.north east) (eb.south east) (ea.south west)]{};}
-      \onslide<3>{\node(o2)[fill=blue,opacity=0.1,fit=(aa.south west) (ea.north east)]{};}
-      \onslide<4>{\fill[blue,opacity=0.1] (aa.north west) -- (ab.north east) -- (ab.south east) -- (aa.south west) -- cycle;}
-      \onslide<5>{\node(o3)[fill=blue,opacity=0.1,fit=(ab.south west) (eb.north east)]{};}
+      \onslide<2>{\node(o1)[fill=gray,opacity=0.1,fit=(ea.north west) (eb.north east) (eb.south east) (ea.south west)]{};}
+      \onslide<3>{\node(o2)[fill=gray,opacity=0.1,fit=(aa.south west) (ea.north east)]{};}
+      \onslide<4>{\fill[gray,opacity=0.1] (aa.north west) -- (ab.north east) -- (ab.south east) -- (aa.south west) -- cycle;}
+      \onslide<5>{\node(o3)[fill=gray,opacity=0.1,fit=(ab.south west) (eb.north east)]{};}
       }
     }]
        & |[alias=ea]| \concolor{\varsigma } \arrow[r] \arrow[dd, "\alpha", dotted] & |[alias=eb]| \concolor{\varsigma'  \arrow[d, "\alpha", dotted]} \\
@@ -348,7 +355,7 @@ There are other alternatives:
     \end{tikzcd}
     \only<beamer>{
     \begin{tikzpicture}[remember picture, overlay,
-      every node/.append style = { align = center, minimum height = 10pt,fill=blue,opacity=0.1,text opacity=1}]
+      every node/.append style = { align = center, minimum height = 10pt,fill=gray,opacity=0.1,text opacity=1}]
       \onslide<2>{\node[left=6cm, text width=4cm](){\textcolor{gray}{\textsf{\footnotesize Program executing state $\varsigma$ transitions to state $\varsigma'$}}};}
       
       \onslide<3>{\node[left=6cm, text width=4cm](){\textcolor{gray}{\textsf{\footnotesize $\alpha(\varsigma)$ abstracts $\varsigma$}}};}
@@ -621,6 +628,7 @@ static void main(string[] args) {
   \item If verification fails, produce a counterexample by computing a backwards path and add the corresponding new predicate to the set of predicates and go to step 1.
   \item Otherwise, we verified the program
   \end{enumerate}
+  \note{During abstraction, we extract the predicates that affect/depend on parameters/globals/returns for each procedure, carry that as a signature and use it to create the Boolean program. SLAM is interprocedural but it is not context sensitive}
 \end{frame}
 
 \begin{frame}{Predicate abstraction: Instrumentation code}
@@ -712,9 +720,52 @@ static void main(string[] args) {
 \end{frame}
 
 \subsection{Dynamic state partitioning}
-\begin{frame}{\todo{Bultan et al. \& cite Jeannet}}
-  \todo{\footcite{bultan_model-checking_1999,jeannet_dynamic_1999}}
-  \todo{\footcite{bultan_composite_2000,jeannet_representing_2002}}
+\begin{frame}{Partitioning the state of control programs}\small
+  \begin{itemize}[<+->]
+  \item Many control programs don't have a program counter like sequential programs
+  \item Bultan et al.\footcite{bultan_model-checking_1999} propose a method to decompose the transition relation. Their method has 3 stages:
+    \begin{enumerate}
+    \item Convert an event-action language to DNF Presburger formulas
+    \item Partition the state space by different valuations of variables with limited range (such as control variables) based on heuristics
+      \begin{itemize}
+      \item Also, decompose the transition relation to have states in a single partition for the domain and the range of each transition formula
+      \end{itemize}
+
+    \item Apply only the relevant parts of the transition relation to each partition when computing a fixpoint
+    \end{enumerate}
+  \item To guarantee convergence, they introduce a widening operator for multipolyhedra
+  \item They later on extend this technique to work on programs containing integers, Booleans, and enums\footcite{bultan_composite_2000}
+  \end{itemize}
+  \note{They evaluate their technique by verifying properties of Bakery algorithm, ticket algorithm, bounded buffer producer-consumer, and a circular queue.}
+  \note{In this work, they merge formulas from the same language together then apply simplification procedures per sublanguage separately}
+\end{frame}
+
+\begin{frame}{Dynamic state partitioning for automata\footcite{jeannet_dynamic_1999}}
+  \begin{itemize}
+  \item Jeannet et al. propose a dynamic partitioning technique to partition state space of an automaton with polyhedral constraints as guards
+  \item They first do a reachability analysis on the automaton's control structure to get an initial CFG
+  \item They then partition each state according to the guards present in the program
+    \begin{itemize}
+    \item They partition a state according to a guard if the guard's condition also partitions the outgoing transitions 
+    \end{itemize}
+  \end{itemize}
+\end{frame}
+
+
+\begin{frame}{Partitioning transfer functions of automata with hetereogeneous types}
+  \small
+  \begin{itemize}
+  \item Jeannet\cite{jeannet_representing_2002} proposes a method for partitioning transfer functions of automata with Booleans and integers
+  \item He represents the transfer function as a multi-terminal binary decision diagram (MTBDD) where the terminals contain the primitive relations for each type
+  \item He considers 3 methods to abstract the MTBDDs:
+    \begin{enumerate}
+    \item Best approximation: intersect the input with every path on MTBDD then join the results ($\bigO(2^{vc})$)
+    \item Cartesian product: project the transfer function to each variable and take the Cartesian product ($\bigO(v2^{c})$)
+    \item Abstraction predicates: consider the paths going to each terminal of the MTBDD as partitions $\bigO(vt)$
+    \end{enumerate}
+  \item He also \emph{specializes} each node in MTBDD based on the constraints imposed by its ancestors to improve precision and simplify constraints
+  \end{itemize}
+  \note{c=choice, v=variables, t=terminals}
 \end{frame}
 
 \begin{frame}{Extending non-parallel analysis to multithreaded programs\footcite{mine2011static}}
@@ -757,6 +808,7 @@ static void main(string[] args) {
 }
 \end{column}
 \end{columns}}
+\note{It's called a functor because of OCaml's functors which take modules and produce modules, this is a transformation that takes an abstract domain and produces a new one}
 \end{frame}
 
 \subsection{Combination of domains}
@@ -831,16 +883,38 @@ static void main(string[] args) {
   \end{itemize}
 \end{frame}
 
-\begin{frame}{Reduction operator example}
+\begin{frame}{Reduction example: ASTRÉE's\footcite{cousot2005astree,cousot2007varieties} Binary product abstract domain functor\footcite{cousot2006combination}}
   \begin{itemize}
-  \item \todo{$\times : \mathcal{D \times D} \to \mathcal{D}$}
-  \item \todo{Binary product abstract domain functor from ASTRÉE\footcite{cousot2005astree,cousot2007varieties,cousot2006combination}}
+  \item $\times : \mathcal{D \times D} \to \mathcal{D}$. It combines two domains and shares information between them automatically
+  \item The information sharing is done by passing new constraints generated by some domains to others
+  \item The constraints passed to $\mathcal{A \times B}$ are passed to both $\mathcal{A}$ and $\mathcal{B}$
+  \item The new constraints generated by $\mathcal{A}$ and $\mathcal{B}$
+  \item The refinement is acyclic to ensure termination (not to make widening unstable)
   \end{itemize}
 \end{frame}
 
-\begin{frame}{Sharing information}
-  \todo{Add an example that gets refined as we communicate the info}
+\begin{frame}{An example domain hierarchy from ASTRÉE\footcite{cousot2006combination}}
+  \begingroup\tiny
+  \begin{center}
+    \begin{tikzcd}[ampersand replacement=\&]
+      \& \alert<1>{\textsf{trace partitioning}} \arrow[d, no head] \&  \&  \&  \&  \\
+      \& \alert<3>{\times} \arrow[ld, no head] \arrow[rd, no head] \&  \&  \&  \&  \\
+      \textsf{intervals} \&  \& \alert<3>{\times} \arrow[ld, no head] \arrow[rd, no head] \&  \&  \&  \\
+      \& \textsf{symbolic domain} \&  \& \alert<3>{\times} \arrow[ld, no head] \arrow[rd, no head] \&  \&  \\
+      \&  \& \textsf{octagons} \&  \& \alert<2>{\textsf{boolean partitioning}} \arrow[d, no head] \&  \\
+      \&  \&  \&  \& \alert<3>{\times} \arrow[ld, no head] \arrow[rd, no head] \&  \\
+      \&  \&  \& \textsf{intervals} \&  \& \textsf{symbolic domain}
+    \end{tikzcd}
+  \end{center}
+  \endgroup
+  \note{Trace partitioning distinguishes between different traces up to current program point and keeps a couple domains below it}
+  \note{Boolean partitioning splits the states for different values of a set of booleans, similar to predicate abstraction}
+  \note{Binary product connects domains to get a partially reduced product, as explained above}
 \end{frame}
+
+% \begin{frame}{Sharing information}
+%   \todo{Add an example that gets refined as we communicate the info}
+% \end{frame}
 
 \begin{frame}[standout]
   Thank you!
