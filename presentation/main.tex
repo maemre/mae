@@ -3,12 +3,23 @@
 \usetheme[titleformat=regular%
 ,numbering=fraction% use slide numbers
 ]{metropolis}
+\metroset{%
+  progressbar = foot,%
+  % background=dark,
+  block=fill
+}
 \usepackage{appendixnumberbeamer} % separate appendix
 \usepackage[citestyle=authortitle-comp,sorting=none]{biblatex}
 \setbeamerfont{footnote}{size=\tiny}
 \addbibresource{mae.bib}
 
 % add notes:
+% \makeatletter
+% \def\beamer@framenotesbegin{% at beginning of slide
+% \usebeamercolor[fg]{normal text}\gdef\beamer@noteitems{}%
+% \gdef\beamer@notes{}%
+% }
+% \makeatother
 % \usepackage{pgfpages}
 % \setbeamertemplate{note page}[plain]
 % \setbeameroption{show notes on second screen=right}
@@ -72,18 +83,18 @@ Low-level software:
 }
 
 
-\begin{frame}{Why abstract interpretation?}
-There are other alternatives:
-\begin{itemize}[<+->]
-\item ad-hoc, iterative DFA (not amenable to systematic correctness)
-\item model checking (there is a neat connection with model checking)
-\item type systems (limits choice of language, context-insensitive)
-\end{itemize}
+% \begin{frame}{Why abstract interpretation?}
+% There are other alternatives:
+% \begin{itemize}[<+->]
+% \item ad-hoc, iterative DFA (not amenable to systematic correctness)
+% \item model checking (there is a neat connection with model checking)
+% \item type systems (limits choice of language, context-insensitive)
+% \end{itemize}
 
-\note{a.i.+MC can give a DFA that is correct by construction}
-\end{frame}
+% \note{a.i.+MC can give a DFA that is correct by construction}
+% \end{frame}
 
-\section{A first attempt}
+\section{The concrete world}
 \begin{frame}{SIMPL\footnote{simple introductory made-up programming language} Syntax}
   \vspace{-2em}
   \small
@@ -105,19 +116,22 @@ There are other alternatives:
 \begin{frame}{SIMPL semantic domains}
   \begingroup\footnotesize We will use abstract machine semantics and represent the semantics of a program as a transition relation.\endgroup
 \begin{align*}
-    \varsigma \in \State & = \Stmt^? \times \Env \times \Store \times \alert<4>{\Kont} \\
-    \rho \in \Env & = \alert<2>{\Value}^{\Var} \only<1>{\alert{= \Set{\rho : \Var \to \Value}}} \\
-    \sigma \in \Store & = \alert<2>{\Value}^{\alert<3>{\Addr}} \\
-    \kappa \in \alert<4>{\Kont} & = \sTag{stmtK}{\Stmt \times \alert<4>{\Kont}} \\
-                         & \disunion \sTag{whileK}{\Exp \times \Stmt \times \alert<4>{\Kont}} \\
-                         & \disunion \sTag{retK}{\Var \times \Exp \times \Env \times \alert<4>{\Kont}}
+    \varsigma \in \State & = \alert<1>{\Stmt^? \times \Env \times \Store \times \alert<2>{\Kont}} \\
+    \rho \in \Env & = \alert<4>{\Value}^{\Var} \only<3>{\alert{= \Set{\rho : \Var \to \Value}}} \\
+    \sigma \in \Store & = \alert<4>{\Value}^{\alert<5>{\Addr}} \\
+    \kappa \in \alert<6>{\Kont} & = \sTag{stmtK}{\Stmt \times \alert<6>{\Kont}} \\
+                         & \disunion \sTag{whileK}{\Exp \times \Stmt \times \alert<6>{\Kont}} \\
+                         & \disunion \sTag{retK}{\Var \times \Exp \times \Env \times \alert<6>{\Kont}}
 \end{align*}
+
+\only<2>{Continuations represent \emph{the rest of computation}.}
+\only<3>{Some parts of the state space is infinite}
 \end{frame}
 
 \begin{frame}{Some transition rules}
   \small
   \begin{itemize}
-  \item $\varsigma \step \varsigma'$ is the transition relation\footnote{Because of nondeterminism. One can also view it as a transition \emph{function} from a state to a set of states.}
+  \item $\varsigma \step \varsigma'$ is the transition relation%\footnote{Because of nondeterminism. One can also view it as a transition \emph{function} from a state to a set of states.}
   \item \(\eta_\varsigma : \Exp \to \Value \) is the per-state expression evaluation function
 \item Current state: \(\varsigma = (so, \rho, \sigma, \kappa) \)
 \item Next state: \( \varsigma' = (so', \rho', \sigma', \kappa') \) \pause
@@ -158,14 +172,15 @@ There are other alternatives:
     \item $\sqcup, \sqcap$ determine the partial order $\sqsubseteq$
     \end{itemize}\vspace{-1em}
   \item<9-> A bounded lattice has a least element $\bot$, (bottom)
-    and greatest element $\top$ (top)\vspace{-1em}
+    and greatest element $\top$ (top)
   \item<10-> Any powerset $\mathcal{P}(S)$ of a set $S$ is a bounded lattice where:
      $\top = S$,
      $\bot = \emptyset$,
      $\sqcup = \cup$,
      $\sqcap = \cap$,
      $\sqsubseteq = \subseteq$
-  \end{itemize}\
+   \item<11-> So the sets of states form a lattice ordered by inclusion
+  \end{itemize}
   \end{column}
   \begin{column}{0.4\textwidth}
     \begin{figure}[h]
@@ -254,7 +269,7 @@ There are other alternatives:
         \draw(top)--(e)--(bot);
       \end{tikzpicture}\\[0.5em]
 
-      \onslide<4->{$\alert<4>{\alpha(5) + \alpha(-7) = e + o = o}$}
+      \onslide<4->{$\alert<4>{\alpha(4) + \alpha(-7) = e + o = o}$}
       \caption{\footnotesize Hasse diagram of an even/odd lattice ($\mathit{Parity}$), and
         an example of abstracting an operator}
     \end{figure}
@@ -349,9 +364,9 @@ There are other alternatives:
       \onslide<5>{\node(o3)[fill=gray,opacity=0.1,fit=(ab.south west) (eb.north east)]{};}
       }
     }]
-       & |[alias=ea]| \concolor{\varsigma } \arrow[r] \arrow[dd, "\alpha", dotted] & |[alias=eb]| \concolor{\varsigma'  \arrow[d, "\alpha", dotted]} \\
+       & |[alias=ea]| \concolor{\varsigma } \arrow[r, "F"] \arrow[dd, "\alpha", dotted] & |[alias=eb]| \concolor{\varsigma'  \arrow[d, "\alpha", dotted]} \\
     &  & \abscolor{\alpha(\varsigma') } \arrow[d, "\sqsubseteq", dashed] \\
-      & |[alias=aa]| \abscolor{\alpha(\varsigma) } \arrow[r] & |[alias=ab]| \abscolor{\alpha(\varsigma)' }
+      & |[alias=aa]| \abscolor{\alpha(\varsigma) } \arrow[r, "\abst{F}"] & |[alias=ab]| \abscolor{\alpha(\varsigma)' }
     \end{tikzcd}
     \only<beamer>{
     \begin{tikzpicture}[remember picture, overlay,
@@ -597,23 +612,23 @@ static void main(string[] args) {
 \end{frame}
 
 \section{Predicate abstraction \& Abstraction refinement}
-\subsection{Predicate abstraction}
+%\subsection{Predicate abstraction}
 \begin{frame}{Predicate abstraction}
   \begin{itemize}[<+->]
   \item Proposed by Clarke et al. and Graf et al. for hardware verification\footcite{clarke1994model,graf1997construction}
   \item Main idea: our abstract domain is a finite set of predicates $\phi_i,\, 1 \le i\le n$ over states
-  \item $\abst{\State} = \pw\left(\bigcup_{i}\Set{\phi_i, \neg \phi_i}\right).$
+  \item $\abst{\State} = \bigcup_{i}\pw\left(\Set{\phi_i, \neg \phi_i}\right).$
   \item $\abst{\varsigma_1} \sqsubseteq \abst{\varsigma_2} \equiv \abst{\varsigma_2} \subseteq \abst{\varsigma_1}.$
   \item $\gamma(\abst{\varsigma}) = \Set{\varsigma \in \State \vert \bigwedge_{\phi \in \varsigma} \phi}.$
-  \item $\alpha(\varsigma) = \bigwedge_{\phi_i(\varsigma)} \phi_i \wedge \Set{\neg\phi_i \vert \neg\phi_i(\varsigma)}.$
-  \item Use model checkers/theorem provers to compute $\abst{\fn{Post}}$ and reachability
+  \item $\alpha(\varsigma) = \bigwedge_{\phi_i(\varsigma)} \phi_i \wedge \bigwedge_{\neg\phi_i(\varsigma)} \neg\phi_i .$
+  \item Use model checkers/theorem provers to compute $\abst{F}$ and reachability
   \end{itemize}
 \end{frame}
-\subsection{Abstraction refinement}
+%\subsection{Abstraction refinement}
 \begin{frame}{Counterexample-Generated Abstraction Refinement (CEGAR)}
   \begin{itemize}[<+->]
   \item Choosing the correct predicates is tricky and tedious
-  \item When proving safety using the current abstraction fails, compute a counterexample using backwards semantics (and a model checker) to find a path it fails
+  \item When proving safety using the current abstraction fails, compute a counterexample using backwards semantics ($\fn{Pre}$) and a model checker to find a path it fails
   \item Add the counterexample to the set of predicates and try again
   \item Proposed by Clarke et al.\footcite{clarke2003counterexample}. Extended by Ball et al. to support C programs for SLAM project\footcite{ball2001automatic,ball2001automatically}
   \item Can be implemented ``naturally'' using CLP by modifying Prolog's fact database on the fly.\footcite{podelski2007armc}
@@ -679,7 +694,7 @@ static void main(string[] args) {
 
 \begin{frame}{Craig interpolants}
   \begin{itemize}[<+->]
-  \item If $\neg (\phi \wedge \psi)$ is false then $\exists I$ (Craig interpolant of $\phi, \psi$) s.t.
+  \item If $\phi \wedge \psi$ is false then $\exists I$ (Craig interpolant of $\phi, \psi$) s.t.
     \begin{itemize}[<+->]
     \item $\phi \implies I$ and $\neg (I \wedge \psi)$
     \item $V(I) \subseteq V(\phi) \cap V(\psi)$ where $V(\varphi)$ denotes the set of variables occuring in $\varphi$
@@ -693,8 +708,8 @@ static void main(string[] args) {
 \end{frame}
 \begin{frame}{Abstraction refinement for widening}
   \small
-  \begin{itemize}
-  \item Gulavani et al. used abstract refinement to find the first instance of widening that causes imprecision\footcite{gulavani2006counterexample}
+  \begin{itemize}[<+->]
+  \item Gulavani et al. used abstraction refinement to find the first instance of widening that causes imprecision\footcite{gulavani2006counterexample}
   \item They use it to determine widening delays, they also keep a history of widening results because widening is not monotonic
   \item On a later paper\footcite{gulavani2008automatically}, they extend this technique to joins and combine results of Craig interpolants and widening
     \begin{itemize}\footnotesize
@@ -719,7 +734,7 @@ static void main(string[] args) {
   \end{itemize}
 \end{frame}
 
-\subsection{Dynamic state partitioning}
+%\subsection{Dynamic state partitioning}
 \begin{frame}{Partitioning the state of control programs}\small
   \begin{itemize}[<+->]
   \item Many control programs don't have a program counter like sequential programs
@@ -755,7 +770,7 @@ static void main(string[] args) {
 \begin{frame}{Partitioning transfer functions of automata with hetereogeneous types}
   \small
   \begin{itemize}
-  \item Jeannet\cite{jeannet_representing_2002} proposes a method for partitioning transfer functions of automata with Booleans and integers
+  \item Jeannet\footcite{jeannet_representing_2002} proposed a method for partitioning transfer functions of automata with Booleans and integers
   \item He represents the transfer function as a multi-terminal binary decision diagram (MTBDD) where the terminals contain the primitive relations for each type
   \item He considers 3 methods to abstract the MTBDDs:
     \begin{enumerate}
@@ -811,7 +826,7 @@ static void main(string[] args) {
 \note{It's called a functor because of OCaml's functors which take modules and produce modules, this is a transformation that takes an abstract domain and produces a new one}
 \end{frame}
 
-\subsection{Combination of domains}
+%\subsection{Combination of domains}
 \begin{frame}{A plethora of domains}
   \footnotesize
   \begin{tightcenter}
