@@ -8,7 +8,6 @@ void lock_return() {
   else state = Locked;
 }
 
-
 void unlock_return() {
   if (state == Unlocked) error();
   else state = Unlocked;
