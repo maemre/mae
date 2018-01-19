@@ -1,6 +1,6 @@
-%\documentclass[aspectratio=169,notes]{beamer}
+\documentclass[aspectratio=169,notes]{beamer}
 %\documentclass[aspectratio=169]{beamer}
-\documentclass[aspectratio=169,handout]{beamer}
+%\documentclass[aspectratio=169,handout]{beamer}
 \usetheme[titleformat=regular%
 ,numbering=fraction% use slide numbers
 ]{metropolis}
@@ -17,15 +17,15 @@
 \addbibresource{mae.bib}
 
 % add notes:
-% \makeatletter
-% \def\beamer@framenotesbegin{% at beginning of slide
-% \usebeamercolor[fg]{normal text}\gdef\beamer@noteitems{}%
-% \gdef\beamer@notes{}%
-% }
-% \makeatother
-% \usepackage{pgfpages}
-% \setbeamertemplate{note page}[plain]
-% \setbeameroption{show notes on second screen=right}
+\makeatletter
+\def\beamer@framenotesbegin{% at beginning of slide
+\usebeamercolor[fg]{normal text}\gdef\beamer@noteitems{}%
+\gdef\beamer@notes{}%
+}
+\makeatother
+\usepackage{pgfpages}
+\setbeamertemplate{note page}[plain]
+\setbeameroption{show notes on second screen=right}
 
 \input{macros}
 
@@ -723,6 +723,7 @@ static void main(String[] args) {
   \note<1->{We instrument the code (automatically) based on the specification}
   \note<2->{We abstract away the statements \& guards not interacting with predicates}
   \note<2->{Let's clean the useless cruft}
+  \note<3->{SLAM does a backwards abstract interpretation then uses forward concrete semantics. BLAST does the opposite.}
 \end{frame}
 
 \begin{frame}{Lazy abstraction\footcite{henzinger2002lazy}}
