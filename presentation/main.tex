@@ -372,10 +372,10 @@ Low-level software:
       \onslide<4>{\fill[gray,opacity=0.1] (aa.north west) -- (ab.north east) -- (ab.south east) -- (aa.south west) -- cycle;}
       \onslide<5>{\node(o3)[fill=gray,opacity=0.1,fit=(ab.south west) (eb.north east)]{};}
       }
-    }]
-       & |[alias=ea]| \concolor{\varsigma } \arrow[r, squiggly] \arrow[dd, "\alpha", dotted] & |[alias=eb]| \concolor{\varsigma'  \arrow[d, "\alpha", dotted]} \\
-    &  & \abscolor{\alpha(\varsigma') } \arrow[d, "\sqsubseteq", dashed] \\
-      & |[alias=aa]| \abscolor{\alpha(\varsigma) } \arrow[r, squiggly] & |[alias=ab]| \abscolor{\alpha(\varsigma)' }
+    },ampersand replacement=\&]
+       \& |[alias=ea]| \concolor{\varsigma } \arrow[r, squiggly] \arrow[dd, "\alpha", dotted] \& |[alias=eb]| \concolor{\varsigma'  \arrow[d, "\alpha", dotted]} \\
+    \&  \& \abscolor{\alpha(\varsigma') } \arrow[d, "\sqsubseteq", dashed] \\
+      \& |[alias=aa]| \abscolor{\alpha(\varsigma) } \arrow[r, squiggly] \& |[alias=ab]| \abscolor{\alpha(\varsigma)' }
     \end{tikzcd}
     \only<beamer>{
     \begin{tikzpicture}[remember picture, overlay,
@@ -549,7 +549,7 @@ static void main(String[] args) {
     \begin{column}{.60\textwidth}
       \pause
       \begin{itemize}[<+->]
-      \item 0CFA with constant propagation would compute the output to be \alert<2>{\texttt{1;$\top$}}
+      \item 0CFA would compute the output to be \alert<2>{\texttt{$\top$;$\top$}}
       \item \texttt{1} pointed by \texttt{y} from first call to \texttt{f} is not reachable on the second call
       \item but it became live again on the second call, it is a \emph{zombie}
       \item Abstract GC would collect \texttt{y} after the call on line 7 and restore precision \pause
@@ -587,22 +587,6 @@ static void main(String[] args) {
 %     \end{column}
 %   \end{columns}
 % \end{frame}
-
-\begin{frame}{Abstract garbage collection}
-  \begin{itemize}[<+->]
-  \item When to do it?
-    \begin{itemize}
-    \item Too infrequent: not much precision gain
-    \item Too frequent: extra overhead\pause
-    \item Strategy suggested by the paper: Perform abstract GC if zombie creation is imminent otherwise.
-    \end{itemize}
-  \item Abstract counting
-    \begin{itemize}
-    \item Count the number of objects at each heap address.
-    \item When we know that an abstract address contains a single object, we can convert \emph{may alias} relations to \emph{must alias} relations.
-    \end{itemize}
-  \end{itemize}
-\end{frame}
 
 \begin{frame}{Monadic abstract interpreters\footcite{sergey2013monadic}}
   \begin{itemize}
@@ -918,6 +902,22 @@ static void main(String[] args) {
 \end{frame}
 
 \appendix
+
+\begin{frame}{Abstract garbage collection, ctd.}
+  \begin{itemize}[<+->]
+  \item When to do it?
+    \begin{itemize}
+    \item Too infrequent: not much precision gain
+    \item Too frequent: extra overhead\pause
+    \item Strategy suggested by the paper: Perform abstract GC if zombie creation is imminent otherwise.
+    \end{itemize}
+  \item Abstract counting
+    \begin{itemize}
+    \item Count the number of objects at each heap address.
+    \item When we know that an abstract address contains a single object, we can convert \emph{may alias} relations to \emph{must alias} relations.
+    \end{itemize}
+  \end{itemize}
+\end{frame}
 
 \begin{frame}{Craig interpolants}
   \begin{itemize}[<+->]
