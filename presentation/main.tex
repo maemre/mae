@@ -1,14 +1,36 @@
-%\documentclass[14pt]{beamer}
-\documentclass[aspectratio=169]{beamer}
+\documentclass[aspectratio=169,notes]{beamer}
+%\documentclass[aspectratio=169]{beamer}
+%\documentclass[aspectratio=169,handout]{beamer}
 \usetheme[titleformat=regular%
 ,numbering=fraction% use slide numbers
 ]{metropolis}
+\metroset{%
+  progressbar = foot,%
+  % background=dark,
+  block=fill
+}
+\only<handout>{\metroset{sectionpage=none}}
+\only<handout>{\usecolortheme{dove}}
 \usepackage{appendixnumberbeamer} % separate appendix
-\usepackage[citestyle=authortitle-ibid,sorting=none]{biblatex}
+\usepackage[citestyle=authortitle-comp,sorting=none]{biblatex}
 \setbeamerfont{footnote}{size=\tiny}
 \addbibresource{mae.bib}
 
+% add notes:
+\makeatletter
+\def\beamer@framenotesbegin{% at beginning of slide
+\usebeamercolor[fg]{normal text}\gdef\beamer@noteitems{}%
+\gdef\beamer@notes{}%
+}
+\makeatother
+\usepackage{pgfpages}
+\setbeamertemplate{note page}[plain]
+\setbeameroption{show notes on second screen=right}
+
 \input{macros}
+
+\newtoggle{labdemo}
+\toggletrue{labdemo}
 
 \title[Major Area Exam]{Abstract Interpretation of Low-level Programs}
 \subtitle{Major Area Exam}
@@ -32,34 +54,38 @@
   \tableofcontents
 \end{frame}
 
-\section{Introduction}
+\section{Motivation}
 \begin{frame}{What is low-level software? Why should we analyze it?}
 Low-level software:
 \begin{itemize}
 \item Interacts with intricate APIs (drivers, kernel modules, databases)
 \item Require preserving subtle invariants (above, control software)
-\item Have heavy reliability requirements
+\item Have strong reliability requirements
 \begin{itemize}
-\item with unpleasant consequences % : BSoD, data loss, Arianne~5, Heartbleed, Patriot missile
+\item with unpleasant consequences\iftoggle{labdemo}{: BSoD, data loss, Arianne~5, Heartbleed, Patriot missile}{}
 \end{itemize}
 \end{itemize}
 
 \end{frame}
 
 \only<beamer>{ % all template changes are local to this group.
-  \setbeamertemplate{navigation symbols}{}
-  \begin{frame}[plain]
-    \begin{tikzpicture}[remember picture,overlay]
-      \node[at=(current page.center)] {
-        \includegraphics[width=\paperwidth]{material/bsod_resized.png}
-      };
-    \end{tikzpicture}
-    %\sound[autostart,inlinesound]{foo}{beep.wav}
-    \pause
-    \Put(10,10){\includegraphics[width=0.4\textwidth]{material/heartbleed.pdf}}\pause
-    \Put(180,200){\includegraphics[width=0.4\textwidth]{material/formal-verification-as-a-sinking-airplane.png}}\pause
-    \Put(210,-100){\includegraphics[width=0.5\textwidth]{material/us-govt-patriot-missile.png}}
-  \end{frame}
+  \nottoggle{labdemo}{
+    \setbeamertemplate{navigation symbols}{}
+    \begin{frame}[plain]
+      \begin{tikzpicture}[remember picture,overlay]
+        \node[at=(current page.center)] {
+          \includegraphics[width=\paperwidth]{material/bsod_resized.png}
+        };
+      \end{tikzpicture}
+      % \sound[autostart,inlinesound]{foo}{beep.wav}
+      \pause
+      \Put(10,10){\includegraphics[width=0.4\textwidth]{material/heartbleed.pdf}}\pause
+      \Put(180,200){\includegraphics[width=0.4\textwidth]{material/formal-verification-as-a-sinking-airplane.png}}\pause
+      \Put(210,-100){\includegraphics[width=0.5\textwidth]{material/us-govt-patriot-missile.png}}
+    \end{frame}
+  }{
+    \addtocounter{framenumber}{1}
+  }
 }
 
 \only<handout>{
@@ -67,16 +93,18 @@ Low-level software:
 }
 
 
-\begin{frame}{Why abstract interpretation?}
-There are other alternatives:
-\begin{itemize}[<+->]
-\item ad-hoc, iterative DFA (not amenable to systematic correctness)
-\item model checking (there is a neat connection with model checking)
-\item type systems (limits choice of language, context-insensitive)
-\end{itemize}
-\end{frame}
+% \begin{frame}{Why abstract interpretation?}
+% There are other alternatives:
+% \begin{itemize}[<+->]
+% \item ad-hoc, iterative DFA (not amenable to systematic correctness)
+% \item model checking (there is a neat connection with model checking)
+% \item type systems (limits choice of language, context-insensitive)
+% \end{itemize}
 
-\section{A first attempt}
+% \note{a.i.+MC can give a DFA that is correct by construction}
+% \end{frame}
+
+\section{The concrete world}
 \begin{frame}{SIMPL\footnote{simple introductory made-up programming language} Syntax}
   \vspace{-2em}
   \small
@@ -85,7 +113,7 @@ There are other alternatives:
   \end{gather*}\vspace{-2em}
   \begin{align*}
     fd \in \ns{FunDef} \eDEF & \alert<5>{\kw{def}\; f(\vo{x}) = s;\,\kw{return}\; e} \\
-    e \in \Exp \eDEF & x \eOR n \eOR b \eOR e_1 \oplus e_2 \eOR *x \eOR \alert<1>{\kw{choose}\;e_1\,e_2} \\
+    e \in \Exp \eDEF & x \eOR n \eOR b \eOR e_1 \oplus e_2 \eOR \alert<3>{*x} \\ % \eOR \alert<1>{\kw{choose}\;e_1\,e_2} \\
     s \in \Stmt \eDEF & s;\,s \eOR \alert<2>{\kw{abort}} \\
     \eOR & \alert<4>{\kw{if}\, e\; s_1 \; \kw{else} \; s_2} \\
     \eOR & \alert<4>{\kw{while}\; e\; s} \\
@@ -98,19 +126,22 @@ There are other alternatives:
 \begin{frame}{SIMPL semantic domains}
   \begingroup\footnotesize We will use abstract machine semantics and represent the semantics of a program as a transition relation.\endgroup
 \begin{align*}
-    \varsigma \in \State & = \Stmt^? \times \Env \times \Store \times \alert<4>{\Kont} \\
-    \rho \in \Env & = \alert<2>{\Value}^{\Var} \only<1>{\alert{= \Set{\rho : \Var \to \Value}}} \\
-    \sigma \in \Store & = \alert<2>{\Value}^{\alert<3>{\Addr}} \\
-    \kappa \in \alert<4>{\Kont} & = \sTag{stmtK}{\Stmt \times \alert<4>{\Kont}} \\
-                         & \disunion \sTag{whileK}{\Exp \times \Stmt \times \alert<4>{\Kont}} \\
-                         & \disunion \sTag{retK}{\Var \times \Exp \times \Env \times \alert<4>{\Kont}}
+    \varsigma \in \State & = \alert<1>{\Stmt^? \times \Env \times \Store \times \alert<2>{\Kont}} \\
+    \rho \in \Env & = \alert<4>{\Value}^{\Var} \only<3>{\alert{= \Set{\rho : \Var \to \Value}}} \\
+    \sigma \in \Store & = \alert<4>{\Value}^{\alert<5>{\Addr}} \\
+    \kappa \in \alert<6>{\Kont} & = \sTag{stmtK}{\Stmt \times \alert<6>{\Kont}} \\
+                         & \disunion \sTag{whileK}{\Exp \times \Stmt \times \alert<6>{\Kont}} \\
+                         & \disunion \sTag{retK}{\Var \times \Exp \times \Env \times \alert<6>{\Kont}}
 \end{align*}
+
+\only<2>{Continuations represent \emph{the rest of computation}.}
+\only<3>{Some parts of the state space are infinite}
 \end{frame}
 
 \begin{frame}{Some transition rules}
   \small
   \begin{itemize}
-  \item $\varsigma \step \varsigma'$ is the transition relation\footnote{Because of nondeterminism. One can also view it as a transition \emph{function} from a state to a set of states.}
+  \item $\varsigma \step \varsigma'$ is the transition relation%\footnote{Because of nondeterminism. One can also view it as a transition \emph{function} from a state to a set of states.}
   \item \(\eta_\varsigma : \Exp \to \Value \) is the per-state expression evaluation function
 \item Current state: \(\varsigma = (so, \rho, \sigma, \kappa) \)
 \item Next state: \( \varsigma' = (so', \rho', \sigma', \kappa') \) \pause
@@ -129,7 +160,7 @@ There are other alternatives:
 
 \begin{frame}{Collecting semantics}
   Abstract machine semantics gives us a state transition system $(\State, I, \step)$ where \pause $\State$ is the set of states, \pause $I \subset \State$ is the set of initial states, \pause $\step \subset \State \times \State$ is the transition relation. \pause Let
-  \[ F : \pw(\State) \monarrow \pw(\State),\, F(X) = \Set{y \vert (x, y) \in \step \wedge x \in X}. \]\pause
+  \[ F : \pw(\State) \textoverop{\alert<2>{mon}}{\to} \pw(\State),\, F(X) = \Set{y \vert x \step y \wedge x \in X}. \]\pause
   $\lfp_I F = I \cup F(I) \cup F(F(I)) \cup \ldots $ is the set of reachable states.\pause
 
   \alert{$\lfp_I F$ is potentially infinite and requires infinitely many steps to compute!}
@@ -140,52 +171,52 @@ There are other alternatives:
 \begingroup
 \small
 \begin{frame}{Lattices and Order Theory}
-  \vspace*{-1em}
   \begin{columns}[T]
   \begin{column}{0.6\textwidth}
   \begin{itemize}
-  \item A lattice $(L, \sqcup, \sqcap, \sqsubseteq)$ is a partially ordered set (poset) with:\vspace{-0.8em}
-    \begin{itemize}
+  \item A lattice $(L, \sqcup, \sqcap, \sqsubseteq)$ is a partially ordered set (poset) with:
+    \begin{itemize}\footnotesize
     \item a least upper bound (join) operation $\sqcup: L \times L \to L$
     \item a greatest lower bound (meet) operation $\sqcap: L \times L \to L$
     \item $\sqcup, \sqcap$ determine the partial order $\sqsubseteq$
-    \end{itemize}\vspace{-1em}
+    \end{itemize}
   \item<9-> A bounded lattice has a least element $\bot$, (bottom)
-    and greatest element $\top$ (top)\vspace{-1em}
+    and greatest element $\top$ (top)
   \item<10-> Any powerset $\mathcal{P}(S)$ of a set $S$ is a bounded lattice where:
      $\top = S$,
      $\bot = \emptyset$,
      $\sqcup = \cup$,
      $\sqcap = \cap$,
      $\sqsubseteq = \subseteq$
-  \end{itemize}\
+   \item<11-> So, the sets of states form a lattice ordered by inclusion
+  \end{itemize}
   \end{column}
   \begin{column}{0.4\textwidth}
     \begin{figure}[h]
     \centering
     \begin{tikzpicture}[x=2cm, y=1.5cm]
-      \node(top)at (1,3){$\textcolor<9>{magenta}{\{+,-,0\} = \top}$} ;
+      \node(top)at (1,3){$\textcolor<9>{mLightBrown}{\{+,-,0\} = \top}$} ;
       \node(pm)at (1,2){$\{+,-\}$} ;
       \node(mz)at (2,2){$\{-,0\}$} ;
-      \node(pz)at (0,2){$\textcolor<4>{magenta}{\{+,0\}}$} ;
+      \node(pz)at (0,2){$\textcolor<4>{mLightBrown}{\{+,0\}}$} ;
       \node(p)at (0,1){$\{+\}$} ;
       \node(m)at (2,1){$\{-\}$} ;
-      \node(z)at (1,1){$\textcolor<8>{magenta}{\{0\}}$} ;
-      \node(bot)at (1,0){$\textcolor<9>{magenta}{\emptyset = \bot}$} ;
+      \node(z)at (1,1){$\textcolor<8>{mLightBrown}{\{0\}}$} ;
+      \node(bot)at (1,0){$\textcolor<9>{mLightBrown}{\emptyset = \bot}$} ;
       \draw(top)--(pm);
       \draw(top)--(mz);
       \draw(top)--(pz);
       \draw(pm)--(p);
       \draw(pm)--(m);
       \draw(mz)--(m);
-      \draw[onslide={<7-8> draw=magenta, line width=1.2pt}](mz)--(z);
-      \draw[onslide={<2-4> draw=magenta, line width=1.2pt}](pz)--(p);
-      \draw[onslide={<3-4,6-8> draw=magenta, line width=1.2pt}](pz)--(z);
+      \draw[onslide={<7-8> draw=mLightBrown, line width=1.2pt}](mz)--(z);
+      \draw[onslide={<2-4> draw=mLightBrown, line width=1.2pt}](pz)--(p);
+      \draw[onslide={<3-4,6-8> draw=mLightBrown, line width=1.2pt}](pz)--(z);
       \draw(p)--(bot);
       \draw(m)--(bot);
       \draw(z)--(bot);
     \end{tikzpicture}
-    \caption{\footnotesize Hasse diagram of a sign lattice, built from the powerset of the set $\{+,-,0\}$}
+    \caption{\footnotesize Hasse diagram of a sign lattice, built from $\pw(\{+,-,0\})$}
   \end{figure}
   % \only<4>{\begin{figure}[t]
   %   \centering
@@ -234,7 +265,7 @@ There are other alternatives:
     \item<7-> This relationship is known as a \alert{\emph{Galois Connection}}
     \end{itemize}
   \end{column}
-  \begin{column}{0.3\textwidth}
+  \begin{column}{0.25\textwidth}
     \begin{figure}
       \centering
       \footnotesize
@@ -247,7 +278,7 @@ There are other alternatives:
         \draw(top)--(e)--(bot);
       \end{tikzpicture}\\[0.5em]
 
-      \onslide<4->{$\alert<4>{\alpha(5) + \alpha(-7) = e + o = o}$}
+      \onslide<4->{$\alert<4>{\alpha(4) + \alpha(-7) = e + o = o}$}
       \caption{\footnotesize Hasse diagram of an even/odd lattice ($\mathit{Parity}$), and
         an example of abstracting an operator}
     \end{figure}
@@ -293,11 +324,11 @@ There are other alternatives:
  \end{tightcenter}
 
  \begin{tikzpicture}[overlay, remember picture]
-   \draw<7-9>[draw=magenta, line width=1.1pt] ($(a)+(-.1em,-.4em)$) rectangle ($(b)+(0.1em,1em)$);
+   \draw<7-9>[draw=mLightBrown, line width=1.1pt] ($(a)+(-.1em,-.4em)$) rectangle ($(b)+(0.1em,1em)$);
    \draw<7-9>[draw opacity=0] (a) to node [midway, below, yshift=-.5em] {$\alpha$ is sound} (b);
-   \draw<4-6>[draw=magenta, line width=1.1pt] ($(ma)+(-.1em,-.4em)$) rectangle ($(mb)+(0.1em,1em)$);
+   \draw<4-6>[draw=mLightBrown, line width=1.1pt] ($(ma)+(-.1em,-.4em)$) rectangle ($(mb)+(0.1em,1em)$);
    %\draw<4>[draw opacity=0] (ma) to node [midway, below, yshift=-.5em] {$\alpha$ is sound} (mb);
-   \draw<10-12>[draw=magenta, line width=1.1pt] ($(ra)+(-.1em,-.4em)$) rectangle ($(rb)+(0.1em,1em)$);
+   \draw<10-12>[draw=mLightBrown, line width=1.1pt] ($(ra)+(-.1em,-.4em)$) rectangle ($(rb)+(0.1em,1em)$);
    %\draw<11>[draw opacity=0] (ra) to node [midway, below, yshift=-.5em] {$\alpha$ is sound} (rb);
  \end{tikzpicture}
 \end{frame}
@@ -336,19 +367,19 @@ There are other alternatives:
   \begin{tightcenter}
     \begin{tikzcd}[execute at end picture={
         \only<beamer>{
-      \onslide<2>{\node(o1)[fill=blue,opacity=0.1,fit=(ea.north west) (eb.north east) (eb.south east) (ea.south west)]{};}
-      \onslide<3>{\node(o2)[fill=blue,opacity=0.1,fit=(aa.south west) (ea.north east)]{};}
-      \onslide<4>{\fill[blue,opacity=0.1] (aa.north west) -- (ab.north east) -- (ab.south east) -- (aa.south west) -- cycle;}
-      \onslide<5>{\node(o3)[fill=blue,opacity=0.1,fit=(ab.south west) (eb.north east)]{};}
+      \onslide<2>{\node(o1)[fill=gray,opacity=0.1,fit=(ea.north west) (eb.north east) (eb.south east) (ea.south west)]{};}
+      \onslide<3>{\node(o2)[fill=gray,opacity=0.1,fit=(aa.south west) (ea.north east)]{};}
+      \onslide<4>{\fill[gray,opacity=0.1] (aa.north west) -- (ab.north east) -- (ab.south east) -- (aa.south west) -- cycle;}
+      \onslide<5>{\node(o3)[fill=gray,opacity=0.1,fit=(ab.south west) (eb.north east)]{};}
       }
     }]
-       & |[alias=ea]| \concolor{\varsigma } \arrow[r] \arrow[dd, "\alpha", dotted] & |[alias=eb]| \concolor{\varsigma'  \arrow[d, "\alpha", dotted]} \\
+       & |[alias=ea]| \concolor{\varsigma } \arrow[r, squiggly] \arrow[dd, "\alpha", dotted] & |[alias=eb]| \concolor{\varsigma'  \arrow[d, "\alpha", dotted]} \\
     &  & \abscolor{\alpha(\varsigma') } \arrow[d, "\sqsubseteq", dashed] \\
-      & |[alias=aa]| \abscolor{\alpha(\varsigma) } \arrow[r] & |[alias=ab]| \abscolor{\alpha(\varsigma)' }
+      & |[alias=aa]| \abscolor{\alpha(\varsigma) } \arrow[r, squiggly] & |[alias=ab]| \abscolor{\alpha(\varsigma)' }
     \end{tikzcd}
     \only<beamer>{
     \begin{tikzpicture}[remember picture, overlay,
-      every node/.append style = { align = center, minimum height = 10pt,fill=blue,opacity=0.1,text opacity=1}]
+      every node/.append style = { align = center, minimum height = 10pt,fill=gray,opacity=0.1,text opacity=1}]
       \onslide<2>{\node[left=6cm, text width=4cm](){\textcolor{gray}{\textsf{\footnotesize Program executing state $\varsigma$ transitions to state $\varsigma'$}}};}
       
       \onslide<3>{\node[left=6cm, text width=4cm](){\textcolor{gray}{\textsf{\footnotesize $\alpha(\varsigma)$ abstracts $\varsigma$}}};}
@@ -400,47 +431,66 @@ There are other alternatives:
   \end{align*}}
 \end{frame}
 
-\begin{frame}{Abstracting Abstract Machines (AAM)}
+\begin{frame}{Abstracting Abstract Machines: Transition relation}
   \begin{itemize}
-  \item The \alt<2->{abstract}{concrete} transition relation \alt<2->{$\abst\varsigma \abst\step {\abst\varsigma}'$}{$\varsigma \step \varsigma'$}
-  \item Current state: \(\alt<2->{\abst\varsigma}{\varsigma} = ({so}, {\alt<2->{\abst\rho}{\rho}}, {\alt<2->{\abst\sigma}{\sigma}}, {\alt<2->{\abst\kappa}{\kappa}}) \)
-\item Next state: \( {\alt<2->{\abst\varsigma}{\varsigma}}' = ({so}', {\alt<2->{\abst\rho}{\rho}}', {\alt<2->{\abst\sigma}{\sigma}}', {\alt<2->{\abst\kappa}{\kappa}}') \)
+  \item Current state: \(\alt<2->{\abst\varsigma}{\varsigma} = ({so}, {\alt<2->{\abst\rho}{\rho}}, {\alt<2->{\abst\sigma}{\sigma}}, {\alt<2->{\abst{a}}{\kappa}}) \)
+\item Next state: \( {\alt<2->{\abst\varsigma}{\varsigma}}' = ({so}', {\alt<2->{\abst\rho}{\rho}}', {\alt<2->{\abst\sigma}{\sigma}}', {\alt<2->{\abst{a}}{\kappa}}') \)
+\item We abuse the notation for accessing value and continuation parts of heap and use \(\abst\sigma(\abst{a})\)
+\item $\fn{tick}_i$ picks a new address based on the analysis' sensitivity (more on this later)
   \end{itemize}
-  \footnotesize
+  {\tiny
   \[
   \begin{array}{llllll}
-    so & \text{side condition} & {so}' & {\alt<2->{\abst\rho}{\rho}}' & {\alt<2->{\abst\sigma}{\sigma}}' & {\alt<2->{\abst\kappa}{\kappa}}' \\ \hline
-    e_1 \update e_2 & \alt<2->{\abst{a} = \abst\eta_{\abst\varsigma}(e_1)}{a = \eta_\varsigma(e_1)} & - & \alt<2->{\abst\rho}{\rho} & \alt<2->{\alert<2>{\alt<2->{\abst\sigma}{\sigma}[a \mapsto \alt<2->{\abst\sigma}{\sigma}(a) \sqcup \abst\eta_{\abst\varsigma}(e_2)]}}{\sigma[a \mapsto \eta_\varsigma(e_2)]} & {\alt<2->{\abst\kappa}{\kappa}} \\
-    \kw{while}\; e\; s & \alt<2->{\alert<3>{\true \in \gamma(\abst\eta_{\abst\varsigma}(e))}}{\eta_\varsigma(e) = \true} & - & \alt<2->{\abst\rho}{\rho} & \alt<2->{\abst\sigma}{\sigma} & \sTag{stmtK}{(s, \sTag{whileK}{(e, s,\alt<2->{\abst\kappa}{\kappa})})} \\
-    \kw{while}\; e\; s & \alt<2->{\alert<3>{\false \in \gamma(\abst\eta_{\abst\varsigma}(e))}}{\eta_\varsigma(e) = \true} & - & \alt<2->{\abst\rho}{\rho} & \alt<2->{\abst\sigma}{\sigma} & {\alt<2->{\abst\kappa}{\kappa}} \\
-    - & \alt<2->{\abst\kappa}{\kappa} = \sTag{stmtK}{(s,\alt<2->{\abst\kappa}{\kappa}_r)} & s & \alt<2->{\abst\rho}{\rho} & \alt<2->{\abst\sigma}{\sigma} & {\alt<2->{\abst\kappa}{\kappa}_r}
+    so & \text{side condition} & {so}' & {\alt<2->{\abst\rho}{\rho}}' & {\alt<2->{\abst\sigma}{\sigma}}' & {\alt<2->{\abst{a}}{\kappa}}' \\ \hline
+    e_1 \update e_2 & \alt<2->{\abst{a} = \abst\eta_{\abst\varsigma}(e_1)}{a = \eta_\varsigma(e_1)} & - & \alt<2->{\abst\rho}{\rho} & \alt<2->{\alert<2>{\alt<2->{\abst\sigma}{\sigma}[a \mapsto \alt<2->{\abst\sigma}{\sigma}(a) \sqcup \abst\eta_{\abst\varsigma}(e_2)]}}{\sigma[a \mapsto \eta_\varsigma(e_2)]} & {\alt<2->{\abst{a}}{\kappa}} \\
+    \kw{while}\; e\; s & \alt<2->{\alert<3>{\true \in \gamma(\abst\eta_{\abst\varsigma}(e)) \wedge \abst{a}_2 = \fn{tick}_2}}{\eta_\varsigma(e) = \true} & - & \alt<2->{\abst\rho}{\rho} & \alt<2->{\abst\sigma[{\abst{a}}' \mapsto \sTag{stmtK}{(s, \abst{a}_2)}, \abst{a}_2 \mapsto \sTag{whileK}{(e, s,\abst{a})}]}{\sigma} & \alt<2->{\fn{tick}_1}{\sTag{stmtK}{(s, \sTag{whileK}{(e, s,\kappa)})}} \\
+    \kw{while}\; e\; s & \alt<2->{\alert<3>{\false \in \gamma(\abst\eta_{\abst\varsigma}(e))}}{\eta_\varsigma(e) = \true} & - & \alt<2->{\abst\rho}{\rho} & \alt<2->{\abst\sigma}{\sigma} & {\alt<2->{\abst{a}}{\kappa}} \\
+    - & \alt<2->{\sigma(\abst{a})}{\kappa} = \sTag{stmtK}{(s,\alt<2->{\abst{a}}{\kappa}_r)} & s & \alt<2->{\abst\rho}{\rho} & \alt<2->{\abst\sigma}{\sigma} & {\alt<2->{\abst{a}}{\kappa}_r}
   \end{array}
 \]
-
+}
 \begin{itemize}
 \item<2-> We are doing weak updates
 \item<3-> The semantics of loops became nondeterministic
 \end{itemize}
-\todo{Kont $\to$ addr change}
 \end{frame}
 
 \begin{frame}{Widening}
   \small
+  \begin{columns}
+    \begin{column}{0.75\textwidth}
   A widening operator $\widen : A \times A \to A$ ensures convergence
   in a domain $A$ with infinite height. It has the following
   properties:\vspace{-0.3em}
   \begin{itemize}\footnotesize
-  \item $\forall a_1, a_2 \in A, a_1 \sqcup a_2 \sqsubseteq a_1 \widen a_2$
-  \item For any sequence $a_1, a_2, \ldots$, let $w_o = a_o, \ldots, w_n = w_{n-1} \widen a_n$. Then, $a_i \sqsubseteq w_i$ and the chain $w_1, w_2, \ldots$ eventually stabilizes
-  \end{itemize}\pause\vspace{-0.3em}
-  \begin{exampleblock}{\small Example: a widening operator on an integer range domain}
-    \vspace{-0.8em}
-  \begin{itemize}[<+->]\footnotesize
-  \item $[1,1] \widen [2,2] \widen [3,3] \widen \ldots \to [1, \infty]$
-  \item $[1,5] \widen [0,5] \widen [-1,5] \widen \ldots \to [-\infty, 5]$
-  \end{itemize}
-\end{exampleblock}\vspace{-1.6em}\pause
-Note: Widening operators are more general than Galois Connections.\footcite{cousot92comparing}\vspace{1em}
+  \item<2-> $\forall a_1, a_2 \in A, a_1 \sqcup a_2 \sqsubseteq a_1 \widen a_2$
+  \item<2-> For any sequence $a_1, a_2, \ldots$, let $w_1 = a_1, \ldots, w_n = w_{n-1} \widen a_n$. Then, $a_i \sqsubseteq w_i$ and the chain $w_1, w_2, \ldots$ eventually stabilizes
+  \end{itemize}\vspace{-0.3em}
+  \uncover<5->{
+    \begin{exampleblock}{\small Example: a widening operator on an integer range domain}
+      \vspace{-0.8em}
+      \begin{itemize}\footnotesize
+      \item $[1,1] \widen [2,2] \widen [3,3] \widen \ldots \to [1, \infty]$
+      \item $[1,5] \widen [0,5] \widen [-1,5] \widen \ldots \to [-\infty, 5]$
+      \end{itemize}
+    \end{exampleblock}
+    }
+\end{column}
+\begin{column}{0.2\textwidth}\tiny
+  \uncover<2->{
+    \begin{tikzcd}[ampersand replacement=\&]
+      \& \alert<4>{w_n}=w_{n-1} \widen a_n \\
+      \& \vdots \arrow[u, no head] \\
+      \alert<3>{\vdots} \textcolor<2>{mLightBrown}{\arrow[ruu, no head]} \& \alert<4>{w_3} = w_2 \widen a_3 \arrow[u, no head] \\
+      \alert<3>{a_3} \textcolor<2>{mLightBrown}{\arrow[ru, no head]} \arrow[u, no head] \& \alert<4>{w_2} = w_1 \widen a_2 \arrow[u, no head] \\
+      \alert<3>{a_2} \textcolor<2>{mLightBrown}{\arrow[ru, no head]} \arrow[u, no head] \&  \\
+      \alert<3>{a_1}=\alert<4>{w_1} \textcolor<2>{mLightBrown}{\arrow[ruu, no head]} \arrow[u, no head] \& 
+    \end{tikzcd}
+  }
+\end{column}
+\end{columns}
+\uncover<6->{Widening operators are more general than Galois Connections to finite lattices\footcite{cousot92comparing}}
+
 \end{frame}
 
 \input{cfa.tex}
@@ -488,10 +538,10 @@ static int f(int x) {
   return x == (int)y;
 }
 
-static void main(string[] args) {
-  std::cout << f(1) << ';'
-            << f(2) << endl;
-  return 0;
+static void main(String[] args) {
+  System.out.print(f(1));
+  System.out.print(";");
+  System.out.print(f(2));
 }
           \end{lstlisting}
         \end{itemize}
@@ -499,9 +549,10 @@ static void main(string[] args) {
     \begin{column}{.60\textwidth}
       \pause
       \begin{itemize}[<+->]
-      \item Non-relational 0CFA would compute the output to be \alert<2>{\texttt{1;$\top$}}. \texttt{1} pointed by \texttt{y} became live again, it is a \emph{zombie}.
-      \item \texttt{y} from first call to \texttt{f} is not reachable on the second call
-      \item Abstract GC would collect \texttt{y} after the first call and restore precision \pause
+      \item 0CFA with constant propagation would compute the output to be \alert<2>{\texttt{1;$\top$}}
+      \item \texttt{1} pointed by \texttt{y} from first call to \texttt{f} is not reachable on the second call
+      \item but it became live again on the second call, it is a \emph{zombie}
+      \item Abstract GC would collect \texttt{y} after the call on line 7 and restore precision \pause
         \begin{itemize}[<+->] \footnotesize
         \item Allows strong updates
         \item We get a \alert{\emph{more precise and faster}} analysis
@@ -565,7 +616,8 @@ static void main(string[] args) {
 \end{frame}
 
 \begin{frame}{Relationship with model checking}
-  \begin{itemize}
+  \small
+  \begin{itemize}[<+->]
   \item Abstract interpretation links model
     checking and a certain kind of dataflow analysis
     \footcite{schmidt1998program,schmidt1998data}
@@ -582,30 +634,32 @@ static void main(string[] args) {
     \end{itemize}
   \item (Trace-based) abstract interpretation creates the finite model of the
     program at the desired precision level
+    \begin{itemize}
+    \item We will see something in the same vein in predicate abstraction
+    \end{itemize}
   \end{itemize}
 \end{frame}
 
 \section{Predicate abstraction \& Abstraction refinement}
-\subsection{Predicate abstraction}
+%\subsection{Predicate abstraction}
 \begin{frame}{Predicate abstraction}
   \begin{itemize}[<+->]
+  \item Proposed by Clarke et al. and Graf et al. for hardware verification\footcite{clarke1994model,graf1997construction}
   \item Main idea: our abstract domain is a finite set of predicates $\phi_i,\, 1 \le i\le n$ over states
-  \item $\abst{\State} = \pw\left(\bigcup_{i}\Set{\phi_i, \neg \phi_i}\right).$
+  \item $\abst{\State} = \bigcup_{i}\pw\left(\Set{\phi_i, \neg \phi_i}\right).$
   \item $\abst{\varsigma_1} \sqsubseteq \abst{\varsigma_2} \equiv \abst{\varsigma_2} \subseteq \abst{\varsigma_1}.$
   \item $\gamma(\abst{\varsigma}) = \Set{\varsigma \in \State \vert \bigwedge_{\phi \in \varsigma} \phi}.$
-  \item $\alpha(\varsigma) = \bigwedge_{\phi_i(\varsigma)} \phi_i \wedge \Set{\neg\phi_i \vert \neg\phi_i(\varsigma)}.$
-  \item Use model checkers/theorem provers to compute $\abst{\fn{Post}}$ and reachability
-  \item Proposed by Clarke et al. and Graf et al. for hardware verification\footcite{clarke1994model,graf1997construction}
+  \item $\alpha(\varsigma) = \bigwedge_{\phi_i(\varsigma)} \phi_i \wedge \bigwedge_{\neg\phi_i(\varsigma)} \neg\phi_i .$
+  \item Use model checkers/theorem provers to compute $\abst{F}$ and reachability
   \end{itemize}
 \end{frame}
-\subsection{Abstraction refinement}
+%\subsection{Abstraction refinement}
 \begin{frame}{Counterexample-Generated Abstraction Refinement (CEGAR)}
   \begin{itemize}[<+->]
   \item Choosing the correct predicates is tricky and tedious
-  \item When proving safety using the current abstraction fails, compute a counterexample using backwards semantics (and a model checker) to find a path it fails
+  \item When proving safety using the current abstraction fails, compute a counterexample using backwards semantics ($\fn{Pre}$) and a model checker to find a path it fails
   \item Add the counterexample to the set of predicates and try again
   \item Proposed by Clarke et al.\footcite{clarke2003counterexample}. Extended by Ball et al. to support C programs for SLAM project\footcite{ball2001automatic,ball2001automatically}
-  \item Can be implemented ``naturally'' using CLP by modifying Prolog's fact database on the fly.\footcite{podelski2007armc}
   \end{itemize}
 \end{frame}
 
@@ -617,11 +671,20 @@ static void main(string[] args) {
   \item If verification fails, produce a counterexample by computing a backwards path and add the corresponding new predicate to the set of predicates and go to step 1.
   \item Otherwise, we verified the program
   \end{enumerate}
+  \note{During abstraction, we extract the predicates that affect/depend on parameters/globals/returns for each procedure, carry that as a signature and use it to create the Boolean program. SLAM is interprocedural but it is not context sensitive}
 \end{frame}
 
 \begin{frame}{Predicate abstraction: Instrumentation code}
   \begingroup\footnotesize
-  $\phi_1 = \texttt{\{state==Locked\}}$, $\phi_2 = \texttt{\{state==Unlocked\}}$\endgroup
+  $\phi_1 = \texttt{\{state==Locked\}}$, $\phi_2 = \texttt{\{state==Unlocked\}}$
+
+  \begin{itemize}[<+->]
+  \item The code on the left is generated by a specification for using
+    spin locks properly
+  \item The code on the right is the predicate abstraction of the code on the left
+  \end{itemize}
+  \endgroup
+  
   \begin{columns}[t]
     \begin{column}{0.45\textwidth}
       \lstinputlisting[language=C,mathescape]{lst/pred_instr.c}
@@ -633,25 +696,34 @@ static void main(string[] args) {
 \end{frame}
 
 \begin{frame}{\alt<5->{Abstraction refinement}{Predicate abstraction: The actual program}}
-  \begingroup\footnotesize\vspace{-0.5em}
-  $\phi_1 = \texttt{\{state==Locked\}}$, $\phi_2 = \texttt{\{state==Unlocked\}}$\vspace{-1.5em}
+  \begingroup\footnotesize\vspace{-0.7em}
+  $\phi_1 = \texttt{\{state==Locked\}}$, $\phi_2 = \texttt{\{state==Unlocked\}}$\vspace{-1.7em}
   \begin{columns}[t]
-    \begin{column}{0.40\textwidth}
+    \begin{column}{0.50\textwidth}
       \lstinputlisting[language=C,mathescape]{lst/pred_program.c}
     \end{column}\pause
-    \begin{column}{0.55\textwidth}
+    \begin{column}{0.50\textwidth}
+      \begin{center}
+
       \only<beamer>{
         \only<3>{\lstinputlisting[language=C,mathescape]{lst/pred_program.bool}}
         }
         \only<4->{\lstinputlisting[language=C,mathescape]{lst/pred_program2.bool}}
         \begin{itemize}\footnotesize
-        \item<5-> We send this program to the model checker
-        \item<6-> Get the counterexample
-        \item<7-> Refine with $\phi_3 = \texttt{\{nPackets==nPacketsOld\}}$
+        \item<5-> Send this program to the model checker to verify it
+        \item<6-> The model checker finds a bad path (counterexample) try falsifying it using concrete reachability analysis% symbolic execution to obtain a refinement
+        \item<7-> Refine with $\phi_3 = \texttt{\{nPackets==nPacketsOld\}}$, generated from the counterexample
         \end{itemize}
+      \end{center}
+
     \end{column}
   \end{columns}
   \endgroup
+
+  \note<1->{We instrument the code (automatically) based on the specification}
+  \note<2->{We abstract away the statements \& guards not interacting with predicates}
+  \note<2->{Let's clean the useless cruft}
+  \note<3->{SLAM does a backwards abstract interpretation then uses forward concrete semantics. BLAST does the opposite.}
 \end{frame}
 
 \begin{frame}{Lazy abstraction\footcite{henzinger2002lazy}}
@@ -665,37 +737,19 @@ static void main(string[] args) {
   \end{itemize}
 \end{frame}
 
-\begin{frame}{Craig interpolants}
+\begin{frame}{Other work in abstraction refinement}
   \begin{itemize}[<+->]
-  \item If $\neg (\phi \wedge \psi)$ is false then $\exists I$ (Craig interpolant of $\phi, \psi$) s.t.
-    \begin{itemize}[<+->]
-    \item $\phi \implies I$ and $\neg (I \wedge \psi)$
-    \item $V(I) \subseteq V(\phi) \cap V(\psi)$ where $V(\varphi)$ denotes the set of variables occuring in $\varphi$
-    \end{itemize}
-  \item Craig interpolants exist for all FOL formulas and can be computed by theorem provers
-  \item A sequence of Craig interpolants can be used instead of computing weakest preconditions for abstraction refinement\footcite{mcmillan2006lazy}\pause
+  \item McMillan\footcite{mcmillan2006lazy} uses Craig interpolants rather than weakest precondition computation and gains $3.8$-$17.7\times$ speedup over lazy abstraction on BLAST benchmarks
+  \item Gulavani et al.\footcite{gulavani2006counterexample} use abstraction refinement to compute which widenings to figure out which widenings to delay
     \begin{itemize}
-    \item $3.8$-$17.7\times$ faster than lazy abstraction on BLAST benchmarks
+    \item They later on extend their technique to delay joins and get more precise widenings with interpolants\footcite{gulavani2008automatically}
     \end{itemize}
-  \end{itemize}
-\end{frame}
-\begin{frame}{Abstraction refinement for widening}
-  \small
-  \begin{itemize}
-  \item Gulavani et al. used abstract refinement to find the first instance of widening that causes imprecision\footcite{gulavani2006counterexample}
-  \item They use it to determine widening delays, they also keep a history of widening results because widening is not monotonic
-  \item On a later paper\footcite{gulavani2008automatically}, they extend this technique to joins and combine results of Craig interpolants and widening
-    \begin{itemize}\footnotesize
-    \item They use bounded widening ($\widen_T$): $\widen_T$ is a widening operation such that\\ if $\exists C \in T.\, A, B \sqsubseteq C$ then $A \widen_T B \sqsubseteq C$
-    \item Then define \emph{interpolated widening} as $A \widen_{\Set{I}} B$ where $I$ is the interpolant of $A, B$.
-    \item This is useful because widening and interpolants find different kinds of invariants
-    \end{itemize}
-  \item Both of these works are implemented using polyhedral domains (formulas over linear arithmetic)
+    \item Podelski et al.\footcite{podelski2007armc} show that abstraction refinement can be implemented ``naturally'' using CLP by modifying Prolog's fact database on the fly
   \end{itemize}
 \end{frame}
 
 \section{Static analysis of control software}
-\begin{frame}{What is control software?}
+\begin{frame}{What is challenging about control software?}
   Example: autopilots, nuclear plant rod controller etc.
   
   \begin{itemize}
@@ -707,34 +761,51 @@ static void main(string[] args) {
   \end{itemize}
 \end{frame}
 
-\subsection{Dynamic state partitioning}
-\begin{frame}{\todo{Bultan et al. \& cite Jeannet}}
-  \todo{\footcite{bultan_model-checking_1999,jeannet_dynamic_1999}}
-  \todo{\footcite{bultan_composite_2000,jeannet_representing_2002}}
+%\subsection{Dynamic state partitioning}
+\begin{frame}{Partitioning the state of control programs}\small
+  \begin{itemize}[<+->]
+  \item Many control programs don't have a program counter like sequential programs
+  \item Bultan et al.\footcite{bultan_model-checking_1999} propose a method to decompose the transition relation. Their method has 3 stages:
+    \begin{enumerate}
+    \item Convert an event-action language to DNF Presburger formulas
+    \item Partition the state space by different valuations of variables with limited range (such as control variables) based on heuristics
+      \begin{itemize}
+      \item Also, decompose the transition relation to have states in a single partition for the domain and the range of each transition formula
+      \end{itemize}
+
+    \item Apply only the relevant parts of the transition relation to each partition when computing a fixpoint
+    \end{enumerate}
+  \item To guarantee convergence, they introduce a widening operator for multipolyhedra
+  \item They later on extend this technique to work on programs containing integers, Booleans, and enums\footcite{bultan_composite_2000}
+  \end{itemize}
+  \note{They evaluate their technique by verifying properties of Bakery algorithm, ticket algorithm, bounded buffer producer-consumer, and a circular queue.}
+  \note{In this work, they merge formulas from the same language together then apply simplification procedures per sublanguage separately}
 \end{frame}
 
-\begin{frame}{Extending non-parallel analysis to multithreaded programs\footcite{mine2011static}}
-  \footnotesize
+\begin{frame}{Dynamic state partitioning for automata\footcite{jeannet_dynamic_1999}}
   \begin{itemize}[<+->]
-  \item For statically fixed threads, locks and scheduling policy
-  \item Start with structural semantics, then consider \emph{interleaving} semantics for paths consisting of interleaving statements from different threads
-  \item Abstract it with \emph{interferences} $I = X \times V \times T$ summarizing the effects of other threads over shared variables flow-insensitively
-    \begin{itemize}[<+->]\footnotesize
-    \item Evaluation of each expression considers all possible interferences and picks the values separately for each instance of a variable
+  \item Jeannet et al. propose a dynamic partitioning technique to partition state space of an automaton with polyhedral constraints as guards
+  \item They first do a reachability analysis on the automaton's control structure to get an initial CFG
+  \item They then partition each state according to the guards present in the program
+    \begin{itemize}
+    \item They partition a state according to a guard if the guard's condition also partitions the outgoing transitions 
     \end{itemize}
-  \item To model different memory consistency models, apply certain program transformations, e.g. reordering assignments, eliminating multiple instances of variables etc.
-  \item Partition the state space by status of threads (waiting, yielding, ready) and status of locks (held by $t$, free) and eliminate the invalid interferences
   \end{itemize}
 \end{frame}
 
-\begin{frame}{Variable packing}
-  \todo{Explain with an example}
+\begin{frame}{Other methods partitioning the state}
+  \begin{itemize}[<+->]
+  \item Jeannet\footcite{jeannet_representing_2002} proposes a method for partitioning transfer functions of automata with Booleans and integers by representing the transfer functions as a multi-terminal binary decision diagram with primitive relations at the leaves
+  \item Miné\footcite{mine2011static} extends an abstract interpreter for sequential programs to parallel programs with statically known threads and locks
+    \begin{itemize}
+    \item He partitions the state space based on the state of threads (waiting on a lock $l$, yielding, ready) and state of locks (held by thread $t$, free)
+    \item  and refines interactions of threads based on these states
+    \end{itemize}
+  \item Chen and Cousot\footcite{chen2015binary} propose automatically extracting branch conditionals and using binary decision trees to partition state space
+  \end{itemize}
 \end{frame}
 
-\begin{frame}{\todo{Chen \& Cousot\footcite{chen2015binary}}}
-\end{frame}
-
-\subsection{Combination of domains}
+%\subsection{Combination of domains}
 \begin{frame}{A plethora of domains}
   \footnotesize
   \begin{tightcenter}
@@ -748,8 +819,11 @@ static void main(string[] args) {
     %Arithmetic-geometric progressions\footcite{feret2005arithmetic} & \( x \mapsto ax + b \) & $ \bigO(n) $
   \end{tabular}
   \end{tightcenter}
-  \uncover<2->{Also: congruences, floating-point versions\footcite{mine2004relational}, arithmetic-geometric progressions\footcite{feret2005arithmetic} \ldots{}}\\
-  \uncover<3->{\alert{How do we choose/combine them?}}
+  \begin{itemize}[<+->]
+  \item Also: congruences, floating-point versions\footcite{mine2004relational}, arithmetic-geometric progressions\footcite{feret2005arithmetic} \ldots{}
+  \item How do we choose which domains to use?
+  \item How do we combine the results of different domains?
+  \end{itemize}
 
   \vspace*{1em}
 
@@ -774,28 +848,28 @@ static void main(string[] args) {
         & \bot \arrow[ru, no head] \arrow[lu, no head] & 
       \end{tikzcd}\]
       \caption{\small Cycle domain $\ns{Cyc}$}
-    \end{subfigure}
+    \end{subfigure}\pause
     \begin{subfigure}[b]{0.45\textwidth}\tiny
       \raggedright
       \[\begin{tikzcd}
         &  & \top &  \\
-        \only<1>{\alert{Null,Cyc} \arrow[rru, no head]} & \mathit{Null,Acyc} \arrow[ru, no head] & \mathit{NotNull,Cyc} \arrow[u, no head] & \mathit{NotNull,Acyc} \arrow[lu, no head] \\
-        &  & \bot \arrow[ru, no head] \arrow[lu, no head] \arrow[u, no head] \only<1>{\arrow[llu, no head]} & 
+        \only<2>{\alert{Null,Cyc} \arrow[rru, no head]} & \mathit{Null,Acyc} \arrow[ru, no head] & \mathit{NotNull,Cyc} \arrow[u, no head] & \mathit{NotNull,Acyc} \arrow[lu, no head] \\
+        &  & \bot \arrow[ru, no head] \arrow[lu, no head] \arrow[u, no head] \only<2>{\arrow[llu, no head]} & 
       \end{tikzcd}\]
-    \caption{\small \alt<2>{The reduced product of $Null$ and $Cyc$}{The Cartesian product $Null \times Cyc$}}
+    \caption{\small \alt<3->{The reduced product of $Null$ and $Cyc$}{The Cartesian product $Null \times Cyc$}}
   \end{subfigure}
 \end{figure}
 \begin{itemize}
-\item<3-> Reduced products have the same concretization. They eliminate impossible (spurious) configurations
-\item<4-> There is no general (algorithmic) way to derive them
-\item<5-> But iterative reductions can provide an approximation
+\item<4-> Reduced products have the same concretization. They eliminate impossible (spurious) configurations
+\item<5-> There is no general (algorithmic) way to derive them
+\item<6-> But iterative reductions can provide an approximation
 \end{itemize}
 
 \end{frame}
 
 \begin{frame}{Iterative reductions}
   \small
-  \begin{itemize}
+  \begin{itemize}[<+->]
   \item A reduction operator\footcite{cousot2011reduced} $\rho: L \to L$ over a lattice $L$ is
     \begin{itemize}
     \item a reductive $\rho(a) \sqsubseteq a$ operation
@@ -806,22 +880,132 @@ static void main(string[] args) {
   \end{itemize}
 \end{frame}
 
-\begin{frame}{Reduction operator example}
-  \begin{itemize}
-  \item \todo{$\times : \mathcal{D \times D} \to \mathcal{D}$}
-  \item \todo{Binary product abstract domain functor from ASTRÉE\footcite{cousot2005astree,cousot2007varieties,cousot2006combination}}
+\begin{frame}{Reduction example: ASTRÉE's\footcite{cousot2005astree,cousot2007varieties} Binary product abstract domain functor\footcite{cousot2006combination}}
+  \begin{itemize}[<+->]
+  \item $\dottimes : \mathcal{D \times D} \to \mathcal{D}$. It combines two domains and shares information between them automatically
+  \item The information sharing is done by passing new constraints generated by some domains to others
+  \item The constraints passed to $\mathcal{A \times B}$ are passed to both $\mathcal{A}$ and $\mathcal{B}$
+  \item The new constraints generated by $\mathcal{A}$ and $\mathcal{B}$
+  \item The refinement is acyclic to ensure termination (not to make widening unstable)
   \end{itemize}
 \end{frame}
 
-\begin{frame}{Sharing information}
-  \todo{Add an example that gets refined as we communicate the info}
+\begin{frame}{An example domain hierarchy from ASTRÉE\footcite{cousot2006combination}}
+  \begingroup\tiny
+  \begin{center}
+    \begin{tikzcd}[ampersand replacement=\&]
+      \& \alert<1>{\textsf{trace partitioning}} \arrow[d, no head] \&  \&  \&  \&  \\
+      \& \alert<3>{\dottimes} \arrow[ld, no head] \arrow[rd, no head] \&  \&  \&  \&  \\
+      \textsf{intervals} \&  \& \alert<3>{\dottimes} \arrow[ld, no head] \arrow[rd, no head] \&  \&  \&  \\
+      \& \textsf{symbolic domain} \&  \& \alert<3>{\dottimes} \arrow[ld, no head] \arrow[rd, no head] \&  \&  \\
+      \&  \& \textsf{octagons} \&  \& \alert<2>{\textsf{boolean partitioning}} \arrow[d, no head] \&  \\
+      \&  \&  \&  \& \alert<3>{\dottimes} \arrow[ld, no head] \arrow[rd, no head] \&  \\
+      \&  \&  \& \textsf{intervals} \&  \& \textsf{symbolic domain}
+    \end{tikzcd}
+  \end{center}
+  \endgroup
+  \note{Trace partitioning distinguishes between different traces up to current program point and keeps a couple domains below it}
+  \note{Boolean partitioning splits the states for different values of a set of booleans, similar to predicate abstraction}
+  \note{Binary product connects domains to get a partially reduced product, as explained above}
 \end{frame}
+
+% \begin{frame}{Sharing information}
+%   \todo{Add an example that gets refined as we communicate the info}
+% \end{frame}
 
 \begin{frame}[standout]
   Thank you!
 \end{frame}
 
 \appendix
+
+\begin{frame}{Craig interpolants}
+  \begin{itemize}[<+->]
+  \item If $\phi \wedge \psi$ is false then $\exists I$ (Craig interpolant of $\phi, \psi$) s.t.
+    \begin{itemize}[<+->]
+    \item $\phi \implies I$ and $\neg (I \wedge \psi)$
+    \item $V(I) \subseteq V(\phi) \cap V(\psi)$ where $V(\varphi)$ denotes the set of variables occuring in $\varphi$
+    \end{itemize}
+  \item Craig interpolants exist for all FOL formulas and can be computed by theorem provers
+  \item A sequence of Craig interpolants can be used instead of computing weakest preconditions for abstraction refinement\footcite{mcmillan2006lazy}\pause
+    \begin{itemize}
+    \item $3.8$-$17.7\times$ faster than lazy abstraction on BLAST benchmarks
+    \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Abstraction refinement for widening}
+  \small
+  \begin{itemize}[<+->]
+  \item Gulavani et al. used abstraction refinement to find the first instance of widening that causes imprecision\footcite{gulavani2006counterexample}
+  \item They use it to determine widening delays, they also keep a history of widening results because widening is not monotonic
+  \item On a later paper\footcite{gulavani2008automatically}, they extend this technique to joins and combine results of Craig interpolants and widening
+    \begin{itemize}\footnotesize
+    \item They use bounded widening ($\widen_T$): $\widen_T$ is a widening operation such that\\ if $\exists C \in T.\, A, B \sqsubseteq C$ then $A \widen_T B \sqsubseteq C$
+    \item Then define \emph{interpolated widening} as $A \widen_{\Set{I}} B$ where $I$ is the interpolant of $A, B$.
+    \item This is useful because widening and interpolants find different kinds of invariants
+    \end{itemize}
+  \item Both of these works are implemented using polyhedral domains (formulas over linear arithmetic)
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Partitioning transfer functions of automata with hetereogeneous types}
+  \small
+  \begin{itemize}
+  \item Jeannet\footcite{jeannet_representing_2002} proposes a method for partitioning transfer functions of automata with Booleans and integers
+  \item He represents the transfer function as a multi-terminal binary decision diagram (MTBDD) where the terminals contain the primitive relations for each type
+  \item He considers 3 methods to abstract the MTBDDs:
+    \begin{enumerate}
+    \item Best approximation: intersect the input with every path on MTBDD then join the results ($\bigO(2^{vc})$)
+    \item Cartesian product: project the transfer function to each variable and take the Cartesian product ($\bigO(v2^{c})$)
+    \item Abstraction predicates: consider the paths going to each terminal of the MTBDD as partitions $\bigO(vt)$
+    \end{enumerate}
+  \item He also \emph{specializes} each node in MTBDD based on the constraints imposed by its ancestors to improve precision and simplify constraints
+  \end{itemize}
+  \note{c=choice, v=variables, t=terminals}
+\end{frame}
+
+\begin{frame}{Extending non-parallel analysis to multithreaded programs\footcite{mine2011static}}
+  \footnotesize
+  \begin{itemize}[<+->]
+  \item For statically fixed threads, locks and scheduling policy
+  \item Start with structural semantics, then consider \emph{interleaving} semantics for paths consisting of interleaving statements from different threads
+  \item Abstract it with \emph{interferences} $I = X \times V \times T$ summarizing the effects of other threads over shared variables flow-insensitively
+    \begin{itemize}[<+->]\footnotesize
+    \item Evaluation of each expression considers all possible interferences and picks the values separately for each instance of a variable
+    \end{itemize}
+  \item To model different memory consistency models, apply certain program transformations, e.g. reordering assignments, eliminating multiple instances of variables etc.
+  \item Partition the state space by the state of threads (waiting, yielding, ready) and the state of locks (held by $t$, free) and eliminate the invalid interferences
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Binary Decision Tree Abstract Domain Functor\footcite{chen2015binary}}
+  \begin{itemize}[<+->]
+  \item Do a control flow analysis, extract DAGs of branch conditions (not loop conditions)
+  \item Construct binary decision trees whose leaves are the input abstract domain
+  \item Define widening and narrowing pointwise
+  \item Partially restore path sensitivity (disjunctions) for some portions of the state
+  \end{itemize}\uncover<5->{
+  \begin{columns}
+    \begin{column}{0.2\textwidth}\centering
+  \lstinputlisting[language=C,numbers=left]{lst/chen_cousot.c}
+\end{column}
+\begin{column}{0.7\textwidth}\centering
+  \footnotesize
+  \alt<6->{\begin{tikzcd}[ampersand replacement=\&]
+    \& x \le 50 \arrow[rd, "\false"] \arrow[ld, "\true"'] \& \\
+    0 \le x \le 50 \wedge x = y \&  \& x+y-102=0 \wedge 51 \le x \le 103
+  \end{tikzcd}}
+{
+  \begin{align*}
+    y \ge 1 \wedge x-y\ge 0 \wedge x + 52y \ge 0\\
+    \alert{\not \therefore x + y \le 102}
+  \end{align*}
+}
+\end{column}
+\end{columns}}
+\note{It's called a functor because of OCaml's functors which take modules and produce modules, this is a transformation that takes an abstract domain and produces a new one}
+\end{frame}
 
 \begin{frame}{Reduced products \& combination of decision procedures\footcite{cousot2011reduced}}
   \footnotesize

@@ -1,6 +1,9 @@
 % multimedia in beamer presentations
 \usepackage{multimedia}
 
+% adding some better facilities to latex such as proper booleans
+\usepackage{etoolbox}
+
 % Unicode math symbols for XeLaTeX
 \usepackage{mathrsfs}
 
@@ -9,6 +12,7 @@
 \usepackage{amsthm}
 \usepackage{amsmath}
 \usepackage{amstext}
+\usepackage{mathabx}
 % math tools for amsmath
 \usepackage{mathtools}
 
@@ -28,6 +32,7 @@
 \usepackage{galois}
 \usepackage{tikz}
 \usetikzlibrary{fit,calc,shapes,arrows.meta,patterns,backgrounds}
+\usetikzlibrary{decorations.pathmorphing}
 \usetikzlibrary{cd}
 \usepackage[beamer]{hf-tikz}
 
@@ -132,8 +137,8 @@
 \newtheorem{thm}{Theorem}
 \newtheorem{eg}{Example}
 
-\newcommand{\abscolor}[1]{\textcolor{magenta}{#1}}
-\newcommand{\concolor}[1]{\textcolor{blue}{#1}}
+\newcommand{\abscolor}[1]{\textcolor{mLightBrown}{#1}}
+\newcommand{\concolor}[1]{\textcolor{mLightGreen}{#1}}
 \newcommand{\abst}[1]{#1^{\#}}
 
 \newcommand{\step}{\rightsquigarrow}
