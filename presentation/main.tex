@@ -26,6 +26,9 @@
 
 \input{macros}
 
+\newtoggle{labdemo}
+\toggletrue{labdemo}
+
 \title[Major Area Exam]{Abstract Interpretation of Low-level Programs}
 \subtitle{Major Area Exam}
 \date{January 23, 2018}
@@ -48,7 +51,7 @@
   \tableofcontents
 \end{frame}
 
-\section{Introduction}
+\section{Motivation}
 \begin{frame}{What is low-level software? Why should we analyze it?}
 Low-level software:
 \begin{itemize}
@@ -56,26 +59,30 @@ Low-level software:
 \item Require preserving subtle invariants (above, control software)
 \item Have strong reliability requirements
 \begin{itemize}
-\item with unpleasant consequences % : BSoD, data loss, Arianne~5, Heartbleed, Patriot missile
+\item with unpleasant consequences\iftoggle{labdemo}{: BSoD, data loss, Arianne~5, Heartbleed, Patriot missile}{}
 \end{itemize}
 \end{itemize}
 
 \end{frame}
 
 \only<beamer>{ % all template changes are local to this group.
-  \setbeamertemplate{navigation symbols}{}
-  \begin{frame}[plain]
-    \begin{tikzpicture}[remember picture,overlay]
-      \node[at=(current page.center)] {
-        \includegraphics[width=\paperwidth]{material/bsod_resized.png}
-      };
-    \end{tikzpicture}
-    %\sound[autostart,inlinesound]{foo}{beep.wav}
-    \pause
-    \Put(10,10){\includegraphics[width=0.4\textwidth]{material/heartbleed.pdf}}\pause
-    \Put(180,200){\includegraphics[width=0.4\textwidth]{material/formal-verification-as-a-sinking-airplane.png}}\pause
-    \Put(210,-100){\includegraphics[width=0.5\textwidth]{material/us-govt-patriot-missile.png}}
-  \end{frame}
+  \nottoggle{labdemo}{
+    \setbeamertemplate{navigation symbols}{}
+    \begin{frame}[plain]
+      \begin{tikzpicture}[remember picture,overlay]
+        \node[at=(current page.center)] {
+          \includegraphics[width=\paperwidth]{material/bsod_resized.png}
+        };
+      \end{tikzpicture}
+      % \sound[autostart,inlinesound]{foo}{beep.wav}
+      \pause
+      \Put(10,10){\includegraphics[width=0.4\textwidth]{material/heartbleed.pdf}}\pause
+      \Put(180,200){\includegraphics[width=0.4\textwidth]{material/formal-verification-as-a-sinking-airplane.png}}\pause
+      \Put(210,-100){\includegraphics[width=0.5\textwidth]{material/us-govt-patriot-missile.png}}
+    \end{frame}
+  }{
+    \addtocounter{framenumber}{1}
+  }
 }
 
 \only<handout>{
@@ -103,7 +110,7 @@ Low-level software:
   \end{gather*}\vspace{-2em}
   \begin{align*}
     fd \in \ns{FunDef} \eDEF & \alert<5>{\kw{def}\; f(\vo{x}) = s;\,\kw{return}\; e} \\
-    e \in \Exp \eDEF & x \eOR n \eOR b \eOR e_1 \oplus e_2 \eOR *x \\ % \eOR \alert<1>{\kw{choose}\;e_1\,e_2} \\
+    e \in \Exp \eDEF & x \eOR n \eOR b \eOR e_1 \oplus e_2 \eOR \alert<3>{*x} \\ % \eOR \alert<1>{\kw{choose}\;e_1\,e_2} \\
     s \in \Stmt \eDEF & s;\,s \eOR \alert<2>{\kw{abort}} \\
     \eOR & \alert<4>{\kw{if}\, e\; s_1 \; \kw{else} \; s_2} \\
     \eOR & \alert<4>{\kw{while}\; e\; s} \\
@@ -150,7 +157,7 @@ Low-level software:
 
 \begin{frame}{Collecting semantics}
   Abstract machine semantics gives us a state transition system $(\State, I, \step)$ where \pause $\State$ is the set of states, \pause $I \subset \State$ is the set of initial states, \pause $\step \subset \State \times \State$ is the transition relation. \pause Let
-  \[ F : \pw(\State) \monarrow \pw(\State),\, F(X) = \Set{y \vert (x, y) \in \step \wedge x \in X}. \]\pause
+  \[ F : \pw(\State) \textoverop{\alert<2>{mon}}{\to} \pw(\State),\, F(X) = \Set{y \vert x \step y \wedge x \in X}. \]\pause
   $\lfp_I F = I \cup F(I) \cup F(F(I)) \cup \ldots $ is the set of reachable states.\pause
 
   \alert{$\lfp_I F$ is potentially infinite and requires infinitely many steps to compute!}
@@ -364,9 +371,9 @@ Low-level software:
       \onslide<5>{\node(o3)[fill=gray,opacity=0.1,fit=(ab.south west) (eb.north east)]{};}
       }
     }]
-       & |[alias=ea]| \concolor{\varsigma } \arrow[r, "F"] \arrow[dd, "\alpha", dotted] & |[alias=eb]| \concolor{\varsigma'  \arrow[d, "\alpha", dotted]} \\
+       & |[alias=ea]| \concolor{\varsigma } \arrow[r, squiggly] \arrow[dd, "\alpha", dotted] & |[alias=eb]| \concolor{\varsigma'  \arrow[d, "\alpha", dotted]} \\
     &  & \abscolor{\alpha(\varsigma') } \arrow[d, "\sqsubseteq", dashed] \\
-      & |[alias=aa]| \abscolor{\alpha(\varsigma) } \arrow[r, "\abst{F}"] & |[alias=ab]| \abscolor{\alpha(\varsigma)' }
+      & |[alias=aa]| \abscolor{\alpha(\varsigma) } \arrow[r, squiggly] & |[alias=ab]| \abscolor{\alpha(\varsigma)' }
     \end{tikzcd}
     \only<beamer>{
     \begin{tikzpicture}[remember picture, overlay,
@@ -448,21 +455,40 @@ Low-level software:
 
 \begin{frame}{Widening}
   \small
+  \begin{columns}
+    \begin{column}{0.75\textwidth}
   A widening operator $\widen : A \times A \to A$ ensures convergence
   in a domain $A$ with infinite height. It has the following
   properties:\vspace{-0.3em}
   \begin{itemize}\footnotesize
-  \item $\forall a_1, a_2 \in A, a_1 \sqcup a_2 \sqsubseteq a_1 \widen a_2$
-  \item For any sequence $a_1, a_2, \ldots$, let $w_o = a_o, \ldots, w_n = w_{n-1} \widen a_n$. Then, $a_i \sqsubseteq w_i$ and the chain $w_1, w_2, \ldots$ eventually stabilizes
-  \end{itemize}\pause\vspace{-0.3em}
-  \begin{exampleblock}{\small Example: a widening operator on an integer range domain}
-    \vspace{-0.8em}
-  \begin{itemize}[<+->]\footnotesize
-  \item $[1,1] \widen [2,2] \widen [3,3] \widen \ldots \to [1, \infty]$
-  \item $[1,5] \widen [0,5] \widen [-1,5] \widen \ldots \to [-\infty, 5]$
-  \end{itemize}
-\end{exampleblock}\vspace{-1.6em}\pause
-Note: Widening operators are more general than Galois Connections.\footcite{cousot92comparing}\vspace{1em}
+  \item<2-> $\forall a_1, a_2 \in A, a_1 \sqcup a_2 \sqsubseteq a_1 \widen a_2$
+  \item<2-> For any sequence $a_1, a_2, \ldots$, let $w_1 = a_1, \ldots, w_n = w_{n-1} \widen a_n$. Then, $a_i \sqsubseteq w_i$ and the chain $w_1, w_2, \ldots$ eventually stabilizes
+  \end{itemize}\vspace{-0.3em}
+  \uncover<5->{
+    \begin{exampleblock}{\small Example: a widening operator on an integer range domain}
+      \vspace{-0.8em}
+      \begin{itemize}\footnotesize
+      \item $[1,1] \widen [2,2] \widen [3,3] \widen \ldots \to [1, \infty]$
+      \item $[1,5] \widen [0,5] \widen [-1,5] \widen \ldots \to [-\infty, 5]$
+      \end{itemize}
+    \end{exampleblock}
+    }
+\end{column}
+\begin{column}{0.2\textwidth}\tiny
+  \uncover<2->{
+    \begin{tikzcd}[ampersand replacement=\&]
+      \& \alert<4>{w_n}=w_{n-1} \widen a_n \\
+      \& \vdots \arrow[u, no head] \\
+      \alert<3>{\vdots} \textcolor<2>{mLightBrown}{\arrow[ruu, no head]} \& \alert<4>{w_3} = w_2 \widen a_3 \arrow[u, no head] \\
+      \alert<3>{a_3} \textcolor<2>{mLightBrown}{\arrow[ru, no head]} \arrow[u, no head] \& \alert<4>{w_2} = w_1 \widen a_2 \arrow[u, no head] \\
+      \alert<3>{a_2} \textcolor<2>{mLightBrown}{\arrow[ru, no head]} \arrow[u, no head] \&  \\
+      \alert<3>{a_1}=\alert<4>{w_1} \textcolor<2>{mLightBrown}{\arrow[ruu, no head]} \arrow[u, no head] \& 
+    \end{tikzcd}
+  }
+\end{column}
+\end{columns}
+Note: Widening operators are more general than Galois Connections.\footcite{cousot92comparing}
+
 \end{frame}
 
 \input{cfa.tex}
@@ -691,6 +717,10 @@ static void main(string[] args) {
     \end{column}
   \end{columns}
   \endgroup
+
+  \note<1->{We instrument the code (automatically) based on the specification}
+  \note<2->{We abstract away the statements \& guards not interacting with predicates}
+  \note<2->{Let's clean the useless cruft}
 \end{frame}
 
 \begin{frame}{Lazy abstraction\footcite{henzinger2002lazy}}
@@ -734,7 +764,7 @@ static void main(string[] args) {
 \end{frame}
 
 \section{Static analysis of control software}
-\begin{frame}{What is control software?}
+\begin{frame}{What is challenging about control software?}
   Example: autopilots, nuclear plant rod controller etc.
   
   \begin{itemize}
@@ -778,64 +808,16 @@ static void main(string[] args) {
   \end{itemize}
 \end{frame}
 
-
-\begin{frame}{Partitioning transfer functions of automata with hetereogeneous types}
-  \small
-  \begin{itemize}
-  \item Jeannet\footcite{jeannet_representing_2002} proposed a method for partitioning transfer functions of automata with Booleans and integers
-  \item He represents the transfer function as a multi-terminal binary decision diagram (MTBDD) where the terminals contain the primitive relations for each type
-  \item He considers 3 methods to abstract the MTBDDs:
-    \begin{enumerate}
-    \item Best approximation: intersect the input with every path on MTBDD then join the results ($\bigO(2^{vc})$)
-    \item Cartesian product: project the transfer function to each variable and take the Cartesian product ($\bigO(v2^{c})$)
-    \item Abstraction predicates: consider the paths going to each terminal of the MTBDD as partitions $\bigO(vt)$
-    \end{enumerate}
-  \item He also \emph{specializes} each node in MTBDD based on the constraints imposed by its ancestors to improve precision and simplify constraints
-  \end{itemize}
-  \note{c=choice, v=variables, t=terminals}
-\end{frame}
-
-\begin{frame}{Extending non-parallel analysis to multithreaded programs\footcite{mine2011static}}
-  \footnotesize
+\begin{frame}{Other methods partitioning the state}
   \begin{itemize}[<+->]
-  \item For statically fixed threads, locks and scheduling policy
-  \item Start with structural semantics, then consider \emph{interleaving} semantics for paths consisting of interleaving statements from different threads
-  \item Abstract it with \emph{interferences} $I = X \times V \times T$ summarizing the effects of other threads over shared variables flow-insensitively
-    \begin{itemize}[<+->]\footnotesize
-    \item Evaluation of each expression considers all possible interferences and picks the values separately for each instance of a variable
+  \item Jeannet\footcite{jeannet_representing_2002} proposes a method for partitioning transfer functions of automata with Booleans and integers by representing the transfer functions as a multi-terminal binary decision diagram with primitive relations at the leaves
+  \item Miné\footcite{mine2011static} extends an abstract interpreter for sequential programs to parallel programs with statically known threads and locks
+    \begin{itemize}
+    \item He partitions the state space based on the status of threads (waiting on a lock $l$, yielding, ready) and status of locks (held by thread $t$, free)
+    \item  and refines interactions of threads based on these statuses
     \end{itemize}
-  \item To model different memory consistency models, apply certain program transformations, e.g. reordering assignments, eliminating multiple instances of variables etc.
-  \item Partition the state space by status of threads (waiting, yielding, ready) and status of locks (held by $t$, free) and eliminate the invalid interferences
+  \item Chen and Cousot\footcite{chen2015binary} propose automatically extracting branch conditionals and using binary decision trees to partition state space
   \end{itemize}
-\end{frame}
-
-\begin{frame}{Binary Decision Tree Abstract Domain Functor\footcite{chen2015binary}}
-  
-  \begin{itemize}[<+->]
-  \item Do a control flow analysis, extract DAGs of branch conditions (not loop conditions)
-  \item Construct binary decision trees whose leaves are the input abstract domain
-  \item Define widening and narrowing pointwise
-  \item Partially restore path sensitivity (disjunctions) for some portions of the state
-  \end{itemize}\uncover<5->{
-  \begin{columns}
-    \begin{column}{0.2\textwidth}\centering
-  \lstinputlisting[language=C,numbers=left]{lst/chen_cousot.c}
-\end{column}
-\begin{column}{0.7\textwidth}\centering
-  \footnotesize
-  \alt<6->{\begin{tikzcd}[ampersand replacement=\&]
-    \& x \le 50 \arrow[rd, "\false"] \arrow[ld, "\true"'] \& \\
-    0 \le x \le 50 \wedge x = y \&  \& x+y-102=0 \wedge 51 \le x \le 103
-  \end{tikzcd}}
-{
-  \begin{align*}
-    y \ge 1 \wedge x-y\ge 0 \wedge x + 52y \ge 0\\
-    \alert{\not \therefore x + y \le 102}
-  \end{align*}
-}
-\end{column}
-\end{columns}}
-\note{It's called a functor because of OCaml's functors which take modules and produce modules, this is a transformation that takes an abstract domain and produces a new one}
 \end{frame}
 
 %\subsection{Combination of domains}
@@ -948,6 +930,64 @@ static void main(string[] args) {
 \end{frame}
 
 \appendix
+
+\begin{frame}{Partitioning transfer functions of automata with hetereogeneous types}
+  \small
+  \begin{itemize}
+  \item Jeannet\footcite{jeannet_representing_2002} proposes a method for partitioning transfer functions of automata with Booleans and integers
+  \item He represents the transfer function as a multi-terminal binary decision diagram (MTBDD) where the terminals contain the primitive relations for each type
+  \item He considers 3 methods to abstract the MTBDDs:
+    \begin{enumerate}
+    \item Best approximation: intersect the input with every path on MTBDD then join the results ($\bigO(2^{vc})$)
+    \item Cartesian product: project the transfer function to each variable and take the Cartesian product ($\bigO(v2^{c})$)
+    \item Abstraction predicates: consider the paths going to each terminal of the MTBDD as partitions $\bigO(vt)$
+    \end{enumerate}
+  \item He also \emph{specializes} each node in MTBDD based on the constraints imposed by its ancestors to improve precision and simplify constraints
+  \end{itemize}
+  \note{c=choice, v=variables, t=terminals}
+\end{frame}
+
+\begin{frame}{Extending non-parallel analysis to multithreaded programs\footcite{mine2011static}}
+  \footnotesize
+  \begin{itemize}[<+->]
+  \item For statically fixed threads, locks and scheduling policy
+  \item Start with structural semantics, then consider \emph{interleaving} semantics for paths consisting of interleaving statements from different threads
+  \item Abstract it with \emph{interferences} $I = X \times V \times T$ summarizing the effects of other threads over shared variables flow-insensitively
+    \begin{itemize}[<+->]\footnotesize
+    \item Evaluation of each expression considers all possible interferences and picks the values separately for each instance of a variable
+    \end{itemize}
+  \item To model different memory consistency models, apply certain program transformations, e.g. reordering assignments, eliminating multiple instances of variables etc.
+  \item Partition the state space by status of threads (waiting, yielding, ready) and status of locks (held by $t$, free) and eliminate the invalid interferences
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Binary Decision Tree Abstract Domain Functor\footcite{chen2015binary}}
+  \begin{itemize}[<+->]
+  \item Do a control flow analysis, extract DAGs of branch conditions (not loop conditions)
+  \item Construct binary decision trees whose leaves are the input abstract domain
+  \item Define widening and narrowing pointwise
+  \item Partially restore path sensitivity (disjunctions) for some portions of the state
+  \end{itemize}\uncover<5->{
+  \begin{columns}
+    \begin{column}{0.2\textwidth}\centering
+  \lstinputlisting[language=C,numbers=left]{lst/chen_cousot.c}
+\end{column}
+\begin{column}{0.7\textwidth}\centering
+  \footnotesize
+  \alt<6->{\begin{tikzcd}[ampersand replacement=\&]
+    \& x \le 50 \arrow[rd, "\false"] \arrow[ld, "\true"'] \& \\
+    0 \le x \le 50 \wedge x = y \&  \& x+y-102=0 \wedge 51 \le x \le 103
+  \end{tikzcd}}
+{
+  \begin{align*}
+    y \ge 1 \wedge x-y\ge 0 \wedge x + 52y \ge 0\\
+    \alert{\not \therefore x + y \le 102}
+  \end{align*}
+}
+\end{column}
+\end{columns}}
+\note{It's called a functor because of OCaml's functors which take modules and produce modules, this is a transformation that takes an abstract domain and produces a new one}
+\end{frame}
 
 \begin{frame}{Reduced products \& combination of decision procedures\footcite{cousot2011reduced}}
   \footnotesize
