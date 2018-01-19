@@ -487,7 +487,7 @@ Low-level software:
   }
 \end{column}
 \end{columns}
-Note: Widening operators are more general than Galois Connections.\footcite{cousot92comparing}
+\uncover<6->{Widening operators are more general than Galois Connections to finite lattices\footcite{cousot92comparing}}
 
 \end{frame}
 
@@ -536,10 +536,10 @@ static int f(int x) {
   return x == (int)y;
 }
 
-static void main(string[] args) {
-  std::cout << f(1) << ';'
-            << f(2) << endl;
-  return 0;
+static void main(String[] args) {
+  System.out.print(f(1));
+  System.out.print(";");
+  System.out.print(f(2));
 }
           \end{lstlisting}
         \end{itemize}
@@ -547,9 +547,10 @@ static void main(string[] args) {
     \begin{column}{.60\textwidth}
       \pause
       \begin{itemize}[<+->]
-      \item Non-relational 0CFA would compute the output to be \alert<2>{\texttt{1;$\top$}}. \texttt{1} pointed by \texttt{y} became live again, it is a \emph{zombie}.
-      \item \texttt{y} from first call to \texttt{f} is not reachable on the second call
-      \item Abstract GC would collect \texttt{y} after the first call and restore precision \pause
+      \item 0CFA with constant propagation would compute the output to be \alert<2>{\texttt{1;$\top$}}
+      \item \texttt{1} pointed by \texttt{y} from first call to \texttt{f} is not reachable on the second call
+      \item but it became live again on the second call, it is a \emph{zombie}
+      \item Abstract GC would collect \texttt{y} after the call on line 7 and restore precision \pause
         \begin{itemize}[<+->] \footnotesize
         \item Allows strong updates
         \item We get a \alert{\emph{more precise and faster}} analysis
@@ -657,7 +658,6 @@ static void main(string[] args) {
   \item When proving safety using the current abstraction fails, compute a counterexample using backwards semantics ($\fn{Pre}$) and a model checker to find a path it fails
   \item Add the counterexample to the set of predicates and try again
   \item Proposed by Clarke et al.\footcite{clarke2003counterexample}. Extended by Ball et al. to support C programs for SLAM project\footcite{ball2001automatic,ball2001automatically}
-  \item Can be implemented ``naturally'' using CLP by modifying Prolog's fact database on the fly.\footcite{podelski2007armc}
   \end{itemize}
 \end{frame}
 
@@ -708,8 +708,8 @@ static void main(string[] args) {
         }
         \only<4->{\lstinputlisting[language=C,mathescape]{lst/pred_program2.bool}}
         \begin{itemize}\footnotesize
-        \item<5-> Send this program to the model checker to verify it \todo{Clarify}
-        \item<6-> The model checker finds a bad path, concretize it using $\fn{Pre}$
+        \item<5-> Send this program to the model checker to verify it
+        \item<6-> The model checker finds a bad path (counterexample) try falsifying it using concrete reachability analysis% symbolic execution to obtain a refinement
         \item<7-> Refine with $\phi_3 = \texttt{\{nPackets==nPacketsOld\}}$, generated from the counterexample
         \end{itemize}
       \end{center}
@@ -734,32 +734,14 @@ static void main(string[] args) {
   \end{itemize}
 \end{frame}
 
-\begin{frame}{Craig interpolants}
+\begin{frame}{Other work in abstraction refinement}
   \begin{itemize}[<+->]
-  \item If $\phi \wedge \psi$ is false then $\exists I$ (Craig interpolant of $\phi, \psi$) s.t.
-    \begin{itemize}[<+->]
-    \item $\phi \implies I$ and $\neg (I \wedge \psi)$
-    \item $V(I) \subseteq V(\phi) \cap V(\psi)$ where $V(\varphi)$ denotes the set of variables occuring in $\varphi$
-    \end{itemize}
-  \item Craig interpolants exist for all FOL formulas and can be computed by theorem provers
-  \item A sequence of Craig interpolants can be used instead of computing weakest preconditions for abstraction refinement\footcite{mcmillan2006lazy}\pause
+  \item McMillan\footcite{mcmillan2006lazy} uses Craig interpolants rather than weakest precondition computation and gains $3.8$-$17.7\times$ speedup over lazy abstraction on BLAST benchmarks
+  \item Gulavani et al.\footcite{gulavani2006counterexample} use abstraction refinement to compute which widenings to delay
     \begin{itemize}
-    \item $3.8$-$17.7\times$ faster than lazy abstraction on BLAST benchmarks
+    \item They later on extend their technique to delay joins and get more precise widenings with interpolants\footcite{gulavani2008automatically}
     \end{itemize}
-  \end{itemize}
-\end{frame}
-\begin{frame}{Abstraction refinement for widening}
-  \small
-  \begin{itemize}[<+->]
-  \item Gulavani et al. used abstraction refinement to find the first instance of widening that causes imprecision\footcite{gulavani2006counterexample}
-  \item They use it to determine widening delays, they also keep a history of widening results because widening is not monotonic
-  \item On a later paper\footcite{gulavani2008automatically}, they extend this technique to joins and combine results of Craig interpolants and widening
-    \begin{itemize}\footnotesize
-    \item They use bounded widening ($\widen_T$): $\widen_T$ is a widening operation such that\\ if $\exists C \in T.\, A, B \sqsubseteq C$ then $A \widen_T B \sqsubseteq C$
-    \item Then define \emph{interpolated widening} as $A \widen_{\Set{I}} B$ where $I$ is the interpolant of $A, B$.
-    \item This is useful because widening and interpolants find different kinds of invariants
-    \end{itemize}
-  \item Both of these works are implemented using polyhedral domains (formulas over linear arithmetic)
+    \item Podelski et al.\footcite{podelski2007armc} show that abstraction refinement can be implemented ``naturally'' using CLP by modifying Prolog's fact database on the fly
   \end{itemize}
 \end{frame}
 
@@ -798,7 +780,7 @@ static void main(string[] args) {
 \end{frame}
 
 \begin{frame}{Dynamic state partitioning for automata\footcite{jeannet_dynamic_1999}}
-  \begin{itemize}
+  \begin{itemize}[<+->]
   \item Jeannet et al. propose a dynamic partitioning technique to partition state space of an automaton with polyhedral constraints as guards
   \item They first do a reachability analysis on the automaton's control structure to get an initial CFG
   \item They then partition each state according to the guards present in the program
@@ -813,7 +795,7 @@ static void main(string[] args) {
   \item Jeannet\footcite{jeannet_representing_2002} proposes a method for partitioning transfer functions of automata with Booleans and integers by representing the transfer functions as a multi-terminal binary decision diagram with primitive relations at the leaves
   \item Miné\footcite{mine2011static} extends an abstract interpreter for sequential programs to parallel programs with statically known threads and locks
     \begin{itemize}
-    \item He partitions the state space based on the status of threads (waiting on a lock $l$, yielding, ready) and status of locks (held by thread $t$, free)
+    \item He partitions the state space based on the state of threads (waiting on a lock $l$, yielding, ready) and state of locks (held by thread $t$, free)
     \item  and refines interactions of threads based on these statuses
     \end{itemize}
   \item Chen and Cousot\footcite{chen2015binary} propose automatically extracting branch conditionals and using binary decision trees to partition state space
@@ -834,8 +816,11 @@ static void main(string[] args) {
     %Arithmetic-geometric progressions\footcite{feret2005arithmetic} & \( x \mapsto ax + b \) & $ \bigO(n) $
   \end{tabular}
   \end{tightcenter}
-  \uncover<2->{Also: congruences, floating-point versions\footcite{mine2004relational}, arithmetic-geometric progressions\footcite{feret2005arithmetic} \ldots{}}\\
-  \uncover<3->{\alert{How do we choose/combine them?}}
+  \begin{itemize}[<+->]
+  \item Also: congruences, floating-point versions\footcite{mine2004relational}, arithmetic-geometric progressions\footcite{feret2005arithmetic} \ldots{}
+  \item How do we choose which domains to use?
+  \item How do we combine the results of different domains?
+  \end{itemize}
 
   \vspace*{1em}
 
@@ -860,21 +845,21 @@ static void main(string[] args) {
         & \bot \arrow[ru, no head] \arrow[lu, no head] & 
       \end{tikzcd}\]
       \caption{\small Cycle domain $\ns{Cyc}$}
-    \end{subfigure}
+    \end{subfigure}\pause
     \begin{subfigure}[b]{0.45\textwidth}\tiny
       \raggedright
       \[\begin{tikzcd}
         &  & \top &  \\
-        \only<1>{\alert{Null,Cyc} \arrow[rru, no head]} & \mathit{Null,Acyc} \arrow[ru, no head] & \mathit{NotNull,Cyc} \arrow[u, no head] & \mathit{NotNull,Acyc} \arrow[lu, no head] \\
-        &  & \bot \arrow[ru, no head] \arrow[lu, no head] \arrow[u, no head] \only<1>{\arrow[llu, no head]} & 
+        \only<2>{\alert{Null,Cyc} \arrow[rru, no head]} & \mathit{Null,Acyc} \arrow[ru, no head] & \mathit{NotNull,Cyc} \arrow[u, no head] & \mathit{NotNull,Acyc} \arrow[lu, no head] \\
+        &  & \bot \arrow[ru, no head] \arrow[lu, no head] \arrow[u, no head] \only<2>{\arrow[llu, no head]} & 
       \end{tikzcd}\]
-    \caption{\small \alt<2->{The reduced product of $Null$ and $Cyc$}{The Cartesian product $Null \times Cyc$}}
+    \caption{\small \alt<3->{The reduced product of $Null$ and $Cyc$}{The Cartesian product $Null \times Cyc$}}
   \end{subfigure}
 \end{figure}
 \begin{itemize}
-\item<3-> Reduced products have the same concretization. They eliminate impossible (spurious) configurations
-\item<4-> There is no general (algorithmic) way to derive them
-\item<5-> But iterative reductions can provide an approximation
+\item<4-> Reduced products have the same concretization. They eliminate impossible (spurious) configurations
+\item<5-> There is no general (algorithmic) way to derive them
+\item<6-> But iterative reductions can provide an approximation
 \end{itemize}
 
 \end{frame}
@@ -931,6 +916,36 @@ static void main(string[] args) {
 
 \appendix
 
+\begin{frame}{Craig interpolants}
+  \begin{itemize}[<+->]
+  \item If $\phi \wedge \psi$ is false then $\exists I$ (Craig interpolant of $\phi, \psi$) s.t.
+    \begin{itemize}[<+->]
+    \item $\phi \implies I$ and $\neg (I \wedge \psi)$
+    \item $V(I) \subseteq V(\phi) \cap V(\psi)$ where $V(\varphi)$ denotes the set of variables occuring in $\varphi$
+    \end{itemize}
+  \item Craig interpolants exist for all FOL formulas and can be computed by theorem provers
+  \item A sequence of Craig interpolants can be used instead of computing weakest preconditions for abstraction refinement\footcite{mcmillan2006lazy}\pause
+    \begin{itemize}
+    \item $3.8$-$17.7\times$ faster than lazy abstraction on BLAST benchmarks
+    \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Abstraction refinement for widening}
+  \small
+  \begin{itemize}[<+->]
+  \item Gulavani et al. used abstraction refinement to find the first instance of widening that causes imprecision\footcite{gulavani2006counterexample}
+  \item They use it to determine widening delays, they also keep a history of widening results because widening is not monotonic
+  \item On a later paper\footcite{gulavani2008automatically}, they extend this technique to joins and combine results of Craig interpolants and widening
+    \begin{itemize}\footnotesize
+    \item They use bounded widening ($\widen_T$): $\widen_T$ is a widening operation such that\\ if $\exists C \in T.\, A, B \sqsubseteq C$ then $A \widen_T B \sqsubseteq C$
+    \item Then define \emph{interpolated widening} as $A \widen_{\Set{I}} B$ where $I$ is the interpolant of $A, B$.
+    \item This is useful because widening and interpolants find different kinds of invariants
+    \end{itemize}
+  \item Both of these works are implemented using polyhedral domains (formulas over linear arithmetic)
+  \end{itemize}
+\end{frame}
+
 \begin{frame}{Partitioning transfer functions of automata with hetereogeneous types}
   \small
   \begin{itemize}
@@ -957,7 +972,7 @@ static void main(string[] args) {
     \item Evaluation of each expression considers all possible interferences and picks the values separately for each instance of a variable
     \end{itemize}
   \item To model different memory consistency models, apply certain program transformations, e.g. reordering assignments, eliminating multiple instances of variables etc.
-  \item Partition the state space by status of threads (waiting, yielding, ready) and status of locks (held by $t$, free) and eliminate the invalid interferences
+  \item Partition the state space by the state of threads (waiting, yielding, ready) and the state of locks (held by $t$, free) and eliminate the invalid interferences
   \end{itemize}
 \end{frame}
 
