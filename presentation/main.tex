@@ -1,6 +1,6 @@
-\documentclass[aspectratio=169,notes]{beamer}
+%\documentclass[aspectratio=169,notes]{beamer}
 %\documentclass[aspectratio=169]{beamer}
-%\documentclass[aspectratio=169,handout]{beamer}
+\documentclass[aspectratio=169,handout]{beamer}
 \usetheme[titleformat=regular%
 ,numbering=fraction% use slide numbers
 ]{metropolis}
@@ -12,20 +12,22 @@
 \only<handout>{\metroset{sectionpage=none}}
 \only<handout>{\usecolortheme{dove}}
 \usepackage{appendixnumberbeamer} % separate appendix
-\usepackage[citestyle=authortitle-comp,sorting=none]{biblatex}
+\usepackage[citestyle=authortitle,sorting=none]{biblatex}
 \setbeamerfont{footnote}{size=\tiny}
 \addbibresource{mae.bib}
 
 % add notes:
-\makeatletter
-\def\beamer@framenotesbegin{% at beginning of slide
-\usebeamercolor[fg]{normal text}\gdef\beamer@noteitems{}%
-\gdef\beamer@notes{}%
+\only<beamer>{
+  \makeatletter
+  \def\beamer@framenotesbegin{% at beginning of slide
+    \usebeamercolor[fg]{normal text}\gdef\beamer@noteitems{}%
+    \gdef\beamer@notes{}%
+  }
+  \makeatother
+  \usepackage{pgfpages}
+  \setbeamertemplate{note page}[plain]
+  \setbeameroption{show notes on second screen=right}
 }
-\makeatother
-\usepackage{pgfpages}
-\setbeamertemplate{note page}[plain]
-\setbeameroption{show notes on second screen=right}
 
 \input{macros}
 
@@ -64,6 +66,7 @@ Low-level software:
 \begin{itemize}
 \item with unpleasant consequences\iftoggle{labdemo}{: BSoD, data loss, Arianne~5, Heartbleed, Patriot missile}{}
 \end{itemize}
+\todo{Explain what invariants are, what's special about low-level programs, and how these techniques are good for them (both as need and amenability)}
 \end{itemize}
 
 \end{frame}
@@ -127,15 +130,16 @@ Low-level software:
   \begingroup\footnotesize We will use abstract machine semantics and represent the semantics of a program as a transition relation.\endgroup
 \begin{align*}
     \varsigma \in \State & = \alert<1>{\Stmt^? \times \Env \times \Store \times \alert<2>{\Kont}} \\
-    \rho \in \Env & = \alert<4>{\Value}^{\Var} \only<3>{\alert{= \Set{\rho : \Var \to \Value}}} \\
-    \sigma \in \Store & = \alert<4>{\Value}^{\alert<5>{\Addr}} \\
-    \kappa \in \alert<6>{\Kont} & = \sTag{stmtK}{\Stmt \times \alert<6>{\Kont}} \\
-                         & \disunion \sTag{whileK}{\Exp \times \Stmt \times \alert<6>{\Kont}} \\
-                         & \disunion \sTag{retK}{\Var \times \Exp \times \Env \times \alert<6>{\Kont}}
+    \rho \in \Env & = \Var \to \alert<3>{\Value} \\ % \alert<4>{\Value}^{\Var} \only<3>{\alert{= \Set{\rho : \Var \to \Value}}} \\
+    \sigma \in \Store & = \alert<4>{\Addr} \to \alert<3>{\Value} \\ % \alert<4>{\Value}^{\alert<5>{\Addr}} \\
+    \kappa \in \alert<5>{\Kont} & = \sTag{stmtK}{\Stmt \times \alert<5>{\Kont}} \\
+                         & \disunion \sTag{whileK}{\Exp \times \Stmt \times \alert<5>{\Kont}} \\
+                         & \disunion \sTag{retK}{\Var \times \Exp \times \Env \times \alert<5>{\Kont}} \\
+                         & \disunion \sTag{haltK}
 \end{align*}
 
-\only<2>{Continuations represent \emph{the rest of computation}.}
-\only<3>{Some parts of the state space are infinite}
+\uncover<2>{Continuations represent \emph{the rest of computation}.}
+\uncover<3>{Some parts of the state space are infinite}
 \end{frame}
 
 \begin{frame}{Some transition rules}
@@ -160,7 +164,10 @@ Low-level software:
 
 \begin{frame}{Collecting semantics}
   Abstract machine semantics gives us a state transition system $(\State, I, \step)$ where \pause $\State$ is the set of states, \pause $I \subset \State$ is the set of initial states, \pause $\step \subset \State \times \State$ is the transition relation. \pause Let
-  \[ F : \pw(\State) \textoverop{\alert<2>{mon}}{\to} \pw(\State),\, F(X) = \Set{y \vert x \step y \wedge x \in X}. \]\pause
+  \[ F : \pw(\State) \textoverop{\alert<-6>{mon}}{\to} \pw(\State),\, F(X) = \Set{y \vert x \step y \wedge x \in X}. \]\pause
+
+  F is monotonic: if $x \subseteq y$ then $F(x) \subseteq F(y)$
+  
   $\lfp_I F = I \cup F(I) \cup F(F(I)) \cup \ldots $ is the set of reachable states.\pause
 
   \alert{$\lfp_I F$ is potentially infinite and requires infinitely many steps to compute!}
@@ -260,9 +267,10 @@ Low-level software:
       \end{align*}\vspace{-2em}
     \item<5-> $\alpha$ and $\gamma$ are kind of like inverses, though
       there is some information loss\vspace{-0.6em}
-    \item<6-> $\alpha$ happens to be the \emph{best possible} function to pair
+    \item<6-> $\alpha$ and $\gamma$ are \emph{sound}: we don't leave anything behind when we go abstract then come back to the concrete \todo{Clean up}
+    \item<7-> $\alpha$ happens to be the \emph{best possible} function to pair
       with $\gamma$ in a certain sense\vspace{-0.6em}
-    \item<7-> This relationship is known as a \alert{\emph{Galois Connection}}
+    \item<8-> This relationship is known as a \alert{\emph{Galois Connection}}
     \end{itemize}
   \end{column}
   \begin{column}{0.25\textwidth}
@@ -404,8 +412,8 @@ Low-level software:
   \only<beamer>{\only<1>{
   \begin{align*}
     \varsigma \in \State & = \Stmt^? \times \Env \times \Store \times \vo{\Kont} \\
-    \rho \in \Env & = \Value^\Var \\
-    \sigma \in \Store & = \Value^\Addr \\
+    \rho \in \Env & = \Var \to \Value \\
+    \sigma \in \Store & = \Addr \to \Value \\
     \kappa \in \Kont & = \sTag{stmtK}{\Stmt \times \Kont} \\
                          & \disunion \sTag{whileK}{\Exp \times \Stmt \times \Kont} \\
                          & \disunion \sTag{retK}{\Var \times \Exp \times \Env \times \Kont}
@@ -415,7 +423,7 @@ Low-level software:
   \begin{align*}
     \abst{\varsigma} \in \abst{\State} & = {\Stmt}^? \times \abst{\Env} \times \abst\Store \times \alert<2>{\abst\Kont} \\
     \abst\rho \in \abst\Env & = {\abst\Value}^{\Var} \\
-    \abst\sigma \in \abst\Store & = {\abst\Value}^{\abst{\Addr}} \\
+    \abst\sigma \in \abst\Store & = {\abst{\Addr}} \to {\abst\Value} \\
     \abst\kappa \in \abst\Kont & = \sTag{stmtK}{\Stmt \times \abst\Kont} \\
                          & \disunion \sTag{whileK}{\Exp \times \Stmt \times \abst\Kont} \\
                          & \disunion \sTag{retK}{\Var \times \Exp \times \abst\Env \times \abst\Kont}
@@ -423,8 +431,8 @@ Low-level software:
 \only<3->{
   \begin{align*}
     \abst{\varsigma} \in \abst{\State} & = {\Stmt}^? \times \abst{\Env} \times \abst\Store \times \alert<3>{\abst\Addr} \only<4>{\alert{\times \abst{\ns{Time}}}} \\
-    \abst\rho \in \abst\Env & = {\abst\Value}^{\Var} \\
-    \abst\sigma \in \abst\Store & = {\left(\abst\Value+\alert<3>{\alert<3>{\abst\Kont}}\right)}^{\abst{\Addr}} \\
+    \abst\rho \in \abst\Env & = \Var \to {\abst\Value} \\
+    \abst\sigma \in \abst\Store & = {\abst{\Addr}} \to {\left(\abst\Value+\alert<3>{\alert<3>{\abst\Kont}}\right)} \\
     \abst\kappa \in \alert<3>{\abst\Kont} & = \sTag{stmtK}{\Stmt \times \alert<3>{\abst\Addr}} \\
                                        & \disunion \sTag{whileK}{\Exp \times \Stmt \times \alert<3>{\abst\Addr}} \\
                                        & \disunion \sTag{retK}{\Var \times \Exp \times \abst\Env \times \alert<3>{\abst\Addr}}
@@ -457,6 +465,7 @@ Low-level software:
 
 \begin{frame}{Widening}
   \small
+  \todo{Simplify}
   \begin{columns}
     \begin{column}{0.75\textwidth}
   A widening operator $\widen : A \times A \to A$ ensures convergence
@@ -467,7 +476,7 @@ Low-level software:
   \item<2-> For any sequence $a_1, a_2, \ldots$, let $w_1 = a_1, \ldots, w_n = w_{n-1} \widen a_n$. Then, $a_i \sqsubseteq w_i$ and the chain $w_1, w_2, \ldots$ eventually stabilizes
   \end{itemize}\vspace{-0.3em}
   \uncover<5->{
-    \begin{exampleblock}{\small Example: a widening operator on an integer range domain}
+    \begin{exampleblock}{\small Example: a widening operator on intervals}
       \vspace{-0.8em}
       \begin{itemize}\footnotesize
       \item $[1,1] \widen [2,2] \widen [3,3] \widen \ldots \to [1, \infty]$
@@ -624,7 +633,7 @@ static void main(String[] args) {
   \end{itemize}
 \end{frame}
 
-\section{Predicate abstraction \& Abstraction refinement}
+\section{Predicate abstraction \& abstraction refinement}
 %\subsection{Predicate abstraction}
 \begin{frame}{Predicate abstraction}
   \begin{itemize}[<+->]
@@ -644,11 +653,12 @@ static void main(String[] args) {
   \item When proving safety using the current abstraction fails, compute a counterexample using backwards semantics ($\fn{Pre}$) and a model checker to find a path it fails
   \item Add the counterexample to the set of predicates and try again
   \item Proposed by Clarke et al.\footcite{clarke2003counterexample}. Extended by Ball et al. to support C programs for SLAM project\footcite{ball2001automatic,ball2001automatically}
+  \item \todo{Announce: ``We will go through an example''}
   \end{itemize}
 \end{frame}
 
 \begin{frame}{CEGAR Example (from SLAM project)}
-  \footnotesize
+  \footnotesize\todo{Drop this slide or make it simple}
   \begin{enumerate}[<+->]
   \item Abstract a C program with a Boolean program with one variable per predicate
   \item Give the abstracted program to a model checker to check if it can reach the \texttt{ERROR} label
@@ -659,6 +669,7 @@ static void main(String[] args) {
 \end{frame}
 
 \begin{frame}{Predicate abstraction: Instrumentation code}
+  \todo{Check again}
   \begingroup\footnotesize
   $\phi_1 = \texttt{\{state==Locked\}}$, $\phi_2 = \texttt{\{state==Unlocked\}}$
 
@@ -851,16 +862,16 @@ static void main(String[] args) {
 
 \end{frame}
 
-\begin{frame}{Iterative reductions}
+\begin{frame}{Iterative reductions\footcite{cousot2011reduced}}
   \small
   \begin{itemize}[<+->]
-  \item A reduction operator\footcite{cousot2011reduced} $\rho: L \to L$ over a lattice $L$ is
+  \item A reduction operator $\rho: L \to L$ over a lattice $L$ is
     \begin{itemize}
     \item a reductive $\rho(a) \sqsubseteq a$ operation
     \item  that preserves concretization $\gamma \circ \rho = \gamma$
 \end{itemize}
   \item The communication of information between different domains is a reduction operator. Iteratively applying it until reaching a fixpoint is a reduction of the cartesian product.
-  \item Also, Nelson-Oppen combination used in SMT solvers can be used for computing iterative reductions efficiently and separately, even if the decision procedures share their signatures.\footcite{cousot2011reduced}
+  \item Also, Nelson-Oppen combination used in SMT solvers can be used for computing iterative reductions efficiently and separately, even if the decision procedures share their signatures.
   \end{itemize}
 \end{frame}
 

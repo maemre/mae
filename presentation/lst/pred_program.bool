@@ -3,18 +3,18 @@ void example() {
     skip;
     lock_return();
     skip;
-    if ($\alert<3>{\texttt{*}}$) {
+    if ($\alert<3>{\top}$) {
       skip;
       unlock_return();
       skip;
-      if(*) {
+      if($\top$) {
         skip;
       } else {
         skip;
       }
       skip;
     } 
-  } while (*);
+  } while ($\top$);
   skip;
   unlock_return();
 }

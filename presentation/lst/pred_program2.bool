@@ -1,9 +1,9 @@
 void example() {
   do {
     lock_return();
-    if (*) {
+    if ($\top$) {
       unlock_return();
     } 
-  } while (*);
+  } while ($\top$);
   unlock_return();
 }
