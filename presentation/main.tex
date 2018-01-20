@@ -16,6 +16,16 @@
 \setbeamerfont{footnote}{size=\tiny}
 \addbibresource{mae.bib}
 
+\AtBeginSection[]
+{
+  \metroset{numbering=none}<beamer>
+  \begin{frame}[noframenumbering]
+    \frametitle{Outline}
+    \tableofcontents[currentsection]
+  \end{frame}
+  \metroset{numbering=fraction}
+}
+
 % add notes:
 \only<beamer>{
   \makeatletter
@@ -49,12 +59,6 @@
 
 \begin{document}
 \maketitle
-
-\begin{frame}{Outline}
-  \small
-  \vspace{0.5em}
-  \tableofcontents
-\end{frame}
 
 \section{Motivation}
 \begin{frame}{What is low-level software? Why should we analyze it?}
@@ -164,7 +168,7 @@ Low-level software:
 
 \begin{frame}{Collecting semantics}
   Abstract machine semantics gives us a state transition system $(\State, I, \step)$ where \pause $\State$ is the set of states, \pause $I \subset \State$ is the set of initial states, \pause $\step \subset \State \times \State$ is the transition relation. \pause Let
-  \[ F : \pw(\State) \textoverop{\alert<-6>{mon}}{\to} \pw(\State),\, F(X) = \Set{y \vert x \step y \wedge x \in X}. \]\pause
+  \[ F : \pw(\State) \alert<-6>{\monarrow} \pw(\State),\, F(X) = \Set{y \vert x \step y \wedge x \in X}. \]\pause
 
   F is monotonic: if $x \subseteq y$ then $F(x) \subseteq F(y)$
   
@@ -355,6 +359,7 @@ Low-level software:
 
 \section{Abstract interpretation}
 \begin{frame}{Abstract interpretation}
+  \todo{move this to the beginning}
   \begin{itemize}[<+->]
   \item Introduced by Cousot and Cousot in 1977 for a flow-chart language \footcite{cousot1977abstract}
   \item Deep connections to math, correct by construction \footcite{cousot1979systematic}
@@ -367,6 +372,7 @@ Low-level software:
 
 \begin{frame}[fragile]{Safe simulations}
   \small
+  \todo{reify $\varsigma$s to actual states, then abstract them}
   \vspace{-1em}
   \begin{itemize}[<+->]
   \item Run the concrete machine and the abstract machine in lockstep
@@ -505,6 +511,7 @@ Low-level software:
 \input{cfa.tex}
 
 \begin{frame}{Widening for Control-Flow\footcite{hardekopf2014widening}}
+  \todo{merge from here to monadic a.i. to a single slide}
   \footnotesize
   \begin{columns}
   \begin{column}{.55\textwidth}
@@ -609,7 +616,7 @@ static void main(String[] args) {
 \end{frame}
 
 \begin{frame}{Relationship with model checking}
-  \small
+  \small\todo{try finding a better DFA equation}
   \begin{itemize}[<+->]
   \item Abstract interpretation links model
     checking and a certain kind of dataflow analysis
@@ -691,6 +698,7 @@ static void main(String[] args) {
 \end{frame}
 
 \begin{frame}{\alt<5->{Abstraction refinement}{Predicate abstraction: The actual program}}
+  \todo{Make the model checking part pictorial by putting a CFG and analyzing it}
   \begingroup\footnotesize\vspace{-0.7em}
   $\phi_1 = \texttt{\{state==Locked\}}$, $\phi_2 = \texttt{\{state==Unlocked\}}$\vspace{-1.7em}
   \begin{columns}[t]
@@ -745,6 +753,9 @@ static void main(String[] args) {
 
 \section{Static analysis of control software}
 \begin{frame}{What is challenging about control software?}
+  \todo{what is challenging here?}
+  \todo{what properties are interesting invariants?}
+  \todo{what about (or restrictions of) these programs make them more amenable for analysis?}
   Example: autopilots, nuclear plant rod controller etc.
   
   \begin{itemize}
@@ -758,6 +769,7 @@ static void main(String[] args) {
 
 %\subsection{Dynamic state partitioning}
 \begin{frame}{Partitioning the state of control programs}\small
+  \todo{try giving an example or simplifying this in general}
   \begin{itemize}[<+->]
   \item Many control programs don't have a program counter like sequential programs
   \item Bultan et al.\footcite{bultan_model-checking_1999} propose a method to decompose the transition relation. Their method has 3 stages:
@@ -778,6 +790,7 @@ static void main(String[] args) {
 \end{frame}
 
 \begin{frame}{Dynamic state partitioning for automata\footcite{jeannet_dynamic_1999}}
+  \todo{try showing an automaton and a state split from the paper}
   \begin{itemize}[<+->]
   \item Jeannet et al. propose a dynamic partitioning technique to partition state space of an automaton with polyhedral constraints as guards
   \item They first do a reachability analysis on the automaton's control structure to get an initial CFG
@@ -788,7 +801,8 @@ static void main(String[] args) {
   \end{itemize}
 \end{frame}
 
-\begin{frame}{Other methods partitioning the state}
+\begin{frame}{Other methods for partitioning the state}
+  \todo{fewer words, just general concepts}
   \begin{itemize}[<+->]
   \item Jeannet\footcite{jeannet_representing_2002} proposes a method for partitioning transfer functions of automata with Booleans and integers by representing the transfer functions as a multi-terminal binary decision diagram with primitive relations at the leaves
   \item Miné\footcite{mine2011static} extends an abstract interpreter for sequential programs to parallel programs with statically known threads and locks
@@ -802,6 +816,7 @@ static void main(String[] args) {
 
 %\subsection{Combination of domains}
 \begin{frame}{A plethora of domains}
+  \todo{explain why we need this many}
   \footnotesize
   \begin{tightcenter}
   \begin{tabular}{lcc}
@@ -816,7 +831,7 @@ static void main(String[] args) {
   \end{tightcenter}
   \begin{itemize}[<+->]
   \item Also: congruences, floating-point versions\footcite{mine2004relational}, arithmetic-geometric progressions\footcite{feret2005arithmetic} \ldots{}
-  \item How do we choose which domains to use?
+  \item How do we choose which domains to use?\todo{skip this}
   \item How do we combine the results of different domains?
   \end{itemize}
 
