@@ -1,6 +1,6 @@
 %\documentclass[aspectratio=169,notes]{beamer}
-%\documentclass[aspectratio=169]{beamer}
-\documentclass[aspectratio=169,handout]{beamer}
+\documentclass[aspectratio=169]{beamer}
+%\documentclass[aspectratio=169,handout]{beamer}
 \usetheme[titleformat=regular%
 ,numbering=fraction% use slide numbers
 ]{metropolis}
@@ -27,7 +27,7 @@
 }
 
 % add notes:
-\only<beamer>{
+\only<notes>{
   \makeatletter
   \def\beamer@framenotesbegin{% at beginning of slide
     \usebeamercolor[fg]{normal text}\gdef\beamer@noteitems{}%
@@ -500,6 +500,7 @@ Low-level software:
 \end{frame}
 %\subsection{Abstraction refinement}
 \begin{frame}{Counterexample-Generated Abstraction Refinement (CEGAR)}
+  \todo{integrate it to the next slide}
   \begin{itemize}[<+->]
   \item Choosing the correct predicates is tricky and tedious
   \item When proving safety using the current abstraction fails, compute a counterexample using backwards semantics ($\fn{Pre}$) and a model checker to find a path it fails
@@ -510,13 +511,16 @@ Low-level software:
 \end{frame}
 
 \begin{frame}{CEGAR Example (from SLAM project)}
-  \footnotesize\todo{Drop this slide or make it simple}
-  \begin{enumerate}[<+->]
-  \item Abstract a C program with a Boolean program with one variable per predicate
-  \item Give the abstracted program to a model checker to check if it can reach the \texttt{ERROR} label
-  \item If verification fails, produce a counterexample by computing a backwards path and add the corresponding new predicate to the set of predicates and go to step 1.
-  \item Otherwise, we verified the program
-  \end{enumerate}
+  \footnotesize
+  % \begin{enumerate}[<+->]
+  % \item Abstract a C program with a Boolean program with one variable per predicate
+  % \item Give the abstracted program to a model checker to check if it can reach the \texttt{ERROR} label
+  % \item If verification fails, produce a counterexample by computing a backwards path and add the corresponding new predicate to the set of predicates and go to step 1.
+  % \item Otherwise, we verified the program
+  % \end{enumerate}
+  \begin{tightcenter}
+    \multiinclude[<+>][start=1,format=pdf,graphics={width=0.7\textwidth}]{fig/cegar}
+  \end{tightcenter}
   \note{During abstraction, we extract the predicates that affect/depend on parameters/globals/returns for each procedure, carry that as a signature and use it to create the Boolean program. SLAM is interprocedural but it is not context sensitive}
 \end{frame}
 
