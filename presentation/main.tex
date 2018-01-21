@@ -99,85 +99,8 @@ Low-level software:
   \addtocounter{framenumber}{1}
 }
 
-
-% \begin{frame}{Why abstract interpretation?}
-% There are other alternatives:
-% \begin{itemize}[<+->]
-% \item ad-hoc, iterative DFA (not amenable to systematic correctness)
-% \item model checking (there is a neat connection with model checking)
-% \item type systems (limits choice of language, context-insensitive)
-% \end{itemize}
-
-% \note{a.i.+MC can give a DFA that is correct by construction}
-% \end{frame}
-
-\section{The concrete world}
-\begin{frame}{SIMPL\footnote{simple introductory made-up programming language} Syntax}
-  \vspace{-2em}
-  \small
-  \begin{gather*}
-    x,f \in \Var,\, b \in \bools,\, n \in \zahlen,\, \oplus \in \ns{BinOp},\,\Value = \bools \disunion \zahlen
-  \end{gather*}\vspace{-2em}
-  \begin{align*}
-    fd \in \ns{FunDef} \eDEF & \alert<5>{\kw{def}\; f(\vo{x}) = s;\,\kw{return}\; e} \\
-    e \in \Exp \eDEF & x \eOR n \eOR b \eOR e_1 \oplus e_2 \eOR \alert<3>{*x} \\ % \eOR \alert<1>{\kw{choose}\;e_1\,e_2} \\
-    s \in \Stmt \eDEF & s;\,s \eOR \alert<2>{\kw{abort}} \\
-    \eOR & \alert<4>{\kw{if}\, e\; s_1 \; \kw{else} \; s_2} \\
-    \eOR & \alert<4>{\kw{while}\; e\; s} \\
-    \eOR & \kw{let}\; x := e \;\kw{in}\;s \\
-    \eOR & \alert<3>{\kw{letref}\; x := \kw{new}\;e \;\kw{in}\;s} \\
-    \eOR & \alert<3>{e_1 \update e_2} \eOR x := e \\
-    \eOR & \alert<5>{x := f(\vo{e})}
-  \end{align*}
-\end{frame}
-\begin{frame}{SIMPL semantic domains}
-  \begingroup\footnotesize We will use abstract machine semantics and represent the semantics of a program as a transition relation.\endgroup
-\begin{align*}
-    \varsigma \in \State & = \alert<1>{\Stmt^? \times \Env \times \Store \times \alert<2>{\Kont}} \\
-    \rho \in \Env & = \Var \to \alert<3>{\Value} \\ % \alert<4>{\Value}^{\Var} \only<3>{\alert{= \Set{\rho : \Var \to \Value}}} \\
-    \sigma \in \Store & = \alert<4>{\Addr} \to \alert<3>{\Value} \\ % \alert<4>{\Value}^{\alert<5>{\Addr}} \\
-    \kappa \in \alert<5>{\Kont} & = \sTag{stmtK}{\Stmt \times \alert<5>{\Kont}} \\
-                         & \disunion \sTag{whileK}{\Exp \times \Stmt \times \alert<5>{\Kont}} \\
-                         & \disunion \sTag{retK}{\Var \times \Exp \times \Env \times \alert<5>{\Kont}} \\
-                         & \disunion \sTag{haltK}
-\end{align*}
-
-\uncover<2>{Continuations represent \emph{the rest of computation}.}
-\uncover<3>{Some parts of the state space are infinite}
-\end{frame}
-
-\begin{frame}{Some transition rules}
-  \small
-  \begin{itemize}
-  \item $\varsigma \step \varsigma'$ is the transition relation%\footnote{Because of nondeterminism. One can also view it as a transition \emph{function} from a state to a set of states.}
-  \item \(\eta_\varsigma : \Exp \to \Value \) is the per-state expression evaluation function
-\item Current state: \(\varsigma = (so, \rho, \sigma, \kappa) \)
-\item Next state: \( \varsigma' = (so', \rho', \sigma', \kappa') \) \pause
-  \end{itemize}
-  \footnotesize
-  \[
-  \begin{array}{llllll}
-    so & \text{side condition} & so' & \rho' & \sigma' & {\kappa}' \\ \hline
-    e_1 \update e_2 & & - & \rho & \sigma[\eta_\varsigma(e_1) \mapsto \eta_\varsigma(e_2)] & {\kappa} \\
-    \kw{while}\; e\; s & \eta_\varsigma(e) = \true & - & \rho & \sigma & \sTag{stmtK}{(s, \sTag{whileK}{(e, s,\kappa)})} \\
-    \kw{while}\; e\; s & \eta_\varsigma(e) = \false & - & \rho & \sigma & {\kappa} \\
-    - & \kappa = \sTag{stmtK}{(s,\kappa_r)} & s & \rho & \sigma & {\kappa_r}
-  \end{array}
-  \]
-\end{frame}
-
-\begin{frame}{Collecting semantics}
-  Abstract machine semantics gives us a state transition system $(\State, I, \step)$ where \pause $\State$ is the set of states, \pause $I \subset \State$ is the set of initial states, \pause $\step \subset \State \times \State$ is the transition relation. \pause Let
-  \[ F : \pw(\State) \alert<-6>{\monarrow} \pw(\State),\, F(X) = \Set{y \vert x \step y \wedge x \in X}. \]\pause
-
-  F is monotonic: if $x \subseteq y$ then $F(x) \subseteq F(y)$
-  
-  $\lfp_I F = I \cup F(I) \cup F(F(I)) \cup \ldots $ is the set of reachable states.\pause
-
-  \alert{$\lfp_I F$ is potentially infinite and requires infinitely many steps to compute!}
-\end{frame}
-
 \section{Abstract interpretation}
+
 \begin{frame}{Abstract interpretation}
   \todo{move this to the beginning}
   \begin{itemize}[<+->]
@@ -188,6 +111,18 @@ Low-level software:
     overapproximates the \emph{concrete} interpreter's behavior
     soundly.
   \end{itemize}
+\end{frame}
+
+\begin{frame}{\todo{A concrete program with state transition system}}
+  
+\end{frame}
+
+\begin{frame}{\todo{Consider the sets of states, collecting semantics \& reachable states}}
+  
+\end{frame}
+
+\begin{frame}{\todo{Form a lattice from the sets of states, then start abstracting them}}
+  
 \end{frame}
 
 \begingroup
@@ -485,43 +420,34 @@ Low-level software:
 \end{frame}
 
 \section{Predicate abstraction \& abstraction refinement}
-%\subsection{Predicate abstraction}
+
 \begin{frame}{Predicate abstraction}
-  \todo{why is this useful for low-level software?}
   \begin{itemize}[<+->]
   \item Proposed by Clarke et al. and Graf et al. for hardware verification\footcite{clarke1994model,graf1997construction}
-  \item Main idea: our abstract domain is a finite set of predicates $\phi_i,\, 1 \le i\le n$ over states
-  \item $\abst{\State} = \bigcup_{i}\pw\left(\Set{\phi_i, \neg \phi_i}\right).$
-  \item $\abst{\varsigma_1} \sqsubseteq \abst{\varsigma_2} \equiv \abst{\varsigma_2} \subseteq \abst{\varsigma_1}.$
-  \item $\gamma(\abst{\varsigma}) = \Set{\varsigma \in \State \vert \bigwedge_{\phi \in \varsigma} \phi}.$
-  \item $\alpha(\varsigma) = \bigwedge_{\phi_i(\varsigma)} \phi_i \wedge \bigwedge_{\neg\phi_i(\varsigma)} \neg\phi_i .$
+  \item Main idea: our abstract domain is a finite set of predicates $\Set{\phi_i,\, 1 \le i\le n}$ over states
   \item Use model checkers/theorem provers to compute $\abst{F}$ and reachability
-  \end{itemize}
-\end{frame}
-%\subsection{Abstraction refinement}
-\begin{frame}{Counterexample-Generated Abstraction Refinement (CEGAR)}
-  \todo{integrate it to the next slide}
-  \begin{itemize}[<+->]
-  \item Choosing the correct predicates is tricky and tedious
-  \item When proving safety using the current abstraction fails, compute a counterexample using backwards semantics ($\fn{Pre}$) and a model checker to find a path it fails
-  \item Add the counterexample to the set of predicates and try again
-  \item Proposed by Clarke et al.\footcite{clarke2003counterexample}. Extended by Ball et al. to support C programs for SLAM project\footcite{ball2001automatic,ball2001automatically}
-  \item \todo{Announce: ``We will go through an example''}
+  \item Predicates can encode the invariants we want to preserve when accessing interfaces
+    \begin{itemize}
+    \item Such as not locking a locked lock, not writing to a closed file
+    \item Useful for verifying that drivers use the OS API correctly
+    \end{itemize}
   \end{itemize}
 \end{frame}
 
-\begin{frame}{CEGAR Example (from SLAM project)}
-  \footnotesize
-  % \begin{enumerate}[<+->]
-  % \item Abstract a C program with a Boolean program with one variable per predicate
-  % \item Give the abstracted program to a model checker to check if it can reach the \texttt{ERROR} label
-  % \item If verification fails, produce a counterexample by computing a backwards path and add the corresponding new predicate to the set of predicates and go to step 1.
-  % \item Otherwise, we verified the program
-  % \end{enumerate}
+\begin{frame}{Counterexample-Generated Abstraction Refinement (CEGAR)\footcite{clarke2003counterexample,ball2001automatic,ball2001automatically}}
+  \small
+  % \begin{itemize}[<+->]
+  % \item Choosing the correct predicates is tricky and tedious
+  % \item When proving safety using the current abstraction fails, compute a counterexample using backwards semantics ($\fn{Pre}$) and a model checker to find a path it fails
+  % \item Add the counterexample to the set of predicates and try again
+  % \item Proposed by Clarke et al.\footcite{clarke2003counterexample}. Extended by Ball et al. to support C programs for SLAM project\footcite{ball2001automatic,ball2001automatically}
+  % \end{itemize}
   \begin{tightcenter}
     \multiinclude[<+>][start=1,format=pdf,graphics={width=0.7\textwidth}]{fig/cegar}
   \end{tightcenter}
-  \note{During abstraction, we extract the predicates that affect/depend on parameters/globals/returns for each procedure, carry that as a signature and use it to create the Boolean program. SLAM is interprocedural but it is not context sensitive}
+  \note{Finding the correct predicates again and again is tedious, why not automate it?\\}
+  \note{During abstraction, we extract the predicates that affect/depend on parameters/globals/returns for each procedure, carry that as a signature and use it to create the Boolean program. SLAM is interprocedural but it is not context sensitive\\}
+  \note{Announce: An example is coming up}
 \end{frame}
 
 \begin{frame}{Predicate abstraction: Instrumentation code}
@@ -591,32 +517,39 @@ Low-level software:
 
 \begin{frame}{Other work in abstraction refinement}
   \begin{itemize}[<+->]
-  \item McMillan\footcite{mcmillan2006lazy} uses Craig interpolants rather than weakest precondition computation and gains $3.8$-$17.7\times$ speedup over lazy abstraction on BLAST benchmarks
-  \item Gulavani et al.\footcite{gulavani2006counterexample} use abstraction refinement to compute which widenings to figure out which widenings to delay
+  \item Using Craig interpolants rather than weakest preconditions gives $3.8$-$17.7\times$ speedup over lazy abstraction on BLAST benchmarks\footcite{mcmillan2006lazy} 
+  \item Gulavani et al.\footcite{gulavani2006counterexample} use abstraction refinement to compute which widenings to delay
     \begin{itemize}
-    \item They later on extend their technique to delay joins and get more precise widenings with interpolants\footcite{gulavani2008automatically}
+    \item They later on extend their technique to get more precise widenings by using interpolants\footcite{gulavani2008automatically}
     \end{itemize}
-    \item Podelski et al.\footcite{podelski2007armc} show that abstraction refinement can be implemented ``naturally'' using CLP by modifying Prolog's fact database on the fly
+    \item Podelski et al.\footcite{podelski2007armc} show that abstraction refinement can be implemented using CLP by modifying Prolog's fact database on the fly
   \end{itemize}
 \end{frame}
 
 \section{Static analysis of control software}
 \begin{frame}{What is challenging about control software?}
-  \todo{what is challenging here?}
-  \todo{what properties are interesting invariants?}
-  \todo{what about (or restrictions of) these programs make them more amenable for analysis?}
-  Example: autopilots, nuclear plant rod controller etc.
+  Example: avionics software, nuclear plant rod controllers etc.
   
-  \begin{itemize}
-  \item<2-> Has multiple synchronous components\pause
+  \begin{itemize}[<+->]
+  \item We want some strict requirements such as no integer overflows
     \begin{itemize}
-    \item<3-> Control part of the state is not as straightforward as sequential programs. \uncover<4->{Represented using control variables, finite state machines etc.}
+    \item Requires reasoning about complex numerical relationships
     \end{itemize}
-  \item<5-> Variables with complex numeric relationships
+  \item Has multiple synchronous components
+    \begin{itemize}
+    \item Control part of the state is not as straightforward as sequential programs
+    \item We need to figure out how to partition the state space to have a precise analysis
+    \end{itemize}
+  \item Has other restrictions making them a nice target for program analysis
+    \begin{itemize}
+    \item No dynamic memory allocation, no recursion, etc.
+    \end{itemize}
   \end{itemize}
+
+  \note{overflows are fine for Civ, not so fun when you're 10,000 ft up in the air}
 \end{frame}
 
-%\subsection{Dynamic state partitioning}
+\subsection{Dynamic state partitioning}
 \begin{frame}{Partitioning the state of control programs}\small
   \todo{try giving an example or simplifying this in general}
   \begin{itemize}[<+->]
@@ -653,35 +586,37 @@ Low-level software:
 \begin{frame}{Other methods for partitioning the state}
   \todo{fewer words, just general concepts}
   \begin{itemize}[<+->]
-  \item Jeannet\footcite{jeannet_representing_2002} proposes a method for partitioning transfer functions of automata with Booleans and integers by representing the transfer functions as a multi-terminal binary decision diagram with primitive relations at the leaves
-  \item Miné\footcite{mine2011static} extends an abstract interpreter for sequential programs to parallel programs with statically known threads and locks
+  \item Partitioning transfer functions of automata with Booleans and integers by representing the functions as a MTBDD\footcite{jeannet_representing_2002} 
+  \item Extending an abstract interpreter for sequential programs to parallel programs\footcite{mine2011static}
     \begin{itemize}
-    \item He partitions the state space based on the state of threads (waiting on a lock $l$, yielding, ready) and state of locks (held by thread $t$, free)
-    \item  and refines interactions of threads based on these states
+    \item Restrictions: threads and locks are statically known, reasonable for control~programs
+    \item Partition the state space based on the state of threads (waiting on a lock $l$, yielding, ready) and state of locks (held by thread $t$, free)
+    \item Refine interactions of threads by throwing away impossible configurations
     \end{itemize}
-  \item Chen and Cousot\footcite{chen2015binary} propose automatically extracting branch conditionals and using binary decision trees to partition state space
+  \item Automatically extracting branch conditionals and using binary decision trees to partition state space\footcite{chen2015binary}
   \end{itemize}
 \end{frame}
 
-%\subsection{Combination of domains}
+\subsection{Combination of domains}
 \begin{frame}{A plethora of domains}
-  \todo{explain why we need this many}
   \footnotesize
+  \begin{itemize}[<+->]
+  \item Analyzing control software requires reasoning about numerical relationships
+  \end{itemize}
   \begin{tightcenter}
-  \begin{tabular}{lcc}
+  \begin{tabular}{lccc}
     \textbf{Domain} & \textbf{Constraints} & \textbf{Complexity} \\
     % Presburger formulas\footcite{bultan_model-checking_1999} & Presburger arithmetic & $ \bigO(2^{2^{2^{pn}}}) $ \\
-    Polyhedra\footcite{cousot1978automatic} & \( \sum_{j} c_{ij}x_j \leq 0 \) & $ \bigO(2^n) $ \\
+    Polyhedra\footcite{cousot1978automatic} & \( \sum_{j} c_{ij}x_j \leq 0 \) & \alert<2>{$ \bigO(2^n)$} & \uncover<2->{Too expensive!} \\
     Octagons\footcite{mine2004weakly} & \( \pm x \pm y \leq c \) & $ \bigO(n^3) $ \\
     Pentagons\footcite{logozzo2010pentagons} & \( x \in [a,b] \wedge x < y \) & $ \bigO(n^2) $ \\
-    Gauges\footcite{venet2012gauge} & \( x \in \left[\sum_{j} a_{j}\lambda_j, \sum_{j} b_{ij}\lambda_j \right] \) & $ \bigO(n2^l) $ \\
+    Gauges\footcite{venet2012gauge} & \( x \in \left[\sum_{j} a_{j}\lambda_j, \sum_{j} b_{ij}\lambda_j \right] \) & $ \bigO(n2^l) $
     %Arithmetic-geometric progressions\footcite{feret2005arithmetic} & \( x \mapsto ax + b \) & $ \bigO(n) $
   \end{tabular}
-  \end{tightcenter}
+  \end{tightcenter}\pause
   \begin{itemize}[<+->]
   \item Also: congruences, floating-point versions\footcite{mine2004relational}, arithmetic-geometric progressions\footcite{feret2005arithmetic} \ldots{}
-  \item How do we choose which domains to use?\todo{skip this}
-  \item How do we combine the results of different domains?
+  \item \alert{How do we combine the results of different domains?}
   \end{itemize}
 
   \vspace*{1em}
@@ -728,18 +663,19 @@ Low-level software:
 
 \begin{frame}{Iterative reductions\footcite{cousot2011reduced}}
   \small
+  \todo{Represent this pictorially}
   \begin{itemize}[<+->]
   \item A reduction operator $\rho: L \to L$ over a lattice $L$ is
     \begin{itemize}
     \item a reductive $\rho(a) \sqsubseteq a$ operation
-    \item  that preserves concretization $\gamma \circ \rho = \gamma$
-\end{itemize}
-  \item The communication of information between different domains is a reduction operator. Iteratively applying it until reaching a fixpoint is a reduction of the cartesian product.
-  \item Also, Nelson-Oppen combination used in SMT solvers can be used for computing iterative reductions efficiently and separately, even if the decision procedures share their signatures.
+    \item that preserves concretization $\gamma \circ \rho = \gamma$ (is sound)
+    \end{itemize}
+  \item The communication of information between two domains is a reduction operator. Iteratively applying it until reaching a fixpoint is a reduction of the cartesian product.
   \end{itemize}
 \end{frame}
 
 \begin{frame}{Reduction example: ASTRÉE's\footcite{cousot2005astree,cousot2007varieties} Binary product abstract domain functor\footcite{cousot2006combination}}
+  \todo{Add a picture}
   \begin{itemize}[<+->]
   \item $\dottimes : \mathcal{D \times D} \to \mathcal{D}$. It combines two domains and shares information between them automatically
   \item The information sharing is done by passing new constraints generated by some domains to others
@@ -768,15 +704,76 @@ Low-level software:
   \note{Binary product connects domains to get a partially reduced product, as explained above}
 \end{frame}
 
-% \begin{frame}{Sharing information}
-%   \todo{Add an example that gets refined as we communicate the info}
-% \end{frame}
-
 \begin{frame}[standout]
   Thank you!
 \end{frame}
 
 \appendix
+
+\begin{frame}{SIMPL\footnote{simple introductory made-up programming language} Syntax}
+  \vspace{-2em}
+  \small
+  \begin{gather*}
+    x,f \in \Var,\, b \in \bools,\, n \in \zahlen,\, \oplus \in \ns{BinOp},\,\Value = \bools \disunion \zahlen
+  \end{gather*}\vspace{-2em}
+  \begin{align*}
+    fd \in \ns{FunDef} \eDEF & \alert<5>{\kw{def}\; f(\vo{x}) = s;\,\kw{return}\; e} \\
+    e \in \Exp \eDEF & x \eOR n \eOR b \eOR e_1 \oplus e_2 \eOR \alert<3>{*x} \\ % \eOR \alert<1>{\kw{choose}\;e_1\,e_2} \\
+    s \in \Stmt \eDEF & s;\,s \eOR \alert<2>{\kw{abort}} \\
+    \eOR & \alert<4>{\kw{if}\, e\; s_1 \; \kw{else} \; s_2} \\
+    \eOR & \alert<4>{\kw{while}\; e\; s} \\
+    \eOR & \kw{let}\; x := e \;\kw{in}\;s \\
+    \eOR & \alert<3>{\kw{letref}\; x := \kw{new}\;e \;\kw{in}\;s} \\
+    \eOR & \alert<3>{e_1 \update e_2} \eOR x := e \\
+    \eOR & \alert<5>{x := f(\vo{e})}
+  \end{align*}
+\end{frame}
+\begin{frame}{SIMPL semantic domains}
+  \begingroup\footnotesize We will use abstract machine semantics and represent the semantics of a program as a transition relation.\endgroup
+\begin{align*}
+    \varsigma \in \State & = \alert<1>{\Stmt^? \times \Env \times \Store \times \alert<2>{\Kont}} \\
+    \rho \in \Env & = \Var \to \alert<3>{\Value} \\ % \alert<4>{\Value}^{\Var} \only<3>{\alert{= \Set{\rho : \Var \to \Value}}} \\
+    \sigma \in \Store & = \alert<4>{\Addr} \to \alert<3>{\Value} \\ % \alert<4>{\Value}^{\alert<5>{\Addr}} \\
+    \kappa \in \alert<5>{\Kont} & = \sTag{stmtK}{\Stmt \times \alert<5>{\Kont}} \\
+                         & \disunion \sTag{whileK}{\Exp \times \Stmt \times \alert<5>{\Kont}} \\
+                         & \disunion \sTag{retK}{\Var \times \Exp \times \Env \times \alert<5>{\Kont}} \\
+                         & \disunion \sTag{haltK}
+\end{align*}
+
+\uncover<2>{Continuations represent \emph{the rest of computation}.}
+\uncover<3>{Some parts of the state space are infinite}
+\end{frame}
+
+\begin{frame}{Some transition rules}
+  \small
+  \begin{itemize}
+  \item $\varsigma \step \varsigma'$ is the transition relation%\footnote{Because of nondeterminism. One can also view it as a transition \emph{function} from a state to a set of states.}
+  \item \(\eta_\varsigma : \Exp \to \Value \) is the per-state expression evaluation function
+\item Current state: \(\varsigma = (so, \rho, \sigma, \kappa) \)
+\item Next state: \( \varsigma' = (so', \rho', \sigma', \kappa') \) \pause
+  \end{itemize}
+  \footnotesize
+  \[
+  \begin{array}{llllll}
+    so & \text{side condition} & so' & \rho' & \sigma' & {\kappa}' \\ \hline
+    e_1 \update e_2 & & - & \rho & \sigma[\eta_\varsigma(e_1) \mapsto \eta_\varsigma(e_2)] & {\kappa} \\
+    \kw{while}\; e\; s & \eta_\varsigma(e) = \true & - & \rho & \sigma & \sTag{stmtK}{(s, \sTag{whileK}{(e, s,\kappa)})} \\
+    \kw{while}\; e\; s & \eta_\varsigma(e) = \false & - & \rho & \sigma & {\kappa} \\
+    - & \kappa = \sTag{stmtK}{(s,\kappa_r)} & s & \rho & \sigma & {\kappa_r}
+  \end{array}
+  \]
+\end{frame}
+
+\begin{frame}{Collecting semantics}
+  Abstract machine semantics gives us a state transition system $(\State, I, \step)$ where $\State$ is the set of states, $I \subset \State$ is the set of initial states, $\step \subset \State \times \State$ is the transition relation. \pause Let
+  \[ F : \pw(\State) \alert<-3>{\monarrow} \pw(\State),\, F(X) = \Set{y \vert x \step y \wedge x \in X}. \]\pause
+
+  F is monotonic: if $x \subseteq y$ then $F(x) \subseteq F(y)$
+  
+  $\lfp_I F = I \cup F(I) \cup F(F(I)) \cup \ldots $ is the set of reachable states.\pause
+
+  \alert{$\lfp_I F$ is potentially infinite and requires infinitely many steps to compute!}
+\end{frame}
 
 \begin{frame}{Abstracting Abstract Machines (AAM)\footcite{van2010abstracting,van2012systematic}}
   \only<beamer>{\only<1>{Here is our state, let's start by abstracting it pointwise}
@@ -840,7 +837,6 @@ Low-level software:
 \input{cfa.tex}
 
 \begin{frame}{Widening for Control-Flow\footcite{hardekopf2014widening}}
-  \todo{merge from here to monadic a.i. to a single slide}
   \footnotesize
   \begin{columns}
   \begin{column}{.55\textwidth}
@@ -1024,7 +1020,7 @@ static void main(String[] args) {
 
 \begin{frame}{Reduced products \& combination of decision procedures\footcite{cousot2011reduced}}
   \footnotesize
-  \begin{itemize}
+  \begin{itemize}[<+->]
   \item The formulas of the language of a theory form a lattice where the ordering is implication
   \item Nelson-Oppen combination of theories is a form of product over the lattices of formulas of different theories
   \item The purification phase is same as observational Cartesian products
@@ -1032,8 +1028,7 @@ static void main(String[] args) {
     \begin{itemize}
     \item which is between the reduced product and the Cartesian product
     \end{itemize}
-  \item So, it can be used in static analyses
-  \item \todo{More detail}
+  \item So, it can be used in static analyses, even when the theories share signatures
   \end{itemize}
 \end{frame}
 
