@@ -10,6 +10,24 @@
 h
 </path>
 </symbol>
+<symbol name="decoration/output-box">
+<path stroke="black" fill="orange">
+92 208 m
+92 92 l
+308 92 l
+308 208 l
+h
+</path>
+</symbol>
+<symbol name="decoration/tool-box">
+<path stroke="black" fill="lightgreen">
+92 208 m
+92 92 l
+308 92 l
+308 208 l
+h
+</path>
+</symbol>
 <symbol name="decoration/simple-box-large">
 <path stroke="black" fill="lightgray">
 92 208 m
@@ -33,7 +51,7 @@ h
 </path>
 </symbol>
 <symbol name="decoration/rounded-box-large">
-<path stroke="black" fill="lightgray">
+<path stroke="black" fill="lightblue">
 96 208 m
 4 0 0 4 96 204 92 204 a
 92 96 l

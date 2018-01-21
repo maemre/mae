@@ -1,7 +1,14 @@
 <?xml version="1.0"?>
 <!DOCTYPE ipe SYSTEM "ipe.dtd">
 <ipe version="70206" creator="Ipe 7.2.7">
-<info created="D:20180113214925" modified="D:20180113215926"/>
+<info created="D:20180113214925" modified="D:20180120163914" tex="xetex"/>
+<preamble>
+\usepackage[]{mathspec}
+\setmainfont[BoldFont={Fira Sans SemiBold}]{Fira Sans Book}
+\setsansfont[BoldFont={Fira Sans SemiBold}]{Fira Sans Book}
+\setmonofont{Fira Mono}
+\setmathsfont(Digits,Latin,Greek){Fira Sans Book}
+\setmathsf[]{Fira Sans Book}</preamble>
 <ipestyle name="presentation">
 <symbol name="arrow/arc(spx)">
 <path stroke="sym-stroke" fill="sym-stroke" pen="sym-pen">
@@ -257,30 +264,279 @@ h
               \itemsep   \topsep}
 \makeatother
 </preamble>
-<layout paper="800 600" origin="0 0" frame="800 600" skip="32" crop="no"/>
+<layout paper="800 600" origin="0 0" frame="800 600" skip="32"/>
 <titlestyle pos="368 554" size="large" color="title"  halign="center" valign="baseline"/>
 <tiling name="falling" angle="-60" step="12" width="3"/>
 <tiling name="rising" angle="30" step="12" width="3"/>
 </ipestyle>
+<ipestyle name="decorations">
+<symbol name="decoration/simple-box-small">
+<path stroke="black" fill="lightgray">
+96 96 m
+304 96 l
+304 204 l
+96 204 l
+h
+</path>
+</symbol>
+<symbol name="decoration/simple-box-large">
+<path stroke="black" fill="lightgray">
+92 208 m
+92 92 l
+308 92 l
+308 208 l
+h
+</path>
+</symbol>
+<symbol name="decoration/rounded-box-small">
+<path stroke="black" fill="lightblue">
+100 204 m
+4 0 0 4 100 200 96 200 a
+96 100 l
+4 0 0 4 100 100 100 96 a
+300 96 l
+4 0 0 4 300 100 304 100 a
+304 200 l
+4 0 0 4 300 200 300 204 a
+h
+</path>
+</symbol>
+<symbol name="decoration/rounded-box-large">
+<path stroke="black" fill="lightblue">
+96 208 m
+4 0 0 4 96 204 92 204 a
+92 96 l
+4 0 0 4 96 96 96 92 a
+304 92 l
+4 0 0 4 304 96 308 96 a
+308 204 l
+4 0 0 4 304 204 304 208 a
+h
+</path>
+</symbol>
+<symbol name="decoration/tabbed">
+<path stroke="black" fill="lightgray">
+96 204 m
+96 96 l
+304 96 l
+304 204 l
+108 204 l
+107 207
+106 208
+105 208
+99 208
+98 208
+97 207
+96 204 s
+h
+</path>
+</symbol>
+<symbol name="decoration/3d-box">
+<group>
+<path stroke="black" fill="lightgray">
+98 206 m
+96 204 l
+96 96 l
+304 96 l
+306 98 l
+306 206 l
+h
+</path>
+<path stroke="black">
+96 204 m
+304 204 l
+304 96 l
+</path>
+<path stroke="black">
+304 204 m
+306 206 l
+</path>
+</group>
+</symbol>
+<symbol name="decoration/comic">
+<path stroke="black" fill="white">
+110 96 m
+106 96
+96 96
+96 106
+96 194
+96 204
+106 204
+294 204
+304 204
+304 194
+304 106
+304 96
+294 96
+118 96 s
+116 92
+106 88 s
+110 92
+110 96 s
+h
+</path>
+</symbol>
+<symbol name="decoration/output-box">
+<path stroke="black" fill="orange">
+92 208 m
+92 92 l
+308 92 l
+308 208 l
+h
+</path>
+</symbol>
+<symbol name="decoration/tool-box">
+<path stroke="black" fill="lightgreen">
+92 208 m
+92 92 l
+308 92 l
+308 208 l
+h
+</path>
+</symbol>
+</ipestyle>
+<ipestyle name="transparency">
+<opacity name="10%" value="0.1"/>
+<opacity name="30%" value="0.3"/>
+<opacity name="50%" value="0.5"/>
+<opacity name="75%" value="0.75"/>
+<opacity name="25%" value="0.25"/>
+<opacity name="20%" value="0.2"/>
+<opacity name="40%" value="0.4"/>
+<opacity name="60%" value="0.6"/>
+<opacity name="70%" value="0.7"/>
+<opacity name="80%" value="0.8"/>
+<opacity name="90%" value="0.9"/>
+</ipestyle>
 <page>
 <layer name="alpha"/>
+<layer name="beta"/>
+<layer name="gamma"/>
+<layer name="delta"/>
+<layer name="epsilon"/>
+<layer name="zeta"/>
+<layer name="eta"/>
+<layer name="theta"/>
+<layer name="iota"/>
+<layer name="kappa"/>
 <view layers="alpha" active="alpha"/>
-<text layer="alpha" matrix="1 0 0 1 -96 64" transformations="translations" pos="128 480" stroke="black" type="minipage" width="128" height="214.874" depth="203.424" valign="top" size="small">\begin{verbatim}
-enum lock_state { Unlocked = 0, Locked = 1};
-lock_state state = Unlocked;
-
-void error() { ERROR: goto ERROR }
-
-void lock() {
-  if (state == Locked) error();
-  else state = Locked;
-}
-
-void lock() {
-  if (state == Unocked) error();
-  else state = Unlocked;
-}
-
-\end{verbatim}</text>
+<view layers="alpha beta" active="alpha"/>
+<view layers="alpha beta gamma" active="delta"/>
+<view layers="alpha beta gamma delta" active="zeta"/>
+<view layers="alpha beta gamma delta epsilon" active="epsilon"/>
+<view layers="alpha beta gamma delta epsilon zeta" active="zeta"/>
+<view layers="alpha beta gamma delta epsilon zeta eta" active="eta"/>
+<view layers="alpha beta gamma delta epsilon zeta eta theta" active="theta"/>
+<view layers="alpha beta gamma delta epsilon zeta eta theta iota" active="iota"/>
+<view layers="alpha beta gamma delta epsilon zeta eta theta kappa" active="kappa"/>
+<group layer="zeta" matrix="1.33333 0 0 1 -106.667 0" decoration="decoration/output-box">
+<text matrix="1 0 0 1 128 -112" transformations="translations" pos="336 192" stroke="black" type="minipage" width="272" height="20.7284" depth="6.748" valign="top">Verified the program</text>
+</group>
+<group layer="delta" matrix="1 0 0 1 80 0" decoration="decoration/simple-box-small">
+<text matrix="1 0 0 1 -272 -112" transformations="translations" pos="576 384" stroke="black" type="minipage" width="128" height="37.0692" depth="23.156" valign="top">Boolean program</text>
+</group>
+<group layer="epsilon" matrix="1 0 0 1 96 16" decoration="decoration/tool-box">
+<text transformations="translations" pos="256 144" stroke="black" type="minipage" width="192" height="17.5868" depth="3.612" valign="top">Model checker</text>
+</group>
+<path layer="delta" matrix="1 0 0 1 80 0" stroke="black" arrow="normal/normal">
+368 336 m
+368 272 l
+</path>
+<path layer="epsilon" matrix="1 0 0 1 80 0" stroke="black" arrow="normal/normal">
+368 208 m
+368 160 l
+</path>
+<path layer="delta" matrix="1.18182 0 0 0 -32 256" stroke="black" arrow="normal/normal">
+176 192 m
+352 144 l
+</path>
+<path layer="theta" matrix="1.17448 0 0 1.67783 -36.2921 -54.2264" stroke="black" arrow="normal/normal">
+208 80 m
+112 176 l
+</path>
+<text matrix="1 0 0 1 -144 16" transformations="translations" pos="176 128" stroke="black" type="label" width="120.982" height="10.7996" depth="2.94" valign="baseline">\tiny{Get new predicates}</text>
+<group layer="beta" matrix="2.2 0 0 0.862012 -38.4 65.1171" decoration="decoration/simple-box-large">
+<text matrix="1 0 0 1 -352 -144" transformations="translations" pos="384 384" stroke="black" type="minipage" width="144" height="17.9508" depth="3.976" valign="top">Predicates</text>
+</group>
+<path matrix="1 0 0 0.765028 0 112.787" stroke="black" arrow="normal/normal">
+80 480 m
+80 208 l
+</path>
+<group layer="alpha" matrix="1 0 0 1 -16 32" decoration="decoration/rounded-box-small">
+<text matrix="1 0 0 1 -144 48" transformations="translations" pos="208 464" stroke="black" type="minipage" width="176" height="37.4332" depth="23.52" valign="top">inteface specification</text>
+</group>
+<group matrix="1 0 0 1 319.172 208" decoration="decoration/rounded-box-large">
+<text matrix="1 0 0 1 -80 -64" transformations="translations" pos="144 368" stroke="black" type="label" width="129.66" height="19.5328" depth="5.88" valign="baseline">C program</text>
+</group>
+<group layer="gamma" matrix="1 0 0 1 88 48" decoration="decoration/simple-box-large">
+<text matrix="1 0 0 1 208 -32" transformations="translations" pos="64 384" stroke="black" type="minipage" width="176" height="37.4332" depth="23.52" valign="top">instrumented program</text>
+</group>
+<path matrix="1 0 0 1 64 3.88163" stroke="black" arrow="normal/normal">
+384 496 m
+384 400 l
+</path>
+<path matrix="1.47456 0 0 1 -65.4907 0" stroke="black" arrow="normal/normal">
+240 368 m
+288 368 l
+</path>
+<group layer="beta" matrix="1 0 0 1 80 -16" decoration="decoration/simple-box-large">
+<text matrix="1.3 0 0 1 -51.2 16" transformations="translations" pos="64 384" stroke="black" type="minipage" width="176" height="29.7024" depth="17.784" valign="top" size="small">instrumentation code</text>
+</group>
+<path stroke="black" arrow="normal/normal">
+144 480 m
+208 384 l
+</path>
+<group layer="eta" matrix="1 0 0 1 48 0" decoration="decoration/simple-box-small">
+<text matrix="1 0 0 1 -288 -192" transformations="translations" pos="368 272" stroke="black" type="minipage" width="208" height="20.3672" depth="6.384" valign="top">Counterexample</text>
+</group>
+<path matrix="1.27045 0 0 1.00258 0.400847 -0.20657" stroke="black" arrow="normal/normal">
+352 128 m
+176 80 l
+</path>
+<path layer="zeta" matrix="0.867007 0 0 1.01229 114.668 -1.44979" stroke="black" arrow="normal/normal">
+384 128 m
+608 80 l
+</path>
+<path layer="iota" stroke="black" fill="darkblue" opacity="40%">
+592 400 m
+448 443.688
+320 416
+320 352
+320 272
+96 304
+16 304
+16 256
+16 208
+192 224
+352 208
+432 192
+560 208
+560 224
+592 400 c
+</path>
+<text matrix="1 0 0 1 -16 -32" transformations="translations" pos="608 336" stroke="darkblue" type="label" width="144.108" height="21.6188" depth="0.308" valign="baseline">Abstraction</text>
+<path layer="kappa" stroke="black" fill="darkcyan" opacity="40%">
+192 160 m
+208 304
+192 304
+16 304
+16 288
+16 224
+48 208
+48 176
+16 160
+32 112
+112 112
+112 64
+112 32
+176 32
+368 32
+368 64
+336 112
+224 128
+192 144
+192 160 c
+</path>
+<text transformations="translations" pos="208 176" stroke="darkcyan" type="label" width="144.668" height="20.8936" depth="0.308" valign="baseline">Refinement</text>
 </page>
 </ipe>
