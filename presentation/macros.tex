@@ -97,8 +97,8 @@
 \newcommand{\widen}{\nabla}
 
 % \newcommand{\|}{\,\vert\,}
-\newcommand{\todo}[1]{{\textcolor{red}{TODO: #1}}}
 
+\newcommand{\todo}[1]{\iftoggle{TODO}{\textcolor{red}{TODO: #1}}{}}
 % ceiling and floor symbols
 \DeclarePairedDelimiter\ceil{\lceil}{\rceil}
 \DeclarePairedDelimiter\floor{\lfloor}{\rfloor}

@@ -43,6 +43,8 @@
 
 \newtoggle{labdemo}
 \toggletrue{labdemo}
+\newtoggle{TODO}
+%\toggletrue{TODO}
 
 \title[Major Area Exam]{Abstract Interpretation of Low-level Programs}
 \subtitle{Major Area Exam}
@@ -105,10 +107,10 @@ Low-level software:
   \begin{itemize}[<+->]
   \item Introduced by Cousot and Cousot in 1977 for a flow-chart language \footcite{cousot1977abstract}
   \item Deep connections to math, correct by construction \footcite{cousot1979systematic}
-  \item Expanded to be used with different kinds of semantics \footcite{schmidt1998trace,schmidt2009abstract}
+  \item Expanded to be used with different kinds of semantics \footcite{schmidt1998trace,schmidt2009abstract,van2010abstracting,van2012systematic}
   \item General idea: Create an \emph{abstract} interpreter that
     overapproximates the \emph{concrete} interpreter's behavior
-    soundly.
+    soundly (captures all behavior)
   \end{itemize}
 \end{frame}
 
@@ -384,15 +386,13 @@ $$
 
 \begin{frame}{Widening}
   \small
-  \todo{Simplify}
   \begin{columns}
     \begin{column}{0.75\textwidth}
-  A widening operator $\widen : A \times A \to A$ ensures convergence
-  in a domain $A$ with infinite height. It has the following
-  properties:\vspace{-0.3em}
-  \begin{itemize}\footnotesize
-  \item<2-> $\forall a_1, a_2 \in A, a_1 \sqcup a_2 \sqsubseteq a_1 \widen a_2$
-  \item<2-> For any sequence $a_1, a_2, \ldots$, let $w_1 = a_1, \ldots, w_n = w_{n-1} \widen a_n$. Then, $a_i \sqsubseteq w_i$ and the chain $w_1, w_2, \ldots$ eventually stabilizes
+      A widening operator $\widen : A \times A \to A$ overapproximates join and
+      \begin{itemize}      
+      \item<2-> accelerates fixpoint computation
+      \item<3-> ensures termination even in an infinitely high lattice
+      \item<4-> we make only finitely many jumps on a chain to converge
   \end{itemize}\vspace{-0.3em}
   \uncover<5->{
     \begin{exampleblock}{\small Example: a widening operator on intervals}
@@ -405,7 +405,6 @@ $$
     }
 \end{column}
 \begin{column}{0.2\textwidth}\tiny
-  \uncover<2->{
     \begin{tikzcd}[ampersand replacement=\&]
       \& \alert<4>{w_n}=w_{n-1} \widen a_n \\
       \& \vdots \arrow[u, no head] \\
@@ -414,7 +413,6 @@ $$
       \alert<3>{a_2} \textcolor<2>{mLightBrown}{\arrow[ru, no head]} \arrow[u, no head] \&  \\
       \alert<3>{a_1}=\alert<4>{w_1} \textcolor<2>{mLightBrown}{\arrow[ruu, no head]} \arrow[u, no head] \&
     \end{tikzcd}
-  }
 \end{column}
 \end{columns}
 \uncover<6->{Widening operators are more general than Galois Connections to finite lattices\footcite{cousot92comparing}}
@@ -425,7 +423,6 @@ $$
   \begin{itemize}
   \item Control flow analysis, $k$-CFA\footcite{shivers1991control}
   \item Abstract garbage collection\footcite{might2006improving}
-  \item Abstracting abstract machines\footcite{van2010abstracting,van2012systematic}
   \item Widening for control flow\footcite{hardekopf2014widening}
   \item Monadic abstract interpreters\footcite{sergey2013monadic,darais2015galois}
   \end{itemize}
@@ -622,7 +619,6 @@ $$
 \end{frame}
 
 \begin{frame}{Other methods for partitioning the state}
-  \todo{fewer words, just general concepts}
   \begin{itemize}[<+->]
   \item Partitioning transfer functions of automata with Booleans and integers by representing the functions as a MTBDD\footcite{jeannet_representing_2002}
   \item Extending an abstract interpreter for sequential programs to parallel programs\footcite{mine2011static}
@@ -646,19 +642,18 @@ $$
     \textbf{Domain} & \textbf{Constraints} & \textbf{Complexity} \\
     % Presburger formulas\footcite{bultan_model-checking_1999} & Presburger arithmetic & $ \bigO(2^{2^{2^{pn}}}) $ \\
     Polyhedra\footcite{cousot1978automatic} & \( \sum_{j} c_{ij}x_j \leq 0 \) & \alert<2>{$ \bigO(2^n)$} & \uncover<2->{Too expensive!} \\
-    Octagons\footcite{mine2004weakly} & \( \pm x \pm y \leq c \) & $ \bigO(n^3) $ \\
+    \alt<5>{\emph{Octagons}}{Octagons}\footcite{mine2004weakly} & \( \pm x \pm y \leq c \) & $ \bigO(n^3) $ \\
     Pentagons\footcite{logozzo2010pentagons} & \( x \in [a,b] \wedge x < y \) & $ \bigO(n^2) $ \\
-    Gauges\footcite{venet2012gauge} & \( x \in \left[\sum_{j} a_{j}\lambda_j, \sum_{j} b_{ij}\lambda_j \right] \) & $ \bigO(n2^l) $
+    Gauges\footcite{venet2012gauge} & \( x \in \left[\sum_{j} a_{j}\lambda_j, \sum_{j} b_{ij}\lambda_j \right] \) & $ \bigO(n2^l) $ & \uncover<4->{\alert<4>{Works better with bounded loops}}
     %Arithmetic-geometric progressions\footcite{feret2005arithmetic} & \( x \mapsto ax + b \) & $ \bigO(n) $
   \end{tabular}
-  \end{tightcenter}\pause
-  \begin{itemize}[<+->]
-  \item Also: congruences, floating-point versions\footcite{mine2004relational}, arithmetic-geometric progressions\footcite{feret2005arithmetic} \ldots{}
-  \item \alert{How do we combine the results of different domains?}
+  \end{tightcenter}
+  \begin{itemize}
+  \item<3-> Also: congruences, floating-point versions\footcite{mine2004relational}, \alt<5>{\emph{arithmetic-geometric progressions}}{arithmetic-geometric progressions}\footcite{feret2005arithmetic} \ldots{}
+  \item<5-> \alert{How do we combine the results of different domains?}
   \end{itemize}
-
   \vspace*{1em}
-
+\note{We want to reason about different kinds of constraints. Most expressive domains are too expensive. Some domains are designed to use the restrictions control software has: gauges--avionics. We want octagons to help with relational stuff, progressions to see how fast values grow with a clock tick; communication would help here}
 \end{frame}
 
 \begin{frame}[fragile]{Reduced products\footcite{cousot1979systematic}}
@@ -812,6 +807,46 @@ $$
 
   \alert{$\lfp_I F$ is potentially infinite and requires infinitely many steps to compute!}
 \end{frame}
+
+\begin{frame}{Widening, detailed}
+  \small
+  \todo{Simplify}
+  \begin{columns}
+    \begin{column}{0.75\textwidth}
+  A widening operator $\widen : A \times A \to A$ ensures convergence
+  in a domain $A$ with infinite height. It has the following
+  properties:\vspace{-0.3em}
+  \begin{itemize}\footnotesize
+  \item<2-> $\forall a_1, a_2 \in A, a_1 \sqcup a_2 \sqsubseteq a_1 \widen a_2$
+  \item<2-> For any sequence $a_1, a_2, \ldots$, let $w_1 = a_1, \ldots, w_n = w_{n-1} \widen a_n$. Then, $a_i \sqsubseteq w_i$ and the chain $w_1, w_2, \ldots$ eventually stabilizes
+  \end{itemize}\vspace{-0.3em}
+  \uncover<5->{
+    \begin{exampleblock}{\small Example: a widening operator on intervals}
+      \vspace{-0.8em}
+      \begin{itemize}\footnotesize
+      \item $[1,1] \widen [2,2] \widen [3,3] \widen \ldots \to [1, \infty]$
+      \item $[1,5] \widen [0,5] \widen [-1,5] \widen \ldots \to [-\infty, 5]$
+      \end{itemize}
+    \end{exampleblock}
+    }
+\end{column}
+\begin{column}{0.2\textwidth}\tiny
+  \uncover<2->{
+    \begin{tikzcd}[ampersand replacement=\&]
+      \& \alert<4>{w_n}=w_{n-1} \widen a_n \\
+      \& \vdots \arrow[u, no head] \\
+      \alert<3>{\vdots} \textcolor<2>{mLightBrown}{\arrow[ruu, no head]} \& \alert<4>{w_3} = w_2 \widen a_3 \arrow[u, no head] \\
+      \alert<3>{a_3} \textcolor<2>{mLightBrown}{\arrow[ru, no head]} \arrow[u, no head] \& \alert<4>{w_2} = w_1 \widen a_2 \arrow[u, no head] \\
+      \alert<3>{a_2} \textcolor<2>{mLightBrown}{\arrow[ru, no head]} \arrow[u, no head] \&  \\
+      \alert<3>{a_1}=\alert<4>{w_1} \textcolor<2>{mLightBrown}{\arrow[ruu, no head]} \arrow[u, no head] \&
+    \end{tikzcd}
+  }
+\end{column}
+\end{columns}
+\uncover<6->{Widening operators are more general than Galois Connections to finite lattices\footcite{cousot92comparing}}
+
+\end{frame}
+
 
 \begin{frame}{Abstracting Abstract Machines (AAM)\footcite{van2010abstracting,van2012systematic}}
   \only<beamer>{\only<1>{Here is our state, let's start by abstracting it pointwise}
