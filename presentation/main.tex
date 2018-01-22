@@ -15,16 +15,6 @@
 \setbeamerfont{footnote}{size=\tiny}
 \addbibresource{mae.bib}
 
-\AtBeginSection[]
-{
-  \metroset{numbering=none}
-  \begin{frame}<beamer>[noframenumbering]
-    \frametitle{Outline}
-    \tableofcontents[currentsection]
-  \end{frame}
-  \metroset{numbering=fraction}
-}
-
 \input{macros}
 
 \newtoggle{notes}
@@ -63,20 +53,46 @@
 \begin{document}
 \maketitle
 
+\metroset{numbering=none}
+\begin{frame}<beamer>[noframenumbering]
+  \frametitle{Outline}
+  \tableofcontents
+\end{frame}
+\metroset{numbering=fraction}
+
 \section{Motivation}
 \begin{frame}{What is low-level software? Why should we analyze it?}
 Low-level software:
-\begin{itemize}
-\item Interacts with intricate APIs (drivers, kernel modules, databases)
-\item Require preserving subtle invariants (above, control software)
-\item Have strong reliability requirements
-\begin{itemize}
-\item with unpleasant consequences\iftoggle{labdemo}{: BSoD, data loss, Arianne~5, Heartbleed, Patriot missile}{}
+\begin{itemize}[<+->]
+\item Drivers
+  \begin{itemize}
+  \item Interacts with intricate OS APIs and require preserving subtle invariants
+  \item Not locking locks twice, not writing to a port after closing it, etc.
+  \end{itemize}
+\item Avionics software
+  \begin{itemize}
+  \item No undefined behavior: integer overflows, out of bounds accesses, etc.
+  \item Uses a subset of the language, e.g. no dynamic allocation, no recursion\footcite{cousot2007varieties}
+    \begin{itemize}
+    \item Easier to analyze
+    \end{itemize}
+  \end{itemize}
+\item They have strong reliability requirements
+  \begin{itemize}
+  \item with unpleasant consequences\iftoggle{labdemo}{: BSoD, data loss, Arianne~5, Heartbleed, Patriot missile}{}
+  \end{itemize}
 \end{itemize}
-\todo{Explain what invariants are, what's special about low-level programs, and how these techniques are good for them (both as need and amenability)}
-\end{itemize}
-
 \end{frame}
+
+\AtBeginSection[]
+{
+  \metroset{numbering=none}
+  \begin{frame}<beamer>[noframenumbering]
+    \frametitle{Outline}
+    \tableofcontents[currentsection]
+  \end{frame}
+  \metroset{numbering=fraction}
+}
 
 \only<beamer>{ % all template changes are local to this group.
   \nottoggle{labdemo}{
@@ -121,7 +137,7 @@ Low-level software:
     \begin{column}{0.45\textwidth}
       We want to show that division on line 3 is always exact in this program:
 
-      \begin{lstlisting}[language=Java,numbers=left,mathescape]
+      \begin{lstlisting}[language=Java,numbers=left,mathescape,basicstyle={\footnotesize\ttfamily}]
 x := random;
 while (x mod 2 == 0) {
   x := x / 2;
@@ -133,7 +149,7 @@ $$
 \begin{itemize}
 \item<2-> We can represent the program's execution as a state transition system
 \item<10-> We are interested in all the values \texttt{x} can take at line 3
-\item<12-> There are infinitely many states!
+\item<11-> There are infinitely many states!
 \end{itemize}
     \end{column}
     \begin{column}{0.5\textwidth}
@@ -152,7 +168,7 @@ $$
       \item<9-> Specifically, its parity
       \item<15-> With this \emph{abstraction} we have a finite transition system
       \end{itemize}
-      \begin{lstlisting}[language=Java,numbers=left,mathescape]
+      \begin{lstlisting}[language=Java,numbers=left,mathescape,basicstyle={\footnotesize\ttfamily}]
 x := random;
 while (x mod 2 == 0) {
   x := x / 2;
@@ -163,7 +179,8 @@ $$
 \end{lstlisting}
     \end{column}
     \begin{column}{0.6\textwidth}
-    \multiinclude[<+>][start=1,format=pdf,graphics={height=0.9\textheight}]{fig/adhoc-lattice}
+      \only<beamer>{\multiinclude[<+>][start=1,format=pdf,graphics={height=0.9\textheight}]{fig/adhoc-lattice}}
+      \only<handout>{\includegraphics[height=0.9\textheight]{fig/adhoc-lattice-15.pdf}}
     \end{column}
   \end{columns}
 \end{frame}
@@ -173,45 +190,42 @@ $$
 \begin{frame}{Lattices and Order Theory}
   \begin{columns}[T]
   \begin{column}{0.6\textwidth}
-  \begin{itemize}
-  \item A lattice $(L, \sqcup, \sqcap, \sqsubseteq)$ is a partially ordered set (poset) with:
+  \begin{itemize}[<+->]
+  \item Any powerset $\mathcal{P}(S)$ of a set $S$ has an interesting structure:
+     $S$ is the largest set,
+     $\emptyset$ is the smallest set,
+     $\cup$, $\cap$ determine $\subseteq$
+  \item A lattice $(L, \sqcup, \sqcap, \sqsubseteq)$ generalizes this notion. It is a partially ordered set (poset) with:
     \begin{itemize}\footnotesize
-    \item a least upper bound (join) operation $\sqcup: L \times L \to L$
-    \item a greatest lower bound (meet) operation $\sqcap: L \times L \to L$
-    \item $\sqcup, \sqcap$ determine the partial order $\sqsubseteq$
+    \item a least upper bound (join) operation $\sqcup: L \times L \to L$ (similar to $\cup$)
+    \item a greatest lower bound (meet) operation $\sqcap: L \times L \to L$ (similar to $\cap$)
+    \item $\sqcup, \sqcap$ determine the partial order $\sqsubseteq$ (similar to $\subseteq$)
     \end{itemize}
-  \item<9-> A bounded lattice has a least element $\bot$, (bottom)
+  \item A bounded lattice has a least element $\bot$, (bottom)
     and greatest element $\top$ (top)
-  \item<10-> Any powerset $\mathcal{P}(S)$ of a set $S$ is a bounded lattice where:
-     $\top = S$,
-     $\bot = \emptyset$,
-     $\sqcup = \cup$,
-     $\sqcap = \cap$,
-     $\sqsubseteq = \subseteq$
-   %\item<11-> So, the sets of states form a lattice ordered by inclusion
   \end{itemize}
   \end{column}
   \begin{column}{0.4\textwidth}
     \begin{figure}[h]
     \centering
     \begin{tikzpicture}[x=2cm, y=1.5cm]
-      \node(top)at (1,3){$\textcolor<9>{mLightBrown}{\{+,-,0\} = \top}$} ;
+      \node(top)at (1,3){$\textcolor<6>{mLightBrown}{\{+,-,0\} = \top}$} ;
       \node(pm)at (1,2){$\{+,-\}$} ;
       \node(mz)at (2,2){$\{-,0\}$} ;
-      \node(pz)at (0,2){$\textcolor<4>{mLightBrown}{\{+,0\}}$} ;
+      \node(pz)at (0,2){$\textcolor<3>{mLightBrown}{\{+,0\}}$} ;
       \node(p)at (0,1){$\{+\}$} ;
       \node(m)at (2,1){$\{-\}$} ;
-      \node(z)at (1,1){$\textcolor<8>{mLightBrown}{\{0\}}$} ;
-      \node(bot)at (1,0){$\textcolor<9>{mLightBrown}{\emptyset = \bot}$} ;
+      \node(z)at (1,1){$\textcolor<4>{mLightBrown}{\{0\}}$} ;
+      \node(bot)at (1,0){$\textcolor<6>{mLightBrown}{\emptyset = \bot}$} ;
       \draw(top)--(pm);
       \draw(top)--(mz);
       \draw(top)--(pz);
       \draw(pm)--(p);
       \draw(pm)--(m);
       \draw(mz)--(m);
-      \draw[onslide={<7-8> draw=mLightBrown, line width=1.2pt}](mz)--(z);
-      \draw[onslide={<2-4> draw=mLightBrown, line width=1.2pt}](pz)--(p);
-      \draw[onslide={<3-4,6-8> draw=mLightBrown, line width=1.2pt}](pz)--(z);
+      \draw[onslide={<6> draw=mLightBrown, line width=1.2pt}](mz)--(z);
+      \draw[onslide={<3> draw=mLightBrown, line width=1.2pt}](pz)--(p);
+      \draw[onslide={<3,6> draw=mLightBrown, line width=1.2pt}](pz)--(z);
       \draw(p)--(bot);
       \draw(m)--(bot);
       \draw(z)--(bot);
@@ -238,30 +252,31 @@ $$
 \begingroup
 \footnotesize
 \begin{frame}{Relating lattices}
-  \vspace*{-1.2em}
-  \begin{columns}[t]
+  \begin{columns}[T]
     \begin{column}{0.7\textwidth}
     \begin{itemize}
     \item There is a relationship between $\mathit{Parity}$ and
       $\mathcal{P}(\mathbb{Z})$:\vspace{-0.8em}
       \begin{align*}
-        \uncover<2->{\gamma : \mathit{Parity} & \monarrow \mathcal{P}(\mathbb{Z}) \\
-        \alpha : \mathcal{P}(\mathbb{Z}) & \monarrow \mathit{Parity}}
+        \uncover<2->{
+        \alpha : \mathcal{P}(\mathbb{Z}) & \monarrow \mathit{Parity} \\
+        \gamma : \mathit{Parity} & \monarrow \mathcal{P}(\mathbb{Z})
+                                   }
       \end{align*}\vspace{-3em}
       \begin{align*}
-        \uncover<3->{\gamma(\top) & = \mathbb{Z}, \gamma(\bot) = \emptyset \\
-        \gamma(o) & = \{z \in \mathbb{Z} \mid z \text{ odd} \} \\
-        \gamma(e) & = \{z \in \mathbb{Z} \mid z \text{ even} \}} \\
-        \uncover<4->{\alpha(S) & = \bigsqcup\limits_{z \in S}
+        \uncover<3->{\alpha(S) & = \bigsqcup\limits_{z \in S}
         \begin{cases}
           o & z \text{ odd}\\
           e & z \text{ even}
-        \end{cases}}
+        \end{cases}}\\
+        \uncover<4->{\gamma(\top) & = \mathbb{Z}, \gamma(\bot) = \emptyset \\
+        \gamma(o) & = \{z \in \mathbb{Z} \mid z \text{ odd} \} \\
+        \gamma(e) & = \{z \in \mathbb{Z} \mid z \text{ even} \}}
       \end{align*}\vspace{-2em}
-    \item<5-> $\alpha$ and $\gamma$ are kind of like inverses, though
+    \item<5-> $\alpha$ and $\gamma$ are \emph{sound}: we don't leave anything behind when we go abstract then come back to the concrete
+    \item<6-> $\alpha$ and $\gamma$ are kind of like inverses, though
       there is some information loss\vspace{-0.6em}
-    \item<6-> $\alpha$ and $\gamma$ are \emph{sound}: we don't leave anything behind when we go abstract then come back to the concrete
-    \item<7-> $\alpha$ happens to be the \emph{best possible} function to pair
+    \item<7-> oftentimes $\alpha$ is chosen to be the \emph{best possible} function to pair
       with $\gamma$ in a certain sense\vspace{-0.6em}
     \item<8-> This relationship is known as a \alert{\emph{Galois Connection}}
     \end{itemize}
@@ -278,10 +293,9 @@ $$
         \draw(top)--(o)--(bot);
         \draw(top)--(e)--(bot);
       \end{tikzpicture}\\[0.5em]
-
-      \onslide<4->{$\alert<4>{\alpha(4) + \alpha(-7) = e + o = o}$}
-      \caption{\footnotesize Hasse diagram of an even/odd lattice ($\mathit{Parity}$), and
-        an example of abstracting an operator}
+      
+      \onslide<3->{$\alert<4>{\alpha(4) + \alpha(-7) = e + o = o}$}
+      \caption{\small The $\mathit{Parity}$ domain}
     \end{figure}
   \end{column}
   \end{columns}
@@ -370,7 +384,7 @@ $$
    \end{tightcenter}
 
    \vspace{-1em}
-   \item<7> By (co)induction, starting from an initially-safe pair of states we will soundly cover every possible path through the program
+   \item<7> By induction, starting from an initially-safe pair of states we will soundly cover every possible path through the program
  \end{itemize}
 \end{frame}
 
@@ -459,14 +473,14 @@ $$
 
 \begin{frame}{Predicate abstraction}
   \begin{itemize}[<+->]
-  \item Proposed by Clarke et al. and Graf et al. for hardware verification\footcite{clarke1994model,graf1997construction}
-  \item Main idea: our abstract domain is a finite set of predicates $\Set{\phi_i,\, 1 \le i\le n}$ over states
-  \item Use model checkers/theorem provers to compute $\abst{F}$ and reachability
   \item Predicates can encode the invariants we want to preserve when accessing interfaces
     \begin{itemize}
-    \item Such as not locking a locked lock, not writing to a closed file
+    \item Such as not locking a locked lock, not using a resource after releasing it
     \item Useful for verifying that drivers use the OS API correctly
     \end{itemize}
+  \item Proposed by Clarke et al. and Graf et al. for hardware verification\footcite{clarke1994model,graf1997construction}
+  \item Main idea: our abstract domain is a finite set of predicates $\Set{\phi_i,\, 1 \le i\le n}$ over states
+  \item Use model checkers/theorem provers to compute reachability
   \end{itemize}
 \end{frame}
 
@@ -582,7 +596,8 @@ $$
     \end{itemize}
   \end{itemize}
 
-  \note{overflows are fine for Civ, not so fun when you're 10,000 ft up in the air}
+  \note{overflows are fine for Civ, not so fun when you're 10,000 ft up in the air\\}
+  \note{we did the simple example, now we are ready for the complex one}
 \end{frame}
 
 \subsection{Dynamic state partitioning}
@@ -593,14 +608,13 @@ $$
   \item Bultan et al.\footcite{bultan_model-checking_1999} propose a method to decompose the transition relation. Their method has 3 stages:
     \begin{enumerate}
     \item Convert an event-action language to DNF Presburger formulas
-    \item Partition the state space by different valuations of variables with limited range (such as control variables) based on heuristics
+    \item Partition the state space by different valuations of selected control variables
       \begin{itemize}
-      \item Also, decompose the transition relation to have states in a single partition for the domain and the range of each transition formula
+      \item Also partition the state space by activation conditions of events
+      \item Decompose the transition relation to have states in a single partition for the domain and the range of each transition formula
       \end{itemize}
-
     \item Apply only the relevant parts of the transition relation to each partition when computing a fixpoint
     \end{enumerate}
-  \item To guarantee convergence, they introduce a widening operator for multipolyhedra
   \item They later on extend this technique to work on programs containing integers, Booleans, and enums\footcite{bultan_composite_2000}
   \end{itemize}
   \note{They evaluate their technique by verifying properties of Bakery algorithm, ticket algorithm, bounded buffer producer-consumer, and a circular queue.}
@@ -610,11 +624,11 @@ $$
 \begin{frame}{Dynamic state partitioning for automata\footcite{jeannet_dynamic_1999}}
   \todo{try showing an automaton and a state split from the paper}
   \begin{itemize}[<+->]
-  \item Jeannet et al. propose a dynamic partitioning technique to partition state space of an automaton with polyhedral constraints as guards
-  \item They first do a reachability analysis on the automaton's control structure to get an initial CFG
-  \item They then partition each state according to the guards present in the program
+  \item Jeannet et al. propose a technique to partition state space of an automaton with polyhedral constraints as guards
+  \item First do a reachability analysis on the automaton's control structure to get an initial CFG
+  \item Then partition each state according to the guards present in the program
     \begin{itemize}
-    \item They partition a state according to a guard if the guard's condition also partitions the outgoing transitions
+    \item Partition a state according to a guard if the guard's condition also partitions the outgoing transitions
     \end{itemize}
   \end{itemize}
 \end{frame}
@@ -636,22 +650,22 @@ $$
 \begin{frame}{A plethora of domains}
   \footnotesize
   \begin{itemize}[<+->]
-  \item Analyzing control software requires reasoning about numerical relationships
+  \item Analyzing control software requires reasoning about complex numerical relationships
   \end{itemize}
   \begin{tightcenter}
   \begin{tabular}{lccc}
     \textbf{Domain} & \textbf{Constraints} & \textbf{Complexity} \\
     % Presburger formulas\footcite{bultan_model-checking_1999} & Presburger arithmetic & $ \bigO(2^{2^{2^{pn}}}) $ \\
-    Polyhedra\footcite{cousot1978automatic} & \( \sum_{j} c_{ij}x_j \leq 0 \) & \alert<2>{$ \bigO(2^n)$} & \uncover<2->{Too expensive!} \\
-    \alt<5>{\emph{Octagons}}{Octagons}\footcite{mine2004weakly} & \( \pm x \pm y \leq c \) & $ \bigO(n^3) $ \\
+    Polyhedra\footcite{cousot1978automatic} & \( \sum_{j} c_{ij}x_j \leq 0 \) & \alert<2>{$ \bigO(2^n)$} & \uncover<2->{Too expensive!} \\ \pause
+    \alt<6>{\emph{Octagons}}{Octagons}\footcite{mine2004weakly} & \( \pm x \pm y \leq c \) & $ \bigO(n^3) $ \\
     Pentagons\footcite{logozzo2010pentagons} & \( x \in [a,b] \wedge x < y \) & $ \bigO(n^2) $ \\
-    Gauges\footcite{venet2012gauge} & \( x \in \left[\sum_{j} a_{j}\lambda_j, \sum_{j} b_{ij}\lambda_j \right] \) & $ \bigO(n2^l) $ & \uncover<4->{\alert<4>{Works better with bounded loops}}
+    Gauges\footcite{venet2012gauge} & \( x \in \left[\sum_{j} a_{j}\lambda_j, \sum_{j} b_{ij}\lambda_j \right] \) & $ \bigO(n2^l) $ & \uncover<5->{\alert<5>{Works better with bounded loops}}
     %Arithmetic-geometric progressions\footcite{feret2005arithmetic} & \( x \mapsto ax + b \) & $ \bigO(n) $
   \end{tabular}
   \end{tightcenter}
   \begin{itemize}
-  \item<3-> Also: congruences, floating-point versions\footcite{mine2004relational}, \alt<5>{\emph{arithmetic-geometric progressions}}{arithmetic-geometric progressions}\footcite{feret2005arithmetic} \ldots{}
-  \item<5-> \alert{How do we combine the results of different domains?}
+  \item<4-> Also: congruences, floating-point versions\footcite{mine2004relational}, \alt<5>{\emph{arithmetic-geometric progressions}}{arithmetic-geometric progressions}\footcite{feret2005arithmetic} \ldots{}
+  \item<6-> \alert{How do we combine the results of different domains?}
   \end{itemize}
   \vspace*{1em}
 \note{We want to reason about different kinds of constraints. Most expressive domains are too expensive. Some domains are designed to use the restrictions control software has: gauges--avionics. We want octagons to help with relational stuff, progressions to see how fast values grow with a clock tick; communication would help here}
@@ -679,42 +693,48 @@ $$
     \end{subfigure}\pause
     \begin{subfigure}[b]{0.45\textwidth}\tiny
       \raggedright
-      \[\begin{tikzcd}
-        &  & \top &  \\
-        \only<2>{\alert{Null,Cyc} \arrow[rru, no head]} & \mathit{Null,Acyc} \arrow[ru, no head] & \mathit{NotNull,Cyc} \arrow[u, no head] & \mathit{NotNull,Acyc} \arrow[lu, no head] \\
-        &  & \bot \arrow[ru, no head] \arrow[lu, no head] \arrow[u, no head] \only<2>{\arrow[llu, no head]} &
-      \end{tikzcd}\]
+      
+      \[
+        \begin{tikzcd}
+ &  & \top &  \\
+\only<2>{\alert{Cyc} \arrow[rru, no head]} & Null \arrow[ru, no head] & NotNull \arrow[u, no head] \arrow[rd, no head] & Acyc \arrow[lu, no head] \\
+\only<2>{\alert{Null,Cyc} \arrow[u, no head] \arrow[ru, no head, crossing over]} & NotNull,Cyc \only<2>{\arrow[lu, no head, crossing over]} \arrow[ru, no head] & Null,Acyc \arrow[lu, no head, crossing over] \arrow[ru, no head, crossing over] & NotNull,Acyc \arrow[u, no head] \\
+ &  & \bot \arrow[ru, no head] \arrow[u, no head] \arrow[lu, no head] \only<2>{\arrow[llu, no head]} & 
+\end{tikzcd}
+      \]
     \caption{\small \alt<3->{The reduced product of $Null$ and $Cyc$}{The Cartesian product $Null \times Cyc$}}
   \end{subfigure}
-\end{figure}
+\end{figure}\vspace*{-1em}
 \begin{itemize}
-\item<4-> Reduced products have the same concretization. They eliminate impossible (spurious) configurations
-\item<5-> There is no general (algorithmic) way to derive them
-\item<6-> But iterative reductions can provide an approximation
+\item<4-> Reduced products have the same concretization. They prune unnecessary combinations
+\item<5-> Optimal reduced products are not modular (new domains require ground-up design)
+\item<6-> But iterative reductions can provide a modular implementation
 \end{itemize}
 
 \end{frame}
 
 \begin{frame}{Iterative reductions\footcite{cousot2011reduced}}
   \small
-  \todo{Represent this pictorially}
-  \begin{itemize}[<+->]
+  \begin{tightcenter}
+    \multiinclude[<+>][start=1,format=pdf,graphics={height=0.3\textheight}]{fig/reduction}
+  \end{tightcenter}
+  \begin{itemize}
   \item A reduction operator $\rho: L \to L$ over a lattice $L$ is
     \begin{itemize}
-    \item a reductive $\rho(a) \sqsubseteq a$ operation
-    \item that preserves concretization $\gamma \circ \rho = \gamma$ (is sound)
+    \item<2-> is a reductive $\rho(a) \sqsubseteq a$ operation
+    \item<3-> that preserves concretization $\gamma \circ \rho = \gamma$ (is sound)
     \end{itemize}
-  \item The communication of information between two domains is a reduction operator. Iteratively applying it until reaching a fixpoint is a reduction of the cartesian product.
+  \item<4-> The communication of information between two domains is a reduction operator. Iteratively applying it until reaching a fixpoint is a reduction of the cartesian product.
   \end{itemize}
 \end{frame}
 
-\begin{frame}{Reduction example: ASTRÉE's\footcite{cousot2005astree,cousot2007varieties} Binary product abstract domain functor\footcite{cousot2006combination}}
+\begin{frame}{Reduction example: ASTRÉE's\footcite{cousot2005astree} Binary product abstract domain functor\footcite{cousot2006combination}}
   \todo{Add a picture}
   \begin{itemize}[<+->]
   \item $\dottimes : \mathcal{D \times D} \to \mathcal{D}$. It combines two domains and shares information between them automatically
   \item The information sharing is done by passing new constraints generated by some domains to others
-  \item The constraints passed to $\mathcal{A \times B}$ are passed to both $\mathcal{A}$ and $\mathcal{B}$
-  \item The new constraints generated by $\mathcal{A}$ and $\mathcal{B}$
+  \item The constraints passed to $\mathcal{A \dottimes B}$ are passed to both $\mathcal{A}$ and $\mathcal{B}$
+  \item The new constraints generated by $\mathcal{A}$ are passed to $\mathcal{B}$
   \item The refinement is acyclic to ensure termination (not to make widening unstable)
   \end{itemize}
 \end{frame}
@@ -736,6 +756,19 @@ $$
   \note{Trace partitioning distinguishes between different traces up to current program point and keeps a couple domains below it}
   \note{Boolean partitioning splits the states for different values of a set of booleans, similar to predicate abstraction}
   \note{Binary product connects domains to get a partially reduced product, as explained above}
+\end{frame}
+
+\begin{frame}{Wrap-up}
+  \begin{itemize}[<+->]
+  \item Proving absence of errors in low-level programs is important
+  \item Abstract interpretation is a framework for constructing sound program analyses by abstracting program behavior
+  \item Predicate abstraction and abstraction refinement help proving that a (low-level) program uses APIs correctly
+  \item Analyzing control software has some challenges. Two of them are:
+    \begin{itemize}
+    \item Partitioning of state space may not be as obvious: partition by guards in the program, control variables, etc.
+    \item Combining different domains: reduced products help there
+    \end{itemize}
+  \end{itemize}
 \end{frame}
 
 \begin{frame}[standout]

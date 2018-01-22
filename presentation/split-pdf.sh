@@ -1,3 +1,3 @@
 #!/bin/zsh
 
-pdftk $1 burst output $2-%d.pdf
+pdftk $1.pdf burst output $1-%d.pdf

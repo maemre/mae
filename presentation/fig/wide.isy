@@ -1,15 +1,5 @@
 <?xml version="1.0"?>
-<!DOCTYPE ipe SYSTEM "ipe.dtd">
-<ipe version="70206" creator="Ipe 7.2.7">
-<info created="D:20180113214925" modified="D:20180122014342" tex="xetex"/>
-<preamble>
-\usepackage[]{mathspec}
-\setmainfont[BoldFont={Fira Sans SemiBold}]{Fira Sans Book}
-\setsansfont[BoldFont={Fira Sans SemiBold}]{Fira Sans Book}
-\setmonofont{Fira Mono}
-\setmathsfont(Digits,Latin,Greek){Fira Sans Book}
-\setmathsf[]{Fira Sans Book}
-\usepackage{tikz-cd}</preamble>
+<!DOCTYPE ipestyle SYSTEM "ipe.dtd">
 <ipestyle name="presentation">
 <symbol name="arrow/arc(spx)">
 <path stroke="sym-stroke" fill="sym-stroke" pen="sym-pen">
@@ -265,41 +255,8 @@ h
               \itemsep   \topsep}
 \makeatother
 </preamble>
-<layout paper="800 600" origin="0 0" frame="800 600" skip="32" crop="no"/>
+<layout paper="800 200" origin="0 0" frame="800 200" skip="32" crop="yes"/>
 <titlestyle pos="368 554" size="large" color="title"  halign="center" valign="baseline"/>
 <tiling name="falling" angle="-60" step="12" width="3"/>
 <tiling name="rising" angle="30" step="12" width="3"/>
 </ipestyle>
-<page>
-<layer name="alpha"/>
-<layer name="beta"/>
-<layer name="gamma"/>
-<view layers="alpha" active="alpha"/>
-<view layers="alpha beta" active="beta"/>
-<view layers="alpha beta gamma" active="gamma"/>
-<text layer="alpha" matrix="1 0 0 1 208 -128" transformations="translations" pos="144 464" stroke="black" type="label" width="379.157" height="73.344" depth="73.512" valign="baseline" size="small" style="math">\tiny\begin{tikzcd}
- &amp;  &amp; \top &amp;  \\
-Cyc \arrow[rru, no head] &amp; Null \arrow[ru, no head] &amp; NotNull \arrow[u, no head] &amp; Acyc \arrow[lu, no head] \\
-Null,Cyc \arrow[u, no head] \arrow[ru, no head] &amp; NotNull,Cyc \arrow[lu, no head] \arrow[ru, no head] &amp; Null,Acyc \arrow[lu, no head] \arrow[ru, no head] &amp; NotNull,Acyc \arrow[lu, no head] \arrow[u, no head] \\
- &amp;  &amp; \bot \arrow[ru, no head] \arrow[u, no head] \arrow[lu, no head] \arrow[llu, no head] &amp; 
-\end{tikzcd}</text>
-<text layer="beta" transformations="translations" pos="128 304" stroke="black" type="label" width="13.9468" height="20.93" depth="1.54" valign="baseline" style="math">\emptyset</text>
-<path stroke="darkgreen" arrow="normal/normal">
-560 272 m
-352 256
-144 304 c
-</path>
-<text matrix="1 0 0 1 -23.8462 -35.3846" transformations="translations" pos="256 304" stroke="darkgreen" type="label" width="12.5424" height="12.8208" depth="5.112" valign="baseline" size="small" style="math">\gamma</text>
-<path stroke="darkgreen" arrow="normal/normal">
-355.539 312.593 m
-151.693 314.131 l
-</path>
-<text matrix="1 0 0 1 -18.4615 21.5385" transformations="translations" pos="256 304" stroke="darkgreen" type="label" width="12.5424" height="12.8208" depth="5.112" valign="baseline" size="small" style="math">\gamma</text>
-<path layer="gamma" stroke="darkmagenta" arrow="normal/normal">
-410.924 310.285 m
-460.155 281.823
-566.308 264.9 c
-</path>
-<text matrix="1 0 0 1 -13.0769 -4.61538" transformations="translations" pos="426.308 284.131" stroke="darkmagenta" type="label" width="16.5928" height="15.0136" depth="5.964" valign="baseline" style="math">\rho</text>
-</page>
-</ipe>
