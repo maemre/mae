@@ -22,12 +22,13 @@
 
 % add notes:
 \iftoggle{notes}{
-  % \makeatletter
-  % \def\beamer@framenotesbegin{% at beginning of slide
-  %   \usebeamercolor[fg]{normal text}\gdef\beamer@noteitems{}%
-  %   \gdef\beamer@notes{}%
-  % }
-  % \makeatother
+  \makeatletter
+  \def\beamer@framenotesbegin{% at beginning of slide
+    \usebeamercolor[fg]{normal text}
+    \gdef\beamer@noteitems{}%
+    \gdef\beamer@notes{}%
+  }
+  \makeatother
   \setbeamertemplate{note page}[plain]
   \setbeameroption{show notes on second screen=right}
 }{}
@@ -448,10 +449,10 @@ $$
 \begin{frame}{Relationship with model checking}
   \begin{itemize}[<+->]
   \item Abstract interpretation links model
-    checking and a certain kind of dataflow analysis
+    checking and a certain kind of data flow analysis
     \footcite{schmidt1998program,schmidt1998data}
   \item There's a mechanical way to transform any bit-vector-based,
-    iterative dataflow analysis to a modal $\mu$-calculus formula
+    iterative data flow analysis to a modal $\mu$-calculus formula
     \begin{itemize}
     \item
       $live(pp) = used(pp) \cup (notModified(pp) \cap (\bigcap_{pp' \in
@@ -496,7 +497,7 @@ $$
     \multiinclude[<+>][start=1,format=pdf,graphics={width=0.7\textwidth}]{fig/cegar}
   \end{tightcenter}
   \note{Finding the correct predicates again and again is tedious, why not automate it?\\}
-  \note{During abstraction, we extract the predicates that affect/depend on parameters/globals/returns for each procedure, carry that as a signature and use it to create the Boolean program. SLAM is interprocedural but it is not context sensitive\\}
+  \note{During abstraction, we extract the predicates that affect/depend on parameters/globals/returns for each procedure, carry that as a signature and use it to create the Boolean program. SLAM is inter-procedural but it is not context sensitive\\}
   \note{Announce: An example is coming up}
 \end{frame}
 
@@ -617,20 +618,38 @@ $$
     \end{enumerate}
   \item They later on extend this technique to work on programs containing integers, Booleans, and enums\footcite{bultan_composite_2000}
   \end{itemize}
+  \note{Their main contribution is symbolic model checking of infinite state systems}
   \note{They evaluate their technique by verifying properties of Bakery algorithm, ticket algorithm, bounded buffer producer-consumer, and a circular queue.}
   \note{In this work, they merge formulas from the same language together then apply simplification procedures per sublanguage separately}
 \end{frame}
 
 \begin{frame}{Dynamic state partitioning for automata\footcite{jeannet_dynamic_1999}}
-  \todo{try showing an automaton and a state split from the paper}
-  \begin{itemize}[<+->]
-  \item Jeannet et al. propose a technique to partition state space of an automaton with linear arithmetic constraints as guards
-  \item First do a reachability analysis on the automaton's control structure to get an initial CFG
-  \item Then partition each state according to the guards present in the program
-    \begin{itemize}
-    \item Partition a state according to a guard if the guard's condition also partitions the outgoing transitions
-    \end{itemize}
-  \end{itemize}
+  \begin{columns}
+    \begin{column}{0.7\textwidth}
+      \begin{itemize}[<+->]
+      \item Jeannet et al. propose a technique to partition state space of an automaton with linear arithmetic constraints as guards
+      \item First do a reachability analysis on the automaton's control structure to get an initial CFG
+      \item Then partition each state according to the guards present in the program
+        \begin{itemize}
+        \item Partition a state according to a guard if the guard's condition also partitions the outgoing transitions
+        \end{itemize}
+      \item Do the analysis after splitting one node, repeat until verifying the program or no more splits are available
+      \end{itemize}
+    \end{column}
+
+    \begin{column}{0.3\textwidth}
+      \begin{figure}
+        \centering
+        
+      \only<beamer>{\multiinclude[<+>][start=1,format=pdf,graphics={height=0.3\textheight}]{fig/state-partitioning}}
+      \only<handout>{\includegraphics[height=0.9\textheight]{fig/state-partitioning-2.pdf}}
+      
+      \caption{Splitting happens only if it leads to partitioning outgoing edges}
+    \end{figure}
+
+    \end{column}
+  \end{columns}
+  \note{according to Jeannet, their partitioning is finer than Bultan's}
 \end{frame}
 
 \begin{frame}{Other methods for partitioning the state}
@@ -724,7 +743,7 @@ $$
     \item<2-> is a reductive $\rho(a) \sqsubseteq a$ operation
     \item<3-> that preserves concretization $\gamma \circ \rho = \gamma$ (is sound)
     \end{itemize}
-  \item<4-> The communication of information between two domains is a reduction operator. Iteratively applying it until reaching a fixpoint is a reduction of the cartesian product.
+  \item<4-> The communication of information between two domains is a reduction operator. Iteratively applying it until reaching a fixpoint is a reduction of the Cartesian product.
   \end{itemize}
 \end{frame}
 
@@ -937,7 +956,7 @@ $$
 }
 \begin{itemize}
 \item<2-> We are doing weak updates
-\item<3-> The semantics of loops became nondeterministic
+\item<3-> The semantics of loops became non-deterministic
 \end{itemize}
 \end{frame}
 
@@ -1042,7 +1061,7 @@ static void main(String[] args) {
   \item If $\phi \wedge \psi$ is false then $\exists I$ (Craig interpolant of $\phi, \psi$) s.t.
     \begin{itemize}[<+->]
     \item $\phi \implies I$ and $\neg (I \wedge \psi)$
-    \item $V(I) \subseteq V(\phi) \cap V(\psi)$ where $V(\varphi)$ denotes the set of variables occuring in $\varphi$
+    \item $V(I) \subseteq V(\phi) \cap V(\psi)$ where $V(\varphi)$ denotes the set of variables occurring in $\varphi$
     \end{itemize}
   \item Craig interpolants exist for all FOL formulas and can be computed by theorem provers
   \item A sequence of Craig interpolants can be used instead of computing weakest preconditions for abstraction refinement\footcite{mcmillan2006lazy}\pause
@@ -1067,7 +1086,7 @@ static void main(String[] args) {
   \end{itemize}
 \end{frame}
 
-\begin{frame}{Partitioning transfer functions of automata with hetereogeneous types}
+\begin{frame}{Partitioning transfer functions of automata with heterogeneous types}
   \small
   \begin{itemize}
   \item Jeannet\footcite{jeannet_representing_2002} proposes a method for partitioning transfer functions of automata with Booleans and integers
