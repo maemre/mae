@@ -1,0 +1,508 @@
+<?xml version="1.0"?>
+<!DOCTYPE ipe SYSTEM "ipe.dtd">
+<ipe version="70206" creator="Ipe 7.2.7">
+<info created="D:20180113214925" modified="D:20180121145937" tex="xetex"/>
+<preamble>
+\usepackage[]{mathspec}
+\setmainfont[BoldFont={Fira Sans SemiBold}]{Fira Sans Book}
+\setsansfont[BoldFont={Fira Sans SemiBold}]{Fira Sans Book}
+\setmonofont{Fira Mono}
+\setmathsfont(Digits,Latin,Greek){Fira Sans Book}
+\setmathsf[]{Fira Sans Book}</preamble>
+<ipestyle name="presentation">
+<symbol name="arrow/arc(spx)">
+<path stroke="sym-stroke" fill="sym-stroke" pen="sym-pen">
+0 0 m
+-1 0.333 l
+-1 -0.333 l
+h
+</path>
+</symbol>
+<symbol name="arrow/farc(spx)">
+<path stroke="sym-stroke" fill="white" pen="sym-pen">
+0 0 m
+-1 0.333 l
+-1 -0.333 l
+h
+</path>
+</symbol>
+<symbol name="mark/circle(sx)" transformations="translations">
+<path fill="sym-stroke">
+0.6 0 0 0.6 0 0 e
+0.4 0 0 0.4 0 0 e
+</path>
+</symbol>
+<symbol name="mark/disk(sx)" transformations="translations">
+<path fill="sym-stroke">
+0.6 0 0 0.6 0 0 e
+</path>
+</symbol>
+<symbol name="mark/fdisk(sfx)" transformations="translations">
+<group>
+<path fill="sym-fill">
+0.5 0 0 0.5 0 0 e
+</path>
+<path fill="sym-stroke" fillrule="eofill">
+0.6 0 0 0.6 0 0 e
+0.4 0 0 0.4 0 0 e
+</path>
+</group>
+</symbol>
+<symbol name="mark/box(sx)" transformations="translations">
+<path fill="sym-stroke" fillrule="eofill">
+-0.6 -0.6 m
+0.6 -0.6 l
+0.6 0.6 l
+-0.6 0.6 l
+h
+-0.4 -0.4 m
+0.4 -0.4 l
+0.4 0.4 l
+-0.4 0.4 l
+h
+</path>
+</symbol>
+<symbol name="mark/square(sx)" transformations="translations">
+<path fill="sym-stroke">
+-0.6 -0.6 m
+0.6 -0.6 l
+0.6 0.6 l
+-0.6 0.6 l
+h
+</path>
+</symbol>
+<symbol name="mark/fsquare(sfx)" transformations="translations">
+<group>
+<path fill="sym-fill">
+-0.5 -0.5 m
+0.5 -0.5 l
+0.5 0.5 l
+-0.5 0.5 l
+h
+</path>
+<path fill="sym-stroke" fillrule="eofill">
+-0.6 -0.6 m
+0.6 -0.6 l
+0.6 0.6 l
+-0.6 0.6 l
+h
+-0.4 -0.4 m
+0.4 -0.4 l
+0.4 0.4 l
+-0.4 0.4 l
+h
+</path>
+</group>
+</symbol>
+<symbol name="mark/cross(sx)" transformations="translations">
+<group>
+<path fill="sym-stroke">
+-0.43 -0.57 m
+0.57 0.43 l
+0.43 0.57 l
+-0.57 -0.43 l
+h
+</path>
+<path fill="sym-stroke">
+-0.43 0.57 m
+0.57 -0.43 l
+0.43 -0.57 l
+-0.57 0.43 l
+h
+</path>
+</group>
+</symbol>
+<symbol name="arrow/fnormal(spx)">
+<path stroke="sym-stroke" fill="white" pen="sym-pen">
+0 0 m
+-1 0.333 l
+-1 -0.333 l
+h
+</path>
+</symbol>
+<symbol name="arrow/pointed(spx)">
+<path stroke="sym-stroke" fill="sym-stroke" pen="sym-pen">
+0 0 m
+-1 0.333 l
+-0.8 0 l
+-1 -0.333 l
+h
+</path>
+</symbol>
+<symbol name="arrow/fpointed(spx)">
+<path stroke="sym-stroke" fill="white" pen="sym-pen">
+0 0 m
+-1 0.333 l
+-0.8 0 l
+-1 -0.333 l
+h
+</path>
+</symbol>
+<symbol name="arrow/linear(spx)">
+<path stroke="sym-stroke" pen="sym-pen">
+-1 0.333 m
+0 0 l
+-1 -0.333 l
+</path>
+</symbol>
+<symbol name="arrow/fdouble(spx)">
+<path stroke="sym-stroke" fill="white" pen="sym-pen">
+0 0 m
+-1 0.333 l
+-1 -0.333 l
+h
+-1 0 m
+-2 0.333 l
+-2 -0.333 l
+h
+</path>
+</symbol>
+<symbol name="arrow/double(spx)">
+<path stroke="sym-stroke" fill="sym-stroke" pen="sym-pen">
+0 0 m
+-1 0.333 l
+-1 -0.333 l
+h
+-1 0 m
+-2 0.333 l
+-2 -0.333 l
+h
+</path>
+</symbol>
+<pen name="normal" value="1.2"/>
+<pen name="heavier" value="2.4"/>
+<pen name="fat" value="3.6"/>
+<pen name="ultrafat" value="6"/>
+<symbolsize name="normal" value="9"/>
+<symbolsize name="large" value="15"/>
+<symbolsize name="small" value="6"/>
+<symbolsize name="tiny" value="3.3"/>
+<arrowsize name="normal" value="15"/>
+<arrowsize name="large" value="20"/>
+<arrowsize name="small" value="10"/>
+<arrowsize name="tiny" value="6"/>
+<color name="red" value="1 0 0"/>
+<color name="green" value="0 1 0"/>
+<color name="blue" value="0 0 1"/>
+<color name="yellow" value="1 1 0"/>
+<color name="orange" value="1 0.647 0"/>
+<color name="gold" value="1 0.843 0"/>
+<color name="purple" value="0.627 0.125 0.941"/>
+<color name="gray" value="0.745"/>
+<color name="brown" value="0.647 0.165 0.165"/>
+<color name="navy" value="0 0 0.502"/>
+<color name="pink" value="1 0.753 0.796"/>
+<color name="seagreen" value="0.18 0.545 0.341"/>
+<color name="turquoise" value="0.251 0.878 0.816"/>
+<color name="violet" value="0.933 0.51 0.933"/>
+<color name="darkblue" value="0 0 0.545"/>
+<color name="darkcyan" value="0 0.545 0.545"/>
+<color name="darkgray" value="0.663"/>
+<color name="darkgreen" value="0 0.392 0"/>
+<color name="darkmagenta" value="0.545 0 0.545"/>
+<color name="darkorange" value="1 0.549 0"/>
+<color name="darkred" value="0.545 0 0"/>
+<color name="lightblue" value="0.678 0.847 0.902"/>
+<color name="lightcyan" value="0.878 1 1"/>
+<color name="lightgray" value="0.827"/>
+<color name="lightgreen" value="0.565 0.933 0.565"/>
+<color name="lightyellow" value="1 1 0.878"/>
+<color name="title" value="0.4 0 0.4"/>
+<dashstyle name="dashed" value="[4] 0"/>
+<dashstyle name="dotted" value="[1 3] 0"/>
+<dashstyle name="dash dotted" value="[4 2 1 2] 0"/>
+<dashstyle name="dash dot dotted" value="[4 2 1 2 1 2] 0"/>
+<textsize name="normal" value="\normalsize"/>
+<textsize name="large" value="\large"/>
+<textsize name="huge" value="\LARGE"/>
+<textsize name="small" value="\normalsize"/>
+<textstretch name="normal" value="2.8"/>
+<textstretch name="large" value="2.8"/>
+<textstretch name="huge" value="2.8"/>
+<textstretch name="small" value="2.4"/>
+<textstyle name="normal" begin="\begin{flushleft}" end="\end{flushleft}"/>
+<textstyle name="center" begin="\begin{center}" end="\end{center}"/>
+<textstyle name="itemize" begin="\begin{flushleft}\begin{itemize}" end="\end{itemize}\end{flushleft}"/>
+<textstyle name="item" begin="\begin{flushleft}\begin{itemize}\item{}" end="\end{itemize}\end{flushleft}"/>
+<gridsize name="16 pts (~6 mm)" value="16"/>
+<gridsize name="32 pts (~12 mm)" value="32"/>
+<gridsize name="10 pts (~3.5 mm)" value="10"/>
+<gridsize name="20 pts (~7 mm)" value="20"/>
+<gridsize name="14 pts (~5 mm)" value="14"/>
+<gridsize name="28 pts (~10 mm)" value="28"/>
+<gridsize name="56 pts (~20 mm)" value="56"/>
+<anglesize name="90 deg" value="90"/>
+<anglesize name="60 deg" value="60"/>
+<anglesize name="45 deg" value="45"/>
+<anglesize name="30 deg" value="30"/>
+<anglesize name="22.5 deg" value="22.5"/>
+<preamble>
+\renewcommand\rmdefault{cmss}
+\makeatletter
+\leftmargini 1.5em
+\leftmargin \leftmargini
+\leftmarginii  1.2em
+\leftmarginiii 1em
+\def\@listI{\leftmargin\leftmargini
+            \parsep \z@
+	    \partopsep 3pt
+	    \topsep \z@
+            \itemsep \z@}
+\@listI
+\def\@listii {\leftmargin\leftmarginii
+              \labelwidth\leftmarginii
+              \advance\labelwidth-\labelsep
+              \topsep    \z@
+              \parsep    \z@
+              \itemsep   \parsep}
+\def\@listiii{\leftmargin\leftmarginiii
+              \labelwidth\leftmarginiii
+              \advance\labelwidth-\labelsep
+              \topsep    \z@
+              \parsep    \z@
+              \partopsep \z@
+              \itemsep   \topsep}
+\makeatother
+</preamble>
+<layout paper="800 600" origin="0 0" frame="800 600" skip="32"/>
+<titlestyle pos="368 554" size="large" color="title"  halign="center" valign="baseline"/>
+<tiling name="falling" angle="-60" step="12" width="3"/>
+<tiling name="rising" angle="30" step="12" width="3"/>
+</ipestyle>
+<ipestyle name="decorations">
+<symbol name="decoration/simple-box-small">
+<path stroke="black" fill="lightgray">
+96 96 m
+304 96 l
+304 204 l
+96 204 l
+h
+</path>
+</symbol>
+<symbol name="decoration/simple-box-large">
+<path stroke="black" fill="lightgray">
+92 208 m
+92 92 l
+308 92 l
+308 208 l
+h
+</path>
+</symbol>
+<symbol name="decoration/rounded-box-small">
+<path stroke="black" fill="lightblue">
+100 204 m
+4 0 0 4 100 200 96 200 a
+96 100 l
+4 0 0 4 100 100 100 96 a
+300 96 l
+4 0 0 4 300 100 304 100 a
+304 200 l
+4 0 0 4 300 200 300 204 a
+h
+</path>
+</symbol>
+<symbol name="decoration/rounded-box-large">
+<path stroke="black" fill="lightblue">
+96 208 m
+4 0 0 4 96 204 92 204 a
+92 96 l
+4 0 0 4 96 96 96 92 a
+304 92 l
+4 0 0 4 304 96 308 96 a
+308 204 l
+4 0 0 4 304 204 304 208 a
+h
+</path>
+</symbol>
+<symbol name="decoration/tabbed">
+<path stroke="black" fill="lightgray">
+96 204 m
+96 96 l
+304 96 l
+304 204 l
+108 204 l
+107 207
+106 208
+105 208
+99 208
+98 208
+97 207
+96 204 s
+h
+</path>
+</symbol>
+<symbol name="decoration/3d-box">
+<group>
+<path stroke="black" fill="lightgray">
+98 206 m
+96 204 l
+96 96 l
+304 96 l
+306 98 l
+306 206 l
+h
+</path>
+<path stroke="black">
+96 204 m
+304 204 l
+304 96 l
+</path>
+<path stroke="black">
+304 204 m
+306 206 l
+</path>
+</group>
+</symbol>
+<symbol name="decoration/comic">
+<path stroke="black" fill="white">
+110 96 m
+106 96
+96 96
+96 106
+96 194
+96 204
+106 204
+294 204
+304 204
+304 194
+304 106
+304 96
+294 96
+118 96 s
+116 92
+106 88 s
+110 92
+110 96 s
+h
+</path>
+</symbol>
+<symbol name="decoration/output-box">
+<path stroke="black" fill="orange">
+92 208 m
+92 92 l
+308 92 l
+308 208 l
+h
+</path>
+</symbol>
+<symbol name="decoration/tool-box">
+<path stroke="black" fill="lightgreen">
+92 208 m
+92 92 l
+308 92 l
+308 208 l
+h
+</path>
+</symbol>
+</ipestyle>
+<ipestyle name="transparency">
+<opacity name="10%" value="0.1"/>
+<opacity name="30%" value="0.3"/>
+<opacity name="50%" value="0.5"/>
+<opacity name="75%" value="0.75"/>
+<opacity name="25%" value="0.25"/>
+<opacity name="20%" value="0.2"/>
+<opacity name="40%" value="0.4"/>
+<opacity name="60%" value="0.6"/>
+<opacity name="70%" value="0.7"/>
+<opacity name="80%" value="0.8"/>
+<opacity name="90%" value="0.9"/>
+</ipestyle>
+<page>
+<layer name="alpha"/>
+<layer name="beta"/>
+<layer name="gamma"/>
+<layer name="delta"/>
+<layer name="epsilon"/>
+<layer name="zeta"/>
+<layer name="eta"/>
+<layer name="theta"/>
+<layer name="iota"/>
+<layer name="kappa"/>
+<layer name="lambda"/>
+<view layers="alpha" active="beta"/>
+<view layers="alpha beta" active="alpha"/>
+<view layers="alpha beta gamma" active="delta"/>
+<view layers="alpha beta gamma delta" active="zeta"/>
+<view layers="alpha beta gamma delta epsilon" active="epsilon"/>
+<view layers="alpha beta gamma delta epsilon zeta" active="zeta"/>
+<view layers="alpha beta gamma delta epsilon zeta eta" active="eta"/>
+<view layers="alpha beta gamma delta epsilon zeta eta theta" active="theta"/>
+<view layers="alpha beta gamma delta epsilon zeta eta theta iota" active="iota"/>
+<view layers="alpha beta gamma delta epsilon zeta eta theta iota kappa" active="kappa"/>
+<view layers="alpha beta gamma delta epsilon zeta eta theta iota kappa lambda" active="lambda"/>
+<group layer="alpha" matrix="1 0 0 1 0 -16" decoration="decoration/rounded-box-small">
+<text matrix="1 0 0 1 -305.52 32" transformations="translations" pos="320 544" stroke="black" type="label" width="196.678" height="20.9244" depth="6.972" valign="baseline" style="math">1, [x \mapsto 0, y \mapsto 0]</text>
+</group>
+<group layer="beta" matrix="1 0 0 1 0 -38.9095" decoration="decoration/rounded-box-small">
+<text matrix="1 0 0 1 -305.59 -32" transformations="translations" pos="320 544" stroke="black" type="label" width="196.818" height="20.9244" depth="6.972" valign="baseline" style="math">2, [x \mapsto 5, y \mapsto 0]</text>
+</group>
+<group layer="gamma" matrix="1 0 0 1 0 -61.819" decoration="decoration/rounded-box-small">
+<text matrix="1 0 0 1 -306.148 -96" transformations="translations" pos="320 544" stroke="black" type="label" width="197.932" height="20.9244" depth="6.972" valign="baseline" style="math">6, [x \mapsto 5, y \mapsto 0]</text>
+</group>
+<group layer="delta" matrix="1 0 0 1 0 -84.7285" decoration="decoration/rounded-box-small">
+<text matrix="1 0 0 1 -304 -160" transformations="translations" pos="320 544" stroke="black" type="label" width="193.637" height="20.9244" depth="6.972" valign="baseline" style="math">7, [x \mapsto 5, y \mapsto 2]</text>
+</group>
+<group layer="epsilon" matrix="1 0 0 1 0 161.008" decoration="decoration/rounded-box-small">
+<text matrix="1 0 0 1 -48 -216.889" transformations="translations" pos="320 544" stroke="black" type="label" width="197.68" height="20.9244" depth="6.972" valign="baseline" style="math">2, [x \mapsto 4, y \mapsto 0]</text>
+</group>
+<group layer="zeta" matrix="1 0 0 1 0 128.806" decoration="decoration/rounded-box-small">
+<text matrix="1 0 0 1 -48 -279.111" transformations="translations" pos="320 544" stroke="black" type="label" width="197.82" height="20.9244" depth="6.972" valign="baseline" style="math">3, [x \mapsto 4, y \mapsto 0]</text>
+</group>
+<group layer="eta" matrix="1 0 0 1 0 96.6049" decoration="decoration/rounded-box-small">
+<text matrix="1 0 0 1 -48 -341.333" transformations="translations" pos="320 544" stroke="black" type="label" width="197.683" height="20.9244" depth="6.972" valign="baseline" style="math">4, [x \mapsto 2, y \mapsto 0]</text>
+</group>
+<group layer="theta" matrix="1 0 0 1 0 64.4032" decoration="decoration/rounded-box-small">
+<text matrix="1 0 0 1 -48 -403.556" transformations="translations" pos="320 544" stroke="black" type="label" width="196.762" height="20.9244" depth="6.972" valign="baseline" style="math">2, [x \mapsto 3, y \mapsto 0]</text>
+</group>
+<group layer="iota" matrix="1 0 0 1 0 32.2016" decoration="decoration/rounded-box-small">
+<text matrix="1 0 0 1 -48 -465.778" transformations="translations" pos="320 544" stroke="black" type="label" width="197.932" height="20.9244" depth="6.972" valign="baseline" style="math">6, [x \mapsto 5, y \mapsto 0]</text>
+</group>
+<group layer="kappa" decoration="decoration/rounded-box-small">
+<text matrix="1 0 0 1 -48 -528" transformations="translations" pos="320 544" stroke="black" type="label" width="193.637" height="20.9244" depth="6.972" valign="baseline" style="math">7, [x \mapsto 5, y \mapsto 2]</text>
+</group>
+<path layer="beta" stroke="black" arrow="normal/normal">
+110.767 550.932 m
+110.767 497.542 l
+</path>
+<path layer="gamma" stroke="black" arrow="normal/normal">
+110.767 461.33 m
+110.767 410.726 l
+</path>
+<path layer="delta" stroke="black" arrow="normal/normal">
+112.624 374.978 m
+112.624 322.981 l
+</path>
+<path layer="epsilon" stroke="black" arrow="normal/normal">
+211.975 548.146 m
+294.494 513.966 l
+</path>
+<path layer="zeta" stroke="black" arrow="normal/normal">
+369.359 474.793 m
+369.359 418.618 l
+</path>
+<path layer="eta" stroke="black" arrow="normal/normal">
+369.823 380.549 m
+369.823 324.838 l
+</path>
+<path layer="theta" stroke="black" arrow="normal/normal">
+369.823 287.233 m
+369.823 229.665 l
+</path>
+<path layer="iota" stroke="black" arrow="normal/normal">
+371.216 191.131 m
+371.216 137.277 l
+</path>
+<path layer="kappa" stroke="black" arrow="normal/normal">
+368.43 98.744 m
+368.43 42.1045 l
+</path>
+<group layer="lambda" matrix="1 0 0 1 24.8209 16" decoration="decoration/rounded-box-small">
+<text matrix="1 0 0 1 188.772 -55.8808" transformations="translations" pos="320 544" stroke="black" type="label" width="32.5444" height="12.3984" depth="0" valign="baseline" style="math">\cdots</text>
+</group>
+<path stroke="black" arrow="normal/normal">
+208 560 m
+528 512 l
+</path>
+</page>
+</ipe>

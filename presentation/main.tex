@@ -102,7 +102,6 @@ Low-level software:
 \section{Abstract interpretation}
 
 \begin{frame}{Abstract interpretation}
-  \todo{move this to the beginning}
   \begin{itemize}[<+->]
   \item Introduced by Cousot and Cousot in 1977 for a flow-chart language \footcite{cousot1977abstract}
   \item Deep connections to math, correct by construction \footcite{cousot1979systematic}
@@ -113,16 +112,57 @@ Low-level software:
   \end{itemize}
 \end{frame}
 
-\begin{frame}{\todo{A concrete program with state transition system}}
-  
+\begin{frame}[fragile]{Programs' executions as state transition systems}
+  \footnotesize
+  \begin{columns}[T]
+    \begin{column}{0.45\textwidth}
+      We want to show that division on line 3 is always exact in this program:
+
+      \begin{lstlisting}[language=Java,numbers=left,mathescape]
+x := random;
+while (x mod 2 == 0) {
+  x := x / 2;
+  x := x + 1;
+}
+y := 2;
+$$
+\end{lstlisting}
+\begin{itemize}
+\item<2-> We can represent the program's execution as a state transition system
+\item<10-> We are interested in all the values \texttt{x} can take at line 3
+\item<12-> There are infinitely many states!
+\end{itemize}
+    \end{column}
+    \begin{column}{0.5\textwidth}
+    \multiinclude[<+>][start=1,format=pdf,graphics={height=0.9\textheight}]{fig/concrete-sem}
+    \end{column}
+
+  \end{columns}
 \end{frame}
 
-\begin{frame}{\todo{Consider the sets of states, collecting semantics \& reachable states}}
-  
-\end{frame}
-
-\begin{frame}{\todo{Form a lattice from the sets of states, then start abstracting them}}
-  
+\begin{frame}[fragile]{Collecting semantics \& abstraction}
+  \footnotesize
+  \begin{columns}[T]
+    \begin{column}{0.4\textwidth}
+      \begin{itemize}
+      \item We are interested in values \texttt{x} takes
+      \item<9-> Specifically, its parity
+      \item<15-> With this \emph{abstraction} we have a finite transition system
+      \end{itemize}
+      \begin{lstlisting}[language=Java,numbers=left,mathescape]
+x := random;
+while (x mod 2 == 0) {
+  x := x / 2;
+  x := x + 1;
+}
+y := 2;
+$$
+\end{lstlisting}
+    \end{column}
+    \begin{column}{0.6\textwidth}
+    \multiinclude[<+>][start=1,format=pdf,graphics={height=0.9\textheight}]{fig/adhoc-lattice}
+    \end{column}
+  \end{columns}
 \end{frame}
 
 \begingroup
@@ -145,7 +185,7 @@ Low-level software:
      $\sqcup = \cup$,
      $\sqcap = \cap$,
      $\sqsubseteq = \subseteq$
-   \item<11-> So, the sets of states form a lattice ordered by inclusion
+   %\item<11-> So, the sets of states form a lattice ordered by inclusion
   \end{itemize}
   \end{column}
   \begin{column}{0.4\textwidth}
@@ -217,7 +257,7 @@ Low-level software:
       \end{align*}\vspace{-2em}
     \item<5-> $\alpha$ and $\gamma$ are kind of like inverses, though
       there is some information loss\vspace{-0.6em}
-    \item<6-> $\alpha$ and $\gamma$ are \emph{sound}: we don't leave anything behind when we go abstract then come back to the concrete \todo{Clean up}
+    \item<6-> $\alpha$ and $\gamma$ are \emph{sound}: we don't leave anything behind when we go abstract then come back to the concrete
     \item<7-> $\alpha$ happens to be the \emph{best possible} function to pair
       with $\gamma$ in a certain sense\vspace{-0.6em}
     \item<8-> This relationship is known as a \alert{\emph{Galois Connection}}
@@ -251,7 +291,7 @@ Low-level software:
   \[ \textcolor<2->{gray}{\forall c \in \mathit{Concrete}, a \in \mathit{Abstract}.\, c \subseteq \gamma(a) \iff \alpha(c) \sqsubseteq a} \]
   \pause
   or, equivalently,
-  $$ \tikzmark{ma}\textcolor<1,7->{gray}{\alpha, \gamma \text{ monotone}}\tikzmark{mb} \qquad \tikzmark{a}\textcolor<1,4-6,10->{gray}{c \subseteq \gamma(\alpha(c))}\tikzmark{b} \qquad \tikzmark{ra}\textcolor<1,4-9>{gray}{\alpha(\gamma(a)) \sqsubseteq a\tikzmark{rb}} $$
+  \[ \tikzmark{ma}\textcolor<1,7->{gray}{\alpha, \gamma \text{ monotone}}\tikzmark{mb} \qquad \tikzmark{a}\textcolor<1,4-6,10->{gray}{c \subseteq \gamma(\alpha(c))}\tikzmark{b} \qquad \tikzmark{ra}\textcolor<1,4-9>{gray}{\alpha(\gamma(a)) \sqsubseteq a\tikzmark{rb}} \]
   \pause
   \vspace*{-1em}
   \begin{tightcenter}
@@ -277,7 +317,7 @@ Low-level software:
      \draw<5-6>[->] (empty) to [bend right] node [pos=0.6, above] {$\alpha$} (bot) ;
      \draw<9,11->[->] (e) to [bend right] node [midway, above] {$\gamma$} (evens);
      \draw<12->[->] (evens) to [bend right] node [pos=0.6, above] {$\alpha$} (e);
-     
+
    \end{tikzpicture}
  \end{tightcenter}
 
@@ -294,7 +334,6 @@ Low-level software:
 
 \begin{frame}[fragile]{Safe simulations}
   \small
-  \todo{reify $\varsigma$s to actual states, then abstract them}
   \vspace{-1em}
   \begin{itemize}[<+->]
   \item Run the concrete machine and the abstract machine in lockstep
@@ -317,11 +356,11 @@ Low-level software:
     \begin{tikzpicture}[remember picture, overlay,
       every node/.append style = { align = center, minimum height = 10pt,fill=gray,opacity=0.1,text opacity=1}]
       \onslide<2>{\node[left=6cm, text width=4cm](){\textcolor{gray}{\textsf{\footnotesize Program executing state $\varsigma$ transitions to state $\varsigma'$}}};}
-      
+
       \onslide<3>{\node[left=6cm, text width=4cm](){\textcolor{gray}{\textsf{\footnotesize $\alpha(\varsigma)$ abstracts $\varsigma$}}};}
-      
+
       \onslide<4>{\node[left=6cm, text width=4cm](){\textcolor{gray}{\textsf{\footnotesize Abstract state $\alpha(\varsigma)$ transitions to $\alpha(\varsigma)'$}}};}
-      
+
       \onslide<5>{\node[left=6cm, text width=4cm](){\textcolor{gray}{\textsf{\footnotesize $\alpha(\varsigma)'$ covers $\alpha(\varsigma')$ thus is a safe counterpart for $\varsigma'$}}};}
     \end{tikzpicture}
     }
@@ -373,7 +412,7 @@ Low-level software:
       \alert<3>{\vdots} \textcolor<2>{mLightBrown}{\arrow[ruu, no head]} \& \alert<4>{w_3} = w_2 \widen a_3 \arrow[u, no head] \\
       \alert<3>{a_3} \textcolor<2>{mLightBrown}{\arrow[ru, no head]} \arrow[u, no head] \& \alert<4>{w_2} = w_1 \widen a_2 \arrow[u, no head] \\
       \alert<3>{a_2} \textcolor<2>{mLightBrown}{\arrow[ru, no head]} \arrow[u, no head] \&  \\
-      \alert<3>{a_1}=\alert<4>{w_1} \textcolor<2>{mLightBrown}{\arrow[ruu, no head]} \arrow[u, no head] \& 
+      \alert<3>{a_1}=\alert<4>{w_1} \textcolor<2>{mLightBrown}{\arrow[ruu, no head]} \arrow[u, no head] \&
     \end{tikzcd}
   }
 \end{column}
@@ -395,7 +434,6 @@ Low-level software:
 \end{frame}
 
 \begin{frame}{Relationship with model checking}
-  \small\todo{try finding a better DFA equation}
   \begin{itemize}[<+->]
   \item Abstract interpretation links model
     checking and a certain kind of dataflow analysis
@@ -404,11 +442,11 @@ Low-level software:
     iterative dataflow analysis to a modal $\mu$-calculus formula
     \begin{itemize}
     \item
-      $VBE(pp) = Used(pp) \cup (notModified(pp) \cap (\bigcap_{pp' \in
-        succ\, pp} VBE(pp')))$
+      $live(pp) = used(pp) \cup (notModified(pp) \cap (\bigcap_{pp' \in
+        \fn{Post}(pp)} live(pp')))$
       \vspace{.5em}
     \item
-      $isVBE(e) = \nu Z \,.\, isUsed(e) \vee (\neg isModified(e)
+      $isLive(x) = \nu Z \,.\, isUsed(x) \vee (\neg isModified(x)
       \wedge \square Z)$
     \end{itemize}
   \item (Trace-based) abstract interpretation creates the finite model of the
@@ -461,7 +499,7 @@ Low-level software:
   \item The code on the right is the predicate abstraction of the code on the left
   \end{itemize}
   \endgroup
-  
+
   \begin{columns}[t]
     \begin{column}{0.45\textwidth}
       \lstinputlisting[language=C,mathescape]{lst/pred_instr.c}
@@ -517,7 +555,7 @@ Low-level software:
 
 \begin{frame}{Other work in abstraction refinement}
   \begin{itemize}[<+->]
-  \item Using Craig interpolants rather than weakest preconditions gives $3.8$-$17.7\times$ speedup over lazy abstraction on BLAST benchmarks\footcite{mcmillan2006lazy} 
+  \item Using Craig interpolants rather than weakest preconditions gives $3.8$-$17.7\times$ speedup over lazy abstraction on BLAST benchmarks\footcite{mcmillan2006lazy}
   \item Gulavani et al.\footcite{gulavani2006counterexample} use abstraction refinement to compute which widenings to delay
     \begin{itemize}
     \item They later on extend their technique to get more precise widenings by using interpolants\footcite{gulavani2008automatically}
@@ -529,7 +567,7 @@ Low-level software:
 \section{Static analysis of control software}
 \begin{frame}{What is challenging about control software?}
   Example: avionics software, nuclear plant rod controllers etc.
-  
+
   \begin{itemize}[<+->]
   \item We want some strict requirements such as no integer overflows
     \begin{itemize}
@@ -578,7 +616,7 @@ Low-level software:
   \item They first do a reachability analysis on the automaton's control structure to get an initial CFG
   \item They then partition each state according to the guards present in the program
     \begin{itemize}
-    \item They partition a state according to a guard if the guard's condition also partitions the outgoing transitions 
+    \item They partition a state according to a guard if the guard's condition also partitions the outgoing transitions
     \end{itemize}
   \end{itemize}
 \end{frame}
@@ -586,7 +624,7 @@ Low-level software:
 \begin{frame}{Other methods for partitioning the state}
   \todo{fewer words, just general concepts}
   \begin{itemize}[<+->]
-  \item Partitioning transfer functions of automata with Booleans and integers by representing the functions as a MTBDD\footcite{jeannet_representing_2002} 
+  \item Partitioning transfer functions of automata with Booleans and integers by representing the functions as a MTBDD\footcite{jeannet_representing_2002}
   \item Extending an abstract interpreter for sequential programs to parallel programs\footcite{mine2011static}
     \begin{itemize}
     \item Restrictions: threads and locks are statically known, reasonable for control~programs
@@ -631,7 +669,7 @@ Low-level software:
       \[\begin{tikzcd}
         & \top &  \\
         \mathit{Null} \arrow[ru, no head] &  & \mathit{NotNull} \arrow[lu, no head] \\
-        & \bot \arrow[ru, no head] \arrow[lu, no head] & 
+        & \bot \arrow[ru, no head] \arrow[lu, no head] &
       \end{tikzcd}\]
       \caption{\small Nullity domain $\ns{Null}$}
     \end{subfigure}
@@ -639,7 +677,7 @@ Low-level software:
       \[\begin{tikzcd}
         & \top &  \\
         \mathit{Cyclic} \arrow[ru, no head] &  & \mathit{NotCyclic} \arrow[lu, no head] \\
-        & \bot \arrow[ru, no head] \arrow[lu, no head] & 
+        & \bot \arrow[ru, no head] \arrow[lu, no head] &
       \end{tikzcd}\]
       \caption{\small Cycle domain $\ns{Cyc}$}
     \end{subfigure}\pause
@@ -648,7 +686,7 @@ Low-level software:
       \[\begin{tikzcd}
         &  & \top &  \\
         \only<2>{\alert{Null,Cyc} \arrow[rru, no head]} & \mathit{Null,Acyc} \arrow[ru, no head] & \mathit{NotNull,Cyc} \arrow[u, no head] & \mathit{NotNull,Acyc} \arrow[lu, no head] \\
-        &  & \bot \arrow[ru, no head] \arrow[lu, no head] \arrow[u, no head] \only<2>{\arrow[llu, no head]} & 
+        &  & \bot \arrow[ru, no head] \arrow[lu, no head] \arrow[u, no head] \only<2>{\arrow[llu, no head]} &
       \end{tikzcd}\]
     \caption{\small \alt<3->{The reduced product of $Null$ and $Cyc$}{The Cartesian product $Null \times Cyc$}}
   \end{subfigure}
@@ -718,7 +756,7 @@ Low-level software:
   \end{gather*}\vspace{-2em}
   \begin{align*}
     fd \in \ns{FunDef} \eDEF & \alert<5>{\kw{def}\; f(\vo{x}) = s;\,\kw{return}\; e} \\
-    e \in \Exp \eDEF & x \eOR n \eOR b \eOR e_1 \oplus e_2 \eOR \alert<3>{*x} \\ % \eOR \alert<1>{\kw{choose}\;e_1\,e_2} \\
+    e \in \Exp \eDEF & x \eOR n \eOR b \eOR e_1 \oplus e_2 \eOR \boxdot e \eOR \alert<3>{*x} \eOR \kw{random}  \\
     s \in \Stmt \eDEF & s;\,s \eOR \alert<2>{\kw{abort}} \\
     \eOR & \alert<4>{\kw{if}\, e\; s_1 \; \kw{else} \; s_2} \\
     \eOR & \alert<4>{\kw{while}\; e\; s} \\
@@ -769,7 +807,7 @@ Low-level software:
   \[ F : \pw(\State) \alert<-3>{\monarrow} \pw(\State),\, F(X) = \Set{y \vert x \step y \wedge x \in X}. \]\pause
 
   F is monotonic: if $x \subseteq y$ then $F(x) \subseteq F(y)$
-  
+
   $\lfp_I F = I \cup F(I) \cup F(F(I)) \cup \ldots $ is the set of reachable states.\pause
 
   \alert{$\lfp_I F$ is potentially infinite and requires infinitely many steps to compute!}
