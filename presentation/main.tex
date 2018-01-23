@@ -389,22 +389,36 @@ $$
  \end{itemize}
 \end{frame}
 
-\begin{frame}{Computing fixpoints}
-  \begin{thm}[Kleene-Tarski fixed point theorem\footcite{kleene_stephen_cole_introduction_1952,tarski1955lattice,cousot1979constructive}]
-    If $L$ is a complete lattice and $F: L \monarrow L$ then $\forall x \in L$, $\lfp_x F$ exists and
-    \[
-      \lfp_x F = \bigsqcup \Set{F^n(x) \vert n \in \nats}.
-    \]
-  \end{thm}
+\begin{frame}{Computing fixpoints\footcite{kleene_stephen_cole_introduction_1952,tarski1955lattice,cousot1979constructive}}
+  \begin{columns}
+    \begin{column}{0.75\textwidth}
+      \begin{thm}[Kleene-Tarski fixed point theorem]
+        If $L$ is a complete lattice and $F: L \monarrow L$ then $\forall x \in L$, $\lfp_x F$ exists and
+        \[
+          \lfp_x F = \bigsqcup \Set{F^n(x) \vert n \in \nats}.
+        \]
+      \end{thm}
 
-  Moreover, if $L$ is Noetherian (has no infinite ascending chains), $\exists n. \lfp_x F = x \sqcup F(x) \sqcup F(F(x)) \sqcup \ldots \sqcup F^n(x)$.
+      \uncover<3->{Moreover, if $L$ is Noetherian (has no infinite ascending chains), $\exists n. \lfp_x F = x \sqcup F(x) \sqcup F(F(x)) \sqcup \ldots \sqcup F^n(x)$.}
+    \end{column}
+    \begin{column}{0.25\textwidth}
+      \begin{tikzcd}
+        \alert<2>{x^* = F(x^*)} \\
+        \vdots \arrow[u, no head] \\
+        x \sqcup F(x) \sqcup F(F(x)) \arrow[u, no head] \\
+        x \sqcup F(x) \arrow[u, no head] \\
+        x \arrow[u, no head]
+      \end{tikzcd}
+    \end{column}
+  \end{columns}
 \end{frame}
 
 \begin{frame}{Widening}
   \small
   \begin{columns}
     \begin{column}{0.75\textwidth}
-      A widening operator $\widen : A \times A \to A$ overapproximates join and
+      Fixpoint computation doesn't terminate on infinitely high lattices.\\
+      \uncover<2->{A widening operator $\widen : A \times A \to A$ overapproximates join and}
       \begin{itemize}      
       \item<2-> accelerates fixpoint computation
       \item<3-> ensures termination even in an infinitely high lattice
@@ -421,6 +435,17 @@ $$
     }
 \end{column}
 \begin{column}{0.2\textwidth}\tiny
+  \begin{onlyenv}<beamer>
+    \begin{onlyenv}<-2>
+    \[\begin{tikzcd}[ampersand replacement=\&]
+      \alert<1>{\vdots} \& \\
+      \alert<1>{a_3} \arrow[u, no head] \& \\
+      \alert<1>{a_2} \arrow[u, no head] \& \\
+      \alert<1>{a_1} \arrow[u, no head] \&
+    \end{tikzcd}\]
+  \end{onlyenv}
+  \end{onlyenv}
+  \begin{onlyenv}<3->
     \begin{tikzcd}[ampersand replacement=\&]
       \& \alert<4>{w_n}=w_{n-1} \widen a_n \\
       \& \vdots \arrow[u, no head] \\
@@ -429,6 +454,7 @@ $$
       \alert<3>{a_2} \textcolor<2>{mLightBrown}{\arrow[ru, no head]} \arrow[u, no head] \&  \\
       \alert<3>{a_1}=\alert<4>{w_1} \textcolor<2>{mLightBrown}{\arrow[ruu, no head]} \arrow[u, no head] \&
     \end{tikzcd}
+  \end{onlyenv}
 \end{column}
 \end{columns}
 \uncover<6->{Widening operators are more general than Galois Connections to finite lattices\footcite{cousot92comparing}}
@@ -496,7 +522,7 @@ $$
   \begin{tightcenter}
     \multiinclude[<+>][start=1,format=pdf,graphics={width=0.7\textwidth}]{fig/cegar}
   \end{tightcenter}
-  \note{Finding the correct predicates again and again is tedious, why not automate it?\\}
+  \note{Finding the correct predicates again and again is tedious, why not automate it?\\ }
   \note{During abstraction, we extract the predicates that affect/depend on parameters/globals/returns for each procedure, carry that as a signature and use it to create the Boolean program. SLAM is inter-procedural but it is not context sensitive\\}
   \note{Announce: An example is coming up}
 \end{frame}
@@ -683,7 +709,7 @@ $$
   \end{tabular}
   \end{tightcenter}
   \begin{itemize}
-  \item<4-> Also: congruences, floating-point versions\footcite{mine2004relational}, \alt<5>{\emph{arithmetic-geometric progressions}}{arithmetic-geometric progressions}\footcite{feret2005arithmetic} \ldots{}
+  \item<4-> Also: congruences, floating-point versions\footcite{mine2004relational}, \alt<6>{\emph{arithmetic-geometric progressions}}{arithmetic-geometric progressions}\footcite{feret2005arithmetic} \ldots{}
   \item<6-> \alert{How do we combine the results of different domains?}
   \end{itemize}
   \vspace*{1em}
@@ -735,7 +761,7 @@ $$
 \begin{frame}{Iterative reductions\footcite{cousot2011reduced}}
   \small
   \begin{tightcenter}
-    \multiinclude[<+>][start=1,format=pdf,graphics={height=0.3\textheight}]{fig/reduction}
+    \multiinclude[<+->][start=1,format=pdf,graphics={height=0.3\textheight}]{fig/reduction}
   \end{tightcenter}
   \begin{itemize}
   \item A reduction operator $\rho: L \to L$ over a lattice $L$ is
