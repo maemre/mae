@@ -1,11 +1,12 @@
 \documentclass[aspectratio=169]{beamer}
-%\documentclass[aspectratio=169,handout]{beamer}
+% \documentclass[aspectratio=169,handout]{beamer}
+
 \usetheme[titleformat=regular%
 ,numbering=fraction% use slide numbers
 ]{metropolis}
 \metroset{%
-  progressbar = foot,%
-  % background=dark,
+  progressbar=foot,%
+  %background=dark,
   block=fill
 }
 \only<handout>{\metroset{sectionpage=none}}
@@ -17,24 +18,29 @@
 
 \input{macros}
 
+\only<handout>{
+  \pgfpagesuselayout{4 on 1}[letterpaper,border shrink=5mm,landscape]
+}
+
 \newtoggle{notes}
-%\toggletrue{notes}
+%\only<beamer>{\toggletrue{notes}}
 
 % add notes:
 \iftoggle{notes}{
   \makeatletter
   \def\beamer@framenotesbegin{% at beginning of slide
+    %\gdef\beamer@noteitems{}%
+    %\gdef\beamer@notes{}%
     \usebeamercolor[fg]{normal text}
-    \gdef\beamer@noteitems{}%
-    \gdef\beamer@notes{}%
   }
   \makeatother
   \setbeamertemplate{note page}[plain]
+  \setbeamerfont{note page}{size=\footnotesize}
   \setbeameroption{show notes on second screen=right}
 }{}
 
 \newtoggle{labdemo}
-\toggletrue{labdemo}
+%\toggletrue{labdemo}
 \newtoggle{TODO}
 %\toggletrue{TODO}
 
@@ -124,11 +130,15 @@ Low-level software:
 \begin{frame}{Abstract interpretation}
   \begin{itemize}[<+->]
   \item Introduced by Cousot and Cousot in 1977 for a flow-chart language \footcite{cousot1977abstract}
-  \item Deep connections to math, correct by construction \footcite{cousot1979systematic}
+  \item Can be designed systematically using math\footcite{cousot1979systematic}
   \item Expanded to be used with different kinds of semantics \footcite{schmidt1998trace,schmidt2009abstract,van2010abstracting,van2012systematic}
   \item General idea: Create an \emph{abstract} interpreter that
     overapproximates the \emph{concrete} interpreter's behavior
     soundly (captures all behavior)
+    \begin{itemize}
+    \item and abstract interpreter terminates 
+    \end{itemize}
+
   \end{itemize}
 \end{frame}
 
@@ -274,12 +284,6 @@ $$
         \gamma(o) & = \{z \in \mathbb{Z} \mid z \text{ odd} \} \\
         \gamma(e) & = \{z \in \mathbb{Z} \mid z \text{ even} \}}
       \end{align*}\vspace{-2em}
-    \item<5-> $\alpha$ and $\gamma$ are \emph{sound}: we don't leave anything behind when we go abstract then come back to the concrete
-    \item<6-> $\alpha$ and $\gamma$ are kind of like inverses, though
-      there is some information loss\vspace{-0.6em}
-    \item<7-> oftentimes $\alpha$ is chosen to be the \emph{best possible} function to pair
-      with $\gamma$ in a certain sense\vspace{-0.6em}
-    \item<8-> This relationship is known as a \alert{\emph{Galois Connection}}
     \end{itemize}
   \end{column}
   \begin{column}{0.25\textwidth}
@@ -294,12 +298,19 @@ $$
         \draw(top)--(o)--(bot);
         \draw(top)--(e)--(bot);
       \end{tikzpicture}\\[0.5em]
-      
-      \onslide<3->{$\alert<4>{\alpha(4) + \alpha(-7) = e + o = o}$}
-      \caption{\small The $\mathit{Parity}$ domain}
+      \onslide<3->{$\alert<3>{\alpha(4) + \alpha(-7) = e + o = o}$}
+      \caption{\footnotesize $\mathit{Parity}$ domain}
     \end{figure}
   \end{column}
-  \end{columns}
+\end{columns}\vspace{-1em}
+\begin{itemize}
+    \item<5-> $\alpha$ and $\gamma$ are \emph{sound}: we don't leave anything behind when we go abstract then come back to the concrete
+    \item<6-> $\alpha$ and $\gamma$ are kind of like inverses, though
+      there is some information loss
+    \item<7-> oftentimes $\alpha$ is chosen to be the \emph{best possible} function to pair
+      with $\gamma$ in a certain sense
+    \item<8-> This relationship is known as a \alert{\emph{Galois Connection}}
+\end{itemize}
 \end{frame}
 \endgroup
 
@@ -356,42 +367,42 @@ $$
   \begin{itemize}[<+->]
   \item Run the concrete machine and the abstract machine in lockstep
   \item Taking a step in both \abscolor{abstract} and \concolor{concrete} machines should result in a new \emph{safe} pair of states
-    \uncover<6->{\alert<6>{($\alpha \circ F \sqsubseteq \abst{F} \circ \alpha$)}}
+    \uncover<6->{\alert<7>{($\alpha \circ F \sqsubseteq \abst{F} \circ \alpha$)}}
   \begin{tightcenter}
     \begin{tikzcd}[execute at end picture={
         \only<beamer>{
-      \onslide<2>{\node(o1)[fill=gray,opacity=0.1,fit=(ea.north west) (eb.north east) (eb.south east) (ea.south west)]{};}
-      \onslide<3>{\node(o2)[fill=gray,opacity=0.1,fit=(aa.south west) (ea.north east)]{};}
-      \onslide<4>{\fill[gray,opacity=0.1] (aa.north west) -- (ab.north east) -- (ab.south east) -- (aa.south west) -- cycle;}
-      \onslide<5>{\node(o3)[fill=gray,opacity=0.1,fit=(ab.south west) (eb.north east)]{};}
+      \onslide<3>{\node(o1)[fill=gray,opacity=0.1,fit=(ea.north west) (eb.north east) (eb.south east) (ea.south west)]{};}
+      \onslide<4>{\node(o2)[fill=gray,opacity=0.1,fit=(aa.south west) (ea.north east)]{};}
+      \onslide<5>{\fill[gray,opacity=0.1] (aa.north west) -- (ab.north east) -- (ab.south east) -- (aa.south west) -- cycle;}
+      \onslide<6>{\node(o3)[fill=gray,opacity=0.1,fit=(ab.south west) (eb.north east)]{};}
       }
     },ampersand replacement=\&]
-       \& |[alias=ea]| \concolor{\varsigma } \arrow[r, squiggly] \arrow[dd, "\alpha", dotted] \& |[alias=eb]| \concolor{\varsigma'  \arrow[d, "\alpha", dotted]} \\
-    \&  \& \abscolor{\alpha(\varsigma') } \arrow[d, "\sqsubseteq", dashed] \\
-      \& |[alias=aa]| \abscolor{\alpha(\varsigma) } \arrow[r, squiggly] \& |[alias=ab]| \abscolor{\alpha(\varsigma)' }
+       \& |[alias=ea]| \concolor{\alt<3->{\varsigma}{x \mapsto 6}} \arrow[r, "\alt<3->{F}{x := x / 2}", squiggly] \arrow[dd, "\alpha", dotted] \& |[alias=eb]| \concolor{\alt<3->{\varsigma'}{x \mapsto 3} \arrow[d, "\alpha", dotted]} \\
+    \&  \& \abscolor{\alt<3->{\alpha(\varsigma')}{x \mapsto o} } \arrow[d, "\sqsubseteq", dashed] \\
+      \& |[alias=aa]| \abscolor{\alt<3->{\alpha(\varsigma)}{x \mapsto e}} \arrow[r,  "\alt<3->{\abst{F}}{x := x / 2}", squiggly] \& |[alias=ab]| \abscolor{\alt<3->{\alpha(\varsigma)'}{x \mapsto \top} }
     \end{tikzcd}
     \only<beamer>{
     \begin{tikzpicture}[remember picture, overlay,
       every node/.append style = { align = center, minimum height = 10pt,fill=gray,opacity=0.1,text opacity=1}]
-      \onslide<2>{\node[left=6cm, text width=4cm](){\textcolor{gray}{\textsf{\footnotesize Program executing state $\varsigma$ transitions to state $\varsigma'$}}};}
+      \onslide<3>{\node[left=6cm, text width=4cm](){\textcolor{gray}{\textsf{\footnotesize Program executing state $\varsigma$ transitions to state $\varsigma'$}}};}
 
-      \onslide<3>{\node[left=6cm, text width=4cm](){\textcolor{gray}{\textsf{\footnotesize $\alpha(\varsigma)$ abstracts $\varsigma$}}};}
+      \onslide<4>{\node[left=6cm, text width=4cm](){\textcolor{gray}{\textsf{\footnotesize $\alpha(\varsigma)$ abstracts $\varsigma$}}};}
 
-      \onslide<4>{\node[left=6cm, text width=4cm](){\textcolor{gray}{\textsf{\footnotesize Abstract state $\alpha(\varsigma)$ transitions to $\alpha(\varsigma)'$}}};}
+      \onslide<5>{\node[left=6cm, text width=4cm](){\textcolor{gray}{\textsf{\footnotesize Abstract state $\alpha(\varsigma)$ transitions to $\alpha(\varsigma)'$}}};}
 
-      \onslide<5>{\node[left=6cm, text width=4cm](){\textcolor{gray}{\textsf{\footnotesize $\alpha(\varsigma)'$ covers $\alpha(\varsigma')$ thus is a safe counterpart for $\varsigma'$}}};}
+      \onslide<6>{\node[left=6cm, text width=4cm](){\textcolor{gray}{\textsf{\footnotesize $\alpha(\varsigma)'$ covers $\alpha(\varsigma')$ thus is a safe counterpart for $\varsigma'$}}};}
     \end{tikzpicture}
     }
    \end{tightcenter}
 
    \vspace{-1em}
-   \item<7> By induction, starting from an initially-safe pair of states we will soundly cover every possible path through the program
+   \item<8> By induction, starting from an initially-safe pair of states we will soundly cover every possible path through the program
  \end{itemize}
 \end{frame}
 
 \begin{frame}{Computing fixpoints\footcite{kleene_stephen_cole_introduction_1952,tarski1955lattice,cousot1979constructive}}
   \begin{columns}
-    \begin{column}{0.75\textwidth}
+    \begin{column}{0.8\textwidth}
       \begin{thm}[Kleene-Tarski fixed point theorem]
         If $L$ is a complete lattice and $F: L \monarrow L$ then $\forall x \in L$, $\lfp_x F$ exists and
         \[
@@ -399,9 +410,9 @@ $$
         \]
       \end{thm}
 
-      \uncover<3->{Moreover, if $L$ is Noetherian (has no infinite ascending chains), $\exists n. \lfp_x F = x \sqcup F(x) \sqcup F(F(x)) \sqcup \ldots \sqcup F^n(x)$.}
+      \uncover<3->{Moreover, if $L$ is Noetherian (has no infinite chains), $\exists n. \lfp_x F = x \sqcup F(x) \sqcup F(F(x)) \sqcup \ldots \sqcup F^n(x)$.}
     \end{column}
-    \begin{column}{0.25\textwidth}
+    \begin{column}{0.2\textwidth}\footnotesize
       \begin{tikzcd}
         \alert<2>{x^* = F(x^*)} \\
         \vdots \arrow[u, no head] \\
@@ -434,7 +445,7 @@ $$
     \end{exampleblock}
     }
 \end{column}
-\begin{column}{0.2\textwidth}\tiny
+\begin{column}{0.2\textwidth}\footnotesize
   \begin{onlyenv}<beamer>
     \begin{onlyenv}<-2>
     \[\begin{tikzcd}[ampersand replacement=\&]
@@ -444,7 +455,7 @@ $$
       \alert<1>{a_1} \arrow[u, no head] \&
     \end{tikzcd}\]
   \end{onlyenv}
-  \end{onlyenv}
+  \end{onlyenv}\tiny
   \begin{onlyenv}<3->
     \begin{tikzcd}[ampersand replacement=\&]
       \& \alert<4>{w_n}=w_{n-1} \widen a_n \\
@@ -668,7 +679,7 @@ $$
         \centering
         
       \only<beamer>{\multiinclude[<+>][start=1,format=pdf,graphics={height=0.3\textheight}]{fig/state-partitioning}}
-      \only<handout>{\includegraphics[height=0.9\textheight]{fig/state-partitioning-2.pdf}}
+      \only<handout>{\includegraphics[height=0.3\textheight]{fig/state-partitioning-2.pdf}}
       
       \caption{Splitting happens only if it leads to partitioning outgoing edges}
     \end{figure}
@@ -687,7 +698,7 @@ $$
     \item Partition the state space based on the state of threads (waiting on a lock $l$, yielding, ready) and state of locks (held by thread $t$, free)
     \item Refine interactions of threads by throwing away impossible configurations
     \end{itemize}
-  \item Automatically extracting branch conditionals and using binary decision trees to partition state space\footcite{chen2015binary}
+  \item Automatically extracting branch conditionals from CFG to construct binary decision trees to partition state space\footcite{chen2015binary}
   \end{itemize}
 \end{frame}
 
@@ -823,7 +834,7 @@ $$
 \appendix
 
 \begin{frame}{SIMPL\footnote{simple introductory made-up programming language} Syntax}
-  \vspace{-2em}
+  \vspace{-2em}\only<handout>{\usebeamercolor*[fg]{normal text}}
   \small
   \begin{gather*}
     x,f \in \Var,\, b \in \bools,\, n \in \zahlen,\, \oplus \in \ns{BinOp},\,\Value = \bools \disunion \zahlen
