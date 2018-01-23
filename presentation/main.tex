@@ -691,12 +691,12 @@ $$
 
 \begin{frame}{Other methods for partitioning the state}
   \begin{itemize}[<+->]
-  \item Partitioning transfer functions of automata with Booleans and integers by representing the functions as a MTBDD\footcite{jeannet_representing_2002}
+  \item Partitioning transfer functions of programs with Booleans and integers by representing the functions as a MTBDD\footcite{jeannet_representing_2002}
   \item Extending an abstract interpreter for sequential programs to parallel programs\footcite{mine2011static}
     \begin{itemize}
     \item Restrictions: threads and locks are statically known, reasonable for control~programs
-    \item Partition the state space based on the state of threads (waiting on a lock $l$, yielding, ready) and state of locks (held by thread $t$, free)
-    \item Refine interactions of threads by throwing away impossible configurations
+    \item Partition the state space based on the state of threads (waiting on a lock~$l$, yielding, ready) and locks (held by thread~$t$, free)
+    \item Refine interactions of threads by ignoring impossible interferences
     \end{itemize}
   \item Automatically extracting branch conditionals from CFG to construct binary decision trees to partition state space\footcite{chen2015binary}
   \end{itemize}
