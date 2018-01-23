@@ -638,7 +638,7 @@ $$
   \note{we did the simple example, now we are ready for the complex one}
 \end{frame}
 
-\subsection{Dynamic state partitioning}
+\subsection{State partitioning}
 \begin{frame}{Partitioning the state of control programs}\small
   \todo{try giving an example or simplifying this in general}
   \begin{itemize}[<+->]
@@ -681,7 +681,7 @@ $$
       \only<beamer>{\multiinclude[<+>][start=1,format=pdf,graphics={height=0.3\textheight}]{fig/state-partitioning}}
       \only<handout>{\includegraphics[height=0.3\textheight]{fig/state-partitioning-2.pdf}}
       
-      \caption{Splitting happens only if it leads to partitioning outgoing edges}
+      \caption{Splitting happens only if it partitions outgoing edges}
     \end{figure}
 
     \end{column}
@@ -691,7 +691,7 @@ $$
 
 \begin{frame}{Other methods for partitioning the state}
   \begin{itemize}[<+->]
-  \item Partitioning transfer functions of programs with Booleans and integers by representing the functions as a MTBDD\footcite{jeannet_representing_2002}
+  \item Partitioning transfer functions of programs with Booleans and integers\footcite{jeannet_representing_2002}
   \item Extending an abstract interpreter for sequential programs to parallel programs\footcite{mine2011static}
     \begin{itemize}
     \item Restrictions: threads and locks are statically known, reasonable for control~programs
@@ -1123,10 +1123,10 @@ static void main(String[] args) {
   \end{itemize}
 \end{frame}
 
-\begin{frame}{Partitioning transfer functions of automata with heterogeneous types}
+\begin{frame}{Partitioning transfer functions of programs with heterogeneous types}
   \small
   \begin{itemize}
-  \item Jeannet\footcite{jeannet_representing_2002} proposes a method for partitioning transfer functions of automata with Booleans and integers
+  \item Jeannet\footcite{jeannet_representing_2002} proposes a method for partitioning transfer functions of programs with Booleans and integers
   \item He represents the transfer function as a multi-terminal binary decision diagram (MTBDD) where the terminals contain the primitive relations for each type
   \item He considers 3 methods to abstract the MTBDDs:
     \begin{enumerate}
