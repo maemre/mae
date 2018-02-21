@@ -1,0 +1,79 @@
+#+TITLE: Mehmet's MAE: Abstract Interpretation of Low-level Programs
+#+AUTHOR: Mehmet Emre
+#+OPTIONS: toc:nil
+#+LATEX_HEADER: \usepackage[margin=1in]{geometry}
+#+latex_header: \usepackage[backend=bibtex,style=numeric,citestyle=authoryear-ibid]{biblatex}
+#+latex_header: \addbibresource{mae.bib}
+#+latex_header: \input{preamble.tex}
+
+#+BEGIN_abstract
+My major area exam will cover abstract interpretation, and two approaches of using it to verify properties of different kinds of low-level programs: predicate abstraction to verify temporal properties related to API usage of low-level software, and combination of domains to verify properties of numerically heavy low-level control software.
+#+END_abstract
+
+* COMMENT The motivation
+** Examples
+*** ASTRÉE
+We want to verify certain properties of low-level avionics software that is on the order of 100K lines of C code with few to no false alarms. An analysis meeting such precision and scalability requirements needs the following:
+ + New abstract domains to capture some specific relationships in target domain (avionics software), such as abstract domains aware of the clock or abstract domains for floating point numbers.
+ + Ability to refine current domains based on counter-examples or false alarms to tune the precision.
+*** Device drivers (SLAM and BLAST)
+We want to verify temporal safety of device drivers written in C. The software is generally infinite-state, so we want to abstract them to get finite state machine abstractions to run model checking on them. Predicate abstraction provides a useful domain here to generate abstracted programs automatically. Counter-example guided refinement automates the analysis further by automatically refining the abstraction by introducing new predicates.
+*** COMMENT Security signature inference for addons (JSAI)
+We want to see if web browser addons possibly leak sensitive information and the definition of "leaking" changes on a case-by-case basis so we want to extract a signature of a browser addon written in JavaScript. We need to solve certain problems to achieve that:
++ JavaScript is a highly dynamic language with prototype-based OOP: The analysis needs to choose among different context sensitivities. This motivates widening for control flow.
++ We need to distinguish array accesses and special property accesses from ordinary accesses to achieve precision, this requires designing different kinds of abstract domains.
++ We are interested in which websites an addon sends information to, this requires inventing string abstract domains that can preserve this information (e.g. string prefix domain).
+
+* Abstract interpretation
+This section is intended to go over foundations of abstract interpretation and some recent work applicable to abstract interpretation in general.
+ 1. fullcite:tarski1955lattice
+ 2. fullcite:cousot1977abstract
+ 3. fullcite:cousot1979systematic
+ 4. fullcite:cousot1979constructive
+ 5. fullcite:shivers1991control
+ 6. fullcite:cousot92comparing
+    # 7. fullcite:jagannathan1997type
+ 7. fullcite:schmidt1998trace
+ 8. fullcite:might2006improving
+ 9. fullcite:schmidt2009abstract
+ 10. fullcite:van2010abstracting
+   # 11. fullcite:van2012systematic
+ 11. fullcite:sergey2013monadic
+ 12. fullcite:hardekopf2014widening
+ 13. fullcite:darais2015galois
+
+* Predicate abstraction and abstraction refinement
+This section is intended to cover predicate abstraction, abstraction refinement, and their applications to verifying usage of APIs in low-level software like device drivers.
+ 1. fullcite:clarke1994model
+ 2. fullcite:graf1997construction
+ 3. fullcite:schmidt1998data
+ 4. fullcite:schmidt1998program
+ 5. fullcite:ball2001automatic
+ 6. fullcite:ball2001automatically
+ 7. fullcite:henzinger2002lazy
+ 8. fullcite:clarke2003counterexample
+ 9. fullcite:mcmillan2006lazy
+ 10. fullcite:gulavani2006counterexample
+ 11. fullcite:podelski2007armc
+ 12. fullcite:gulavani2008automatically
+
+* Static analysis of control software
+This section is intended to cover techniques developed/used for analysis of low-level control software like avionics software using abstract interpretation.
+ 1. fullcite:cousot1978automatic
+ 2. fullcite:bultan_model-checking_1999
+ 3. fullcite:bultan_composite_2000
+ 4. fullcite:jeannet_representing_2002
+ 5. fullcite:mine2004weakly
+ 6. fullcite:feret2005arithmetic
+ 7. fullcite:cousot2005astree
+ 8. fullcite:cousot2006combination
+ 9. fullcite:cousot2007varieties
+ 10. fullcite:logozzo2010pentagons
+ 11. fullcite:mine2011static
+ 12. fullcite:cousot2011reduced
+ 13. fullcite:venet2012gauge
+ 14. fullcite:chen2015binary
+
+# \printbibliography
+
+# bibliography:mae.bib

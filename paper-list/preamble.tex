@@ -1,0 +1,19 @@
+\renewbibmacro*{cite:labelyear+extrayear}{%
+\iffieldundef{labelyear}
+{}
+{\printtext[bibhyperref]{%
+\iffieldundef{origyear}{}{\printfield{origyear}\addslash}%   <--- added
+\printfield{labelyear}%
+\printfield{extrayear}}}}
+
+\renewbibmacro*{date+extrayear}{%
+\iffieldundef{year}
+{}
+{\printtext[parens]{%
+\iffieldundef{origyear}{}{\printfield{origyear}\addslash}%  <--- added
+\printdateextra}}}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "mae"
+%%% End:
